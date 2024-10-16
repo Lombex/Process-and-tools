@@ -1,11 +1,7 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using WarehouseAPI.Models;
+using CSharpAPI.Models;
 
-namespace WarehouseAPI.Service
+namespace CSharpAPI.Service
 {
     public class WarehouseService : IWarehouseService
     {

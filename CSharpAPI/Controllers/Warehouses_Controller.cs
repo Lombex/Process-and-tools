@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using WarehouseAPI.Models;
-using WarehouseAPI.Service;
 
-namespace WarehouseAPI.Controller
+using Microsoft.AspNetCore.Mvc;
+using CSharpAPI.Models;
+using CSharpAPI.Service;
+
+namespace CSharpAPI.Controller
 {
-    [Route("api/warehouse")]
+    [Route("api/v1/warehouses")]
     [ApiController]
     public class WarehousesController : ControllerBase
     {
@@ -52,7 +52,7 @@ namespace WarehouseAPI.Controller
             if (!updated)
                 return NotFound($"Warehouse with id {id} not found.");
 
-            return NoContent(); // 204 No Content
+            return Ok("Warehouse has been updated"); // 204 No Content
         }
 
         [HttpDelete("{id}")]
@@ -62,7 +62,7 @@ namespace WarehouseAPI.Controller
             if (!deleted)
                 return NotFound($"Warehouse with id {id} not found.");
 
-            return NoContent(); // 204 No Content
+            return Ok("Warehouse has been deleted"); // 204 No Content
         }
     }
 }
