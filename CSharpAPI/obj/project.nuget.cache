@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "gjAxwlBTaGRpdnIdJmxb6TBKsiEtGlStGNxPFPZEmaS8k9wfyQ+3ZwvQh497NHu4Mcpp6uCFrmmw6BLBvJDNTw==",
+  "dgSpecHash": "YGWX1HAG9EAyq//aGL7uuJofDLGoHRGfXsjfaM+aS6ddROx20IXGCDFga1+XR3JeQ03STXE6qXzegSbdwvsrWg==",
   "success": true,
-  "projectFilePath": "/Users/steynhellendoorn/Informatica jaar twee (deel 2)/Software-construction/MainBranch_zonderC#/Software-Construction/CSharpAPI/CSharpAPI.csproj",
+  "projectFilePath": "/Users/steynhellendoorn/Informatica jaar twee (deel 2)/Software-construction/Development_branch/Software-Construction/CSharpAPI/CSharpAPI.csproj",
   "expectedPackageFiles": [
     "/Users/steynhellendoorn/.nuget/packages/entityframework/6.4.4/entityframework.6.4.4.nupkg.sha512",
     "/Users/steynhellendoorn/.nuget/packages/microsoft.csharp/4.7.0/microsoft.csharp.4.7.0.nupkg.sha512",
