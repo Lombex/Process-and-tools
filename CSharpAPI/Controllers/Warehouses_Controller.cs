@@ -39,7 +39,7 @@ namespace CSharpAPI.Controller
                 return BadRequest("Warehouse is null.");
 
             _warehouseService.AddWarehouse(warehouse);
-            return CreatedAtAction(nameof(Get), new { id = warehouse.Id }, warehouse);
+            return CreatedAtAction(nameof(Get), new { id = warehouse.id }, warehouse);
         }
 
         [HttpPut("{id}")]

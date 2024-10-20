@@ -3,23 +3,23 @@ namespace CSharpAPI.Models
 {
     public class Warehouse
     {
-        public int Id { get; set; }
-        public string? Code { get; set; }
-        public string? Name { get; set; }
-        public string? Address { get; set; }
-        public string? Zip { get; set; }
-        public string? City { get; set; }
-        public string? Province { get; set; }
-        public string? Country { get; set; }
-        public Contact? Contact { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public int id { get; set; }
+        public string? code { get; set; }
+        public string? name { get; set; }
+        public string? address { get; set; }
+        public string? zip { get; set; }
+        public string? city { get; set; }
+        public string? province { get; set; }
+        public string? country { get; set; }
+        public Contact? contact { get; set; }
+        public DateTime created_at { get; set; }
+        public DateTime updated_at { get; set; }
     }
 
     public class Contact
     {
-        public string? Name { get; set; }
-        public string? Phone { get; set; }
-        public string? Email { get; set; }
+        public string? name { get; set; }
+        public string? phone { get; set; }
+        public string? email { get; set; }
     }
 }

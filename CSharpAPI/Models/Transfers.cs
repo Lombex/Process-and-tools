@@ -5,19 +5,13 @@ namespace CSharpAPI.Models
 {
     public class Transfer
     {
-        public int Id { get; set; }
-        public string? Reference { get; set; }
-        public int? TransferFrom { get; set; }  // Nullable to allow null values
-        public int TransferTo { get; set; }
-        public string? TransferStatus { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }  // Nullable to allow null values
-        public List<TransferItem>? Items { get; set; }
-    }
-
-    public class TransferItem
-    {
-        public string? ItemId { get; set; }
-        public int Amount { get; set; }
+        public int id { get; set; }
+        public string? reference { get; set; }
+        public int? transfer_from { get; set; } 
+        public int transfer_to { get; set; }
+        public string? transfer_status { get; set; }
+        public DateTime created_at { get; set; }
+        public DateTime? updated_at { get; set; } 
+        public List<Items>? items { get; set; }
     }
 }

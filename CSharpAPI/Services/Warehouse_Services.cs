@@ -29,15 +29,12 @@ namespace CSharpAPI.Service
             }
         }
 
-        public Warehouse GetWarehouseById(int id)
-        {
-            return GetAllWarehouses().FirstOrDefault(w => w.Id == id);
-        }
-
+        public Warehouse GetWarehouseById(int id) => GetAllWarehouses().FirstOrDefault(w => w.id == id);
+            
         public void AddWarehouse(Warehouse newWarehouse)
         {
             var warehouses = GetAllWarehouses();
-            newWarehouse.Id = warehouses.Count > 0 ? warehouses.Max(w => w.Id) + 1 : 1; // Auto increment ID
+            newWarehouse.id = warehouses.Count > 0 ? warehouses.Max(w => w.id) + 1 : 1; // Auto increment ID
             warehouses.Add(newWarehouse);
             SaveWarehouses(warehouses);
         }
@@ -45,21 +42,21 @@ namespace CSharpAPI.Service
         public bool UpdateWarehouse(int id, Warehouse updatedWarehouse)
         {
             var warehouses = GetAllWarehouses();
-            var existingWarehouse = warehouses.FirstOrDefault(w => w.Id == id);
+            var existingWarehouse = warehouses.FirstOrDefault(w => w.id == id);
 
             if (existingWarehouse == null)
                 return false;
 
-            existingWarehouse.Code = updatedWarehouse.Code;
-            existingWarehouse.Name = updatedWarehouse.Name;
-            existingWarehouse.Address = updatedWarehouse.Address;
-            existingWarehouse.Zip = updatedWarehouse.Zip;
-            existingWarehouse.City = updatedWarehouse.City;
-            existingWarehouse.Province = updatedWarehouse.Province;
-            existingWarehouse.Country = updatedWarehouse.Country;
-            existingWarehouse.Contact = updatedWarehouse.Contact;
-            existingWarehouse.CreatedAt = updatedWarehouse.CreatedAt;
-            existingWarehouse.UpdatedAt = updatedWarehouse.UpdatedAt;
+            existingWarehouse.code = updatedWarehouse.code;
+            existingWarehouse.name = updatedWarehouse.name;
+            existingWarehouse.address = updatedWarehouse.address;
+            existingWarehouse.zip = updatedWarehouse.zip;
+            existingWarehouse.city = updatedWarehouse.city;
+            existingWarehouse.province = updatedWarehouse.province;
+            existingWarehouse.country = updatedWarehouse.country;
+            existingWarehouse.contact = updatedWarehouse.contact;
+            existingWarehouse.created_at = updatedWarehouse.created_at;
+            existingWarehouse.updated_at = updatedWarehouse.updated_at;
 
             SaveWarehouses(warehouses);
             return true;
@@ -68,7 +65,7 @@ namespace CSharpAPI.Service
         public bool DeleteWarehouse(int id)
         {
             var warehouses = GetAllWarehouses();
-            var warehouseToDelete = warehouses.FirstOrDefault(w => w.Id == id);
+            var warehouseToDelete = warehouses.FirstOrDefault(w => w.id == id);
 
             if (warehouseToDelete == null)
                 return false;
