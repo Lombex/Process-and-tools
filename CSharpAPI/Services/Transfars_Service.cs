@@ -6,14 +6,14 @@ namespace CSharpAPI.Service {
     public class TransferSerivce : ITransfersService {
         private readonly string dummydata = "data/transfer.json";
 
-        public List<Transfer> GetAllTransfers() {
-            if (!File.Exists(dummydata)) return new List<Transfer>();
-            return JsonConvert.DeserializeObject<List<Transfer>>(File.ReadAllText(dummydata)) ?? new List<Transfer>();
+        public List<TransferModel> GetAllTransfers() {
+            if (!File.Exists(dummydata)) return new List<TransferModel>();
+            return JsonConvert.DeserializeObject<List<TransferModel>>(File.ReadAllText(dummydata)) ?? new List<TransferModel>();
 
             // still returns our dummy data
         }
 
-        public Transfer GetTransferById(int id) {
+        public TransferModel GetTransferById(int id) {
             var _transfer = GetAllTransfers().FirstOrDefault(x => x.id == id);
             if (_transfer == null) throw new Exception("This Transfer does not exits!");
             return _transfer;
@@ -26,7 +26,7 @@ namespace CSharpAPI.Service {
             return _transfer.items;
         }
 
-        public bool UpdateTransfer(int id, Transfer updateTransfer) {
+        public bool UpdateTransfer(int id, TransferModel updateTransfer) {
             var _transfer = GetAllTransfers().FirstOrDefault(x => x.id == id);
             if (_transfer == null) return false;
 
@@ -44,7 +44,7 @@ namespace CSharpAPI.Service {
             return true;
         }
 
-        public void CreateTransfer(Transfer transfer) {
+        public void CreateTransfer(TransferModel transfer) {
             var AllTransfers = GetAllTransfers();
             transfer.id = AllTransfers.Count > 0 ? AllTransfers.Max(x => x.id) + 1 : 1;
             AllTransfers.Add(transfer);
@@ -64,13 +64,13 @@ namespace CSharpAPI.Service {
     }
 
     public interface ITransfersService {
-        List<Transfer> GetAllTransfers();
-        Transfer GetTransferById(int id);
+        List<TransferModel> GetAllTransfers();
+        TransferModel GetTransferById(int id);
         List<Items> GetItemFromTransferId(int id);
-        bool UpdateTransfer(int id, Transfer updateTransfer);
+        bool UpdateTransfer(int id, TransferModel updateTransfer);
 
         // commit => CommitTransfer();
-        void CreateTransfer(Transfer transfer);
+        void CreateTransfer(TransferModel transfer);
         bool DeleteTransfer(int id);
     }
 }

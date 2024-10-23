@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CSharpAPI.Models
 {
-    public class Transfer
+    public class TransferModel
     {
         public int id { get; set; }
         public string? reference { get; set; }

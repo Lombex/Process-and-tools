@@ -32,7 +32,7 @@ namespace CSharpAPI.Controller {
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateTransfer(int id, [FromBody] Transfer transfer) {
+        public IActionResult UpdateTransfer(int id, [FromBody] TransferModel transfer) {
             if (transfer == null) return BadRequest("Request is empty!");
             var updatedTransfer = _transferSerivces.UpdateTransfer(id, transfer);
             if (!updatedTransfer) return NotFound($"Transfer with id {id} not found.");
@@ -40,7 +40,7 @@ namespace CSharpAPI.Controller {
         }
 
         [HttpPost]
-        public IActionResult CreateTransfer([FromBody] Transfer transfer) {
+        public IActionResult CreateTransfer([FromBody] TransferModel transfer) {
             if (transfer == null) return BadRequest("Request is empty!");
             _transferSerivces.CreateTransfer(transfer);
             return CreatedAtAction(nameof(GetTransferById), new { id = transfer.id}, transfer);

@@ -13,16 +13,13 @@ namespace CSharpAPI.Models
         public string? shipping_notes { get; set; }
         public string? picking_notes { get; set; }
         public int warehouse_id { get; set; }
-
-        // ship_to { get; set; }
-        // bill_to { get; set; }
-
+        public int ship_to { get; set; }
+        public int bill_to { get; set; }
         public int shipment_id { get; set; }
         public float total_amount { get; set; }
         public float total_discount { get; set; }
         public float total_tax { get; set; }
         public float total_surcharge { get; set; }
-
         public DateTime created_at { get; set; }
         public DateTime updated_at { get; set; }
         public List<Items>? items { get; set; }
