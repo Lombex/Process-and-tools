@@ -2,7 +2,7 @@ name: CI/CD Workflow
 
 on:
   push:
-    branches: ["Testingbranch"]
+    branches: ["CICDTestingBranch"]
 
 jobs:
   build:
