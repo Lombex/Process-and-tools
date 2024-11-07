@@ -1,13 +1,5 @@
 [
   {
-    "id": 1,
-    "name": "Updated Group",
-    "description": "Updated Group Description",
-    "itemtype_id": 1,
-    "created_at": "2024-11-07T14:23:57.81638Z",
-    "updated_at": "2024-11-07T14:24:30.183738Z"
-  },
-  {
     "id": 2,
     "name": "Test Group",
     "description": "Test Group Description",
@@ -22,5 +14,21 @@
     "itemtype_id": 1,
     "created_at": "2024-11-07T14:24:39.224831Z",
     "updated_at": "2024-11-07T14:24:39.224831Z"
+  },
+  {
+    "id": 4,
+    "name": "kaas Group",
+    "description": "Test Group Description",
+    "itemtype_id": 1,
+    "created_at": "2024-11-07T21:27:16.109653Z",
+    "updated_at": "2024-11-07T21:27:16.109653Z"
+  },
+  {
+    "id": 5,
+    "name": "kaas Group",
+    "description": "Test Group Description",
+    "itemtype_id": 1,
+    "created_at": "2024-11-07T21:39:43.931427Z",
+    "updated_at": "2024-11-07T21:39:43.931427Z"
   }
 ]

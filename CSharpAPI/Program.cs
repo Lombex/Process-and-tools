@@ -12,7 +12,9 @@ builder.Services.AddSingleton<IWarehouseService, WarehouseService>();
 builder.Services.AddSingleton<IItemTypeService, ItemTypeService>();
 builder.Services.AddSingleton<IItemGroupService, ItemGroupService>();
 builder.Services.AddSingleton<IItemLineService, ItemLineService>();
-builder.Services.AddSingleton<ITransfersService, TransferSerivce>();
+// builder.Services.AddSingleton<ITransfersService, TransferSerivce>();
+builder.Services.AddSingleton<IShipmentService, ShipmentService>();
+builder.Services.AddSingleton<ILocationService, LocationService>();
 
 // Add CORS
 builder.Services.AddCors(options =>
