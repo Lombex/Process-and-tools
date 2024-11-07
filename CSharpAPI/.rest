@@ -1,2 +1,104 @@
 GET http://localhost:5001/
 ###
+@baseUrl = http://localhost:5001/api/v1
+
+### ItemTypes ###
+
+### Get all item types
+GET {{baseUrl}}/itemtypes
+Accept: application/json
+
+### Get single item type
+GET {{baseUrl}}/itemtypes/1
+Accept: application/json
+
+### Create item type
+POST {{baseUrl}}/itemtypes
+Content-Type: application/json
+
+{
+    "name": "Test Type",
+    "description": "Test Type Description"
+}
+
+### Update item type
+PUT {{baseUrl}}/itemtypes/1
+Content-Type: application/json
+
+{
+    "name": "Updated Type",
+    "description": "Updated Type Description"
+}
+
+### Delete item type
+DELETE {{baseUrl}}/itemtypes/1
+
+### ItemGroups ###
+
+### Get all item groups
+GET {{baseUrl}}/itemgroups
+Accept: application/json
+
+### Get single item group
+GET {{baseUrl}}/itemgroups/1
+Accept: application/json
+
+### Create item group
+POST {{baseUrl}}/itemgroups
+Content-Type: application/json
+
+{
+    "name": "kaas Group",
+    "description": "Test Group Description",
+    "itemtype_id": 1
+}
+
+### Update item group
+PUT {{baseUrl}}/itemgroups/1
+Content-Type: application/json
+
+{
+    "name": "Updated Group",
+    "description": "Updated Group Description",
+    "itemtype_id": 1
+}
+
+### Delete item group
+DELETE {{baseUrl}}/itemgroups/1
+
+### ItemLines ###
+
+### Get all item lines
+GET {{baseUrl}}/itemlines
+Accept: application/json
+
+### Get single item line
+GET {{baseUrl}}/itemlines/1
+Accept: application/json
+
+### Create item line
+POST {{baseUrl}}/itemlines
+Content-Type: application/json
+
+{
+    "name": "Test Line",
+    "description": "Test Line Description",
+    "itemgroup_id": 1
+}
+
+### Update item line
+PUT {{baseUrl}}/itemlines/1
+Content-Type: application/json
+
+{
+    "name": "Updated Line",
+    "description": "Updated Line Description",
+    "itemgroup_id": 1
+}
+
+### Delete item line
+DELETE {{baseUrl}}/itemlines/1
+
+### Get item lines by group
+GET {{baseUrl}}/itemlines/bygroup/1
+Accept: application/json
