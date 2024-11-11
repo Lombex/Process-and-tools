@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CSharpAPI.Controllers
 {
     [ApiController]
-    [Route("api/v1/[controller]")]
+    [Route("api/v1/itemgroups")]
     public class ItemGroupsController : ControllerBase
     {
         private readonly IItemGroupService _service;

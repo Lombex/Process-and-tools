@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CSharpAPI.Controllers
 {
     [ApiController]
-[Route("api/v1/[controller]")]
+[Route("api/v1/shipments")]
 public class ShipmentsController : ControllerBase
 {
     private readonly IShipmentService _service;

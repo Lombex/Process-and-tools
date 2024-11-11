@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CSharpAPI.Controller
 {
+    [ApiController]
     [Route("api/v1/suppliers")]
     public class SupplierController : ControllerBase
     {

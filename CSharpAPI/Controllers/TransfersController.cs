@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CSharpAPI.Controller {
     
+    [ApiController]
     [Route("api/v1/transfers")]
     public class TransferController : ControllerBase {
         private readonly ITransfersService _transferSerivces;

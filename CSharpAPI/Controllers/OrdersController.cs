@@ -5,6 +5,7 @@ using System.Security.Cryptography.Xml;
 
 namespace CShartpAPI.Controller
 {
+    [ApiController]
     [Route("api/v1/orders")]
     public class OrdersControllers : ControllerBase
     {

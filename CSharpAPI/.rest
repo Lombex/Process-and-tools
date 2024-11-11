@@ -7,7 +7,7 @@ GET {{baseUrl}}/itemtypes
 Accept: application/json
 
 ### Get single item type
-GET {{baseUrl}}/itemtypes/1
+GET {{baseUrl}}/itemtypes/2
 Accept: application/json
 
 ### Create item type
@@ -112,7 +112,7 @@ GET {{baseUrl}}/locations/1
 Accept: application/json
 
 ### Get locations by warehouse
-GET {{baseUrl}}/locations/warehouse/1
+GET {{baseUrl}}/locations/warehouse/34547
 Accept: application/json
 
 ### Create location
@@ -126,7 +126,7 @@ Content-Type: application/json
 }
 
 ### Update location
-PUT {{baseUrl}}/locations/1
+PUT {{baseUrl}}/locations/34547
 Content-Type: application/json
 
 {
@@ -136,7 +136,7 @@ Content-Type: application/json
 }
 
 ### Delete location
-DELETE {{baseUrl}}/locations/1
+DELETE {{baseUrl}}/locations/34547
 
 ### Shipments ###
 
@@ -193,4 +193,171 @@ Content-Type: application/json
 }
 
 ### Delete shipment
-DELETE {{baseUrl}}/shipments/1
+DELETE {{baseUrl}}/shipments/2
+
+### Items ###
+
+### Get all items
+GET {{baseUrl}}/items
+Accept: application/json
+
+### Get single item
+GET {{baseUrl}}/items/ITEM001
+Accept: application/json
+
+### Get items by line
+GET {{baseUrl}}/items/line/1
+Accept: application/json
+
+### Get items by group
+GET {{baseUrl}}/items/group/1
+Accept: application/json
+
+### Get items by supplier
+GET {{baseUrl}}/items/supplier/1
+Accept: application/json
+
+### Create item
+POST {{baseUrl}}/items
+Content-Type: application/json
+
+{
+    "code": "TEST001",
+    "description": "Test Item",
+    "short_description": "Test",
+    "upc_code": "123456789",
+    "model_number": "MDL001",
+    "commodity_code": "COM001",
+    "item_line": 1,
+    "item_group": 1,
+    "item_type": 1,
+    "unit_purchase_quantity": 1,
+    "unit_order_quantity": 10,
+    "pack_order_quantity": 100,
+    "supplier_id": 1,
+    "supplier_code": "SUP001",
+    "supplier_part_number": "PART001"
+}
+
+### Update item
+PUT {{baseUrl}}/items/ITEM001
+Content-Type: application/json
+
+{
+    "code": "TEST001-UPD",
+    "description": "Updated Test Item",
+    "short_description": "Updated Test",
+    "upc_code": "987654321",
+    "model_number": "MDL001-UPD",
+    "commodity_code": "COM001-UPD",
+    "item_line": 1,
+    "item_group": 1,
+    "item_type": 1,
+    "unit_purchase_quantity": 2,
+    "unit_order_quantity": 20,
+    "pack_order_quantity": 200,
+    "supplier_id": 1,
+    "supplier_code": "SUP001-UPD",
+    "supplier_part_number": "PART001-UPD"
+}
+
+### Delete item
+DELETE {{baseUrl}}/items/ITEM001
+
+### Inventories ###
+
+### Get all inventories
+GET {{baseUrl}}/inventories
+Accept: application/json
+
+### Get single inventory
+GET {{baseUrl}}/inventories/1
+Accept: application/json
+
+### Get inventories by item
+GET {{baseUrl}}/inventories/item/ITEM001
+Accept: application/json
+
+### Get inventories by location
+GET {{baseUrl}}/inventories/location/1
+Accept: application/json
+
+### Create inventory
+POST {{baseUrl}}/inventories
+Content-Type: application/json
+
+{
+    "item_id": "ITEM001",
+    "description": "Test Inventory",
+    "item_reference": "REF001",
+    "locations": [1, 2, 3],
+    "total_on_hand": 100,
+    "total_expected": 50,
+    "total_ordered": 25,
+    "total_allocated": 10,
+    "total_available": 115
+}
+
+### Update inventory
+PUT {{baseUrl}}/inventories/1
+Content-Type: application/json
+
+{
+    "item_id": "ITEM001",
+    "description": "Updated Test Inventory",
+    "item_reference": "REF001-UPD",
+    "locations": [1, 2, 3, 4],
+    "total_on_hand": 200,
+    "total_expected": 75,
+    "total_ordered": 50,
+    "total_allocated": 20,
+    "total_available": 205
+}
+
+### Delete inventory
+DELETE {{baseUrl}}/inventories/1
+
+
+### Get all clients
+GET {{baseUrl}}/clients
+Accept: application/json
+
+### Get single client
+GET {{baseUrl}}/clients/1
+Accept: application/json
+
+### Create client
+POST {{baseUrl}}/clients
+Content-Type: application/json
+
+{
+    "name": "Test Client",
+    "address": "Test Street 123",
+    "city": "Test City",
+    "zip_code": "1234 AB",
+    "province": "Test Province",
+    "country": "Test Country",
+    "contact_name": "John Doe",
+    "contact_phone": "1234567890",
+    "contact_email": "john@test.com"
+}
+
+### Update client
+PUT {{baseUrl}}/clients/1
+Content-Type: application/json
+
+{
+    "id": 1,
+    "name": "Updated Client",
+    "address": "Updated Street 123",
+    "city": "Updated City",
+    "zip_code": "5678 CD",
+    "province": "Updated Province",
+    "country": "Updated Country",
+    "contact_name": "Jane Doe",
+    "contact_phone": "0987654321",
+    "contact_email": "jane@test.com"
+}
+
+### Delete client
+DELETE {{baseUrl}}/clients/1
