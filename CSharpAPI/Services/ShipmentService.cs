@@ -5,10 +5,10 @@ namespace CSharpAPI.Service
 {
    public interface IShipmentService
 {
-    List<ShipmentsModel> GetAll();
-    ShipmentsModel GetById(int id);
-    void Add(ShipmentsModel shipment);
-    bool Update(int id, ShipmentsModel shipment);
+    List<ShipmentModel> GetAll();
+    ShipmentModel GetById(int id);
+    void Add(ShipmentModel shipment);
+    bool Update(int id, ShipmentModel shipment);
     bool Delete(int id);
 }
 
@@ -16,16 +16,16 @@ public class ShipmentService : IShipmentService
 {
     private readonly string dataPath = "data/shipments.json";
 
-    public List<ShipmentsModel> GetAll()
+    public List<ShipmentModel> GetAll()
     {
         if (!File.Exists(dataPath))
-            return new List<ShipmentsModel>();
+            return new List<ShipmentModel>();
 
         var jsonContent = File.ReadAllText(dataPath);
-        return JsonConvert.DeserializeObject<List<ShipmentsModel>>(jsonContent) ?? new List<ShipmentsModel>();
+        return JsonConvert.DeserializeObject<List<ShipmentModel>>(jsonContent) ?? new List<ShipmentModel>();
     }
 
-    public ShipmentsModel GetById(int id)
+    public ShipmentModel GetById(int id)
     {
         var shipment = GetAll().FirstOrDefault(x => x.id == id);
         if (shipment == null)
@@ -33,7 +33,7 @@ public class ShipmentService : IShipmentService
         return shipment;
     }
 
-    public void Add(ShipmentsModel shipment)
+    public void Add(ShipmentModel shipment)
     {
         var items = GetAll();
         shipment.id = items.Count > 0 ? items.Max(x => x.id) + 1 : 1;
@@ -43,7 +43,7 @@ public class ShipmentService : IShipmentService
         SaveToFile(items);
     }
 
-    public bool Update(int id, ShipmentsModel shipment)
+    public bool Update(int id, ShipmentModel shipment)
     {
         var items = GetAll();
         var existing = items.FirstOrDefault(x => x.id == id);
@@ -84,7 +84,7 @@ public class ShipmentService : IShipmentService
         return true;
     }
 
-    private void SaveToFile(List<ShipmentsModel> items)
+    private void SaveToFile(List<ShipmentModel> items)
     {
         var jsonContent = JsonConvert.SerializeObject(items, Formatting.Indented);
         File.WriteAllText(dataPath, jsonContent);

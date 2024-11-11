@@ -16,13 +16,13 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<ItemsModel>> GetAllItems()
+        public ActionResult<IEnumerable<ItemModel>> GetAllItems()
         {
             return Ok(_itemsService.GetAllItems());
         }
 
         [HttpGet("{uid}")]
-        public ActionResult<ItemsModel> GetItemById(string uid)
+        public ActionResult<ItemModel> GetItemById(string uid)
         {
             try
             {
@@ -35,14 +35,14 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult<ItemsModel> CreateItem(ItemsModel item)
+        public ActionResult<ItemModel> CreateItem(ItemModel item)
         {
             _itemsService.CreateItem(item);
             return CreatedAtAction(nameof(GetItemById), new { uid = item.uid }, item);
         }
 
         [HttpPut("{uid}")]
-        public IActionResult UpdateItem(string uid, ItemsModel item)
+        public IActionResult UpdateItem(string uid, ItemModel item)
         {
             if (_itemsService.UpdateItem(uid, item))
                 return NoContent();
@@ -58,19 +58,19 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet("line/{lineId}")]
-        public ActionResult<IEnumerable<ItemsModel>> GetItemsByLineId(int lineId)
+        public ActionResult<IEnumerable<ItemModel>> GetItemsByLineId(int lineId)
         {
             return Ok(_itemsService.GetItemsByLineId(lineId));
         }
 
         [HttpGet("group/{groupId}")]
-        public ActionResult<IEnumerable<ItemsModel>> GetItemsByGroupId(int groupId)
+        public ActionResult<IEnumerable<ItemModel>> GetItemsByGroupId(int groupId)
         {
             return Ok(_itemsService.GetItemsByGroupId(groupId));
         }
 
         [HttpGet("supplier/{supplierId}")]
-        public ActionResult<IEnumerable<ItemsModel>> GetItemsBySupplierId(int supplierId)
+        public ActionResult<IEnumerable<ItemModel>> GetItemsBySupplierId(int supplierId)
         {
             return Ok(_itemsService.GetItemsBySupplierId(supplierId));
         }

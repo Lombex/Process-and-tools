@@ -16,13 +16,13 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<InventoriesModel>> GetAllInventories()
+        public ActionResult<IEnumerable<InventorieModel>> GetAllInventories()
         {
             return Ok(_inventoriesService.GetAllInventories());
         }
 
         [HttpGet("{id}")]
-        public ActionResult<InventoriesModel> GetInventoryById(int id)
+        public ActionResult<InventorieModel> GetInventoryById(int id)
         {
             try
             {
@@ -35,14 +35,14 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult<InventoriesModel> CreateInventory(InventoriesModel inventory)
+        public ActionResult<InventorieModel> CreateInventory(InventorieModel inventory)
         {
             _inventoriesService.CreateInventory(inventory);
             return CreatedAtAction(nameof(GetInventoryById), new { id = inventory.id }, inventory);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateInventory(int id, InventoriesModel inventory)
+        public IActionResult UpdateInventory(int id, InventorieModel inventory)
         {
             if (_inventoriesService.UpdateInventory(id, inventory))
                 return NoContent();
@@ -58,13 +58,13 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet("item/{itemId}")]
-        public ActionResult<IEnumerable<InventoriesModel>> GetInventoriesByItemId(string itemId)
+        public ActionResult<IEnumerable<InventorieModel>> GetInventoriesByItemId(string itemId)
         {
             return Ok(_inventoriesService.GetInventoriesByItemId(itemId));
         }
 
         [HttpGet("location/{locationId}")]
-        public ActionResult<IEnumerable<InventoriesModel>> GetInventoriesByLocation(int locationId)
+        public ActionResult<IEnumerable<InventorieModel>> GetInventoriesByLocation(int locationId)
         {
             return Ok(_inventoriesService.GetInventoriesByLocation(locationId));
         }

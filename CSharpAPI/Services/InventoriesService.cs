@@ -5,25 +5,25 @@ namespace CSharpAPI.Service
 {   
      public interface IInventoriesService
     {
-        IEnumerable<InventoriesModel> GetAllInventories();
-        InventoriesModel GetInventoryById(int id);
-        void CreateInventory(InventoriesModel inventory);
-        bool UpdateInventory(int id, InventoriesModel inventory);
+        IEnumerable<InventorieModel> GetAllInventories();
+        InventorieModel GetInventoryById(int id);
+        void CreateInventory(InventorieModel inventory);
+        bool UpdateInventory(int id, InventorieModel inventory);
         bool DeleteInventory(int id);
-        IEnumerable<InventoriesModel> GetInventoriesByItemId(string itemId);
-        IEnumerable<InventoriesModel> GetInventoriesByLocation(int locationId);
+        IEnumerable<InventorieModel> GetInventoriesByItemId(string itemId);
+        IEnumerable<InventorieModel> GetInventoriesByLocation(int locationId);
     }
 
     public class InventoriesService : IInventoriesService
     {
-        private List<InventoriesModel> _inventories;
+        private List<InventorieModel> _inventories;
         private int _nextId = 1;
 
         public InventoriesService()
         {
-            _inventories = new List<InventoriesModel>
+            _inventories = new List<InventorieModel>
             {
-                new InventoriesModel
+                new InventorieModel
                 {
                     id = 0,
                     item_id = "ITEM001",
@@ -36,9 +36,9 @@ namespace CSharpAPI.Service
             _nextId = 1;
         }
 
-        public IEnumerable<InventoriesModel> GetAllInventories() => _inventories;
+        public IEnumerable<InventorieModel> GetAllInventories() => _inventories;
 
-        public InventoriesModel GetInventoryById(int id)
+        public InventorieModel GetInventoryById(int id)
         {
             var inventory = _inventories.FirstOrDefault(x => x.id == id);
             if (inventory == null)
@@ -48,7 +48,7 @@ namespace CSharpAPI.Service
             return inventory;
         }
 
-        public void CreateInventory(InventoriesModel inventory)
+        public void CreateInventory(InventorieModel inventory)
         {
             inventory.id = _nextId++;
             inventory.created_at = DateTime.UtcNow;
@@ -56,7 +56,7 @@ namespace CSharpAPI.Service
             _inventories.Add(inventory);
         }
 
-        public bool UpdateInventory(int id, InventoriesModel inventory)
+        public bool UpdateInventory(int id, InventorieModel inventory)
         {
             var existingInventory = _inventories.FirstOrDefault(x => x.id == id);
             if (existingInventory == null) return false;
@@ -84,12 +84,12 @@ namespace CSharpAPI.Service
             return true;
         }
 
-        public IEnumerable<InventoriesModel> GetInventoriesByItemId(string itemId)
+        public IEnumerable<InventorieModel> GetInventoriesByItemId(string itemId)
         {
             return _inventories.Where(i => i.item_id == itemId);
         }
 
-        public IEnumerable<InventoriesModel> GetInventoriesByLocation(int locationId)
+        public IEnumerable<InventorieModel> GetInventoriesByLocation(int locationId)
         {
             return _inventories.Where(i => i.locations != null && i.locations.Contains(locationId));
         }

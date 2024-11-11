@@ -33,7 +33,7 @@ namespace CSharpAPI.Controller
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] Warehouse warehouse)
+        public IActionResult Post([FromBody] WarehouseModel warehouse)
         {
             if (warehouse == null)
                 return BadRequest("Warehouse is null.");
@@ -43,7 +43,7 @@ namespace CSharpAPI.Controller
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] Warehouse warehouse)
+        public IActionResult Put(int id, [FromBody] WarehouseModel warehouse)
         {
             if (warehouse == null)
                 return BadRequest("Warehouse is null.");

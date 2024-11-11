@@ -1,6 +1,6 @@
 namespace CSharpAPI.Models
 {
-    public class ItemType
+    public class ItemTypeModel
     {
         public int id { get; set; }
         public string? name { get; set; }

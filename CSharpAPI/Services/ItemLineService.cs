@@ -4,24 +4,24 @@ namespace CSharpAPI.Service
 {
     public interface IItemLineService
     {
-        IEnumerable<ItemLine> GetAllItemLines();
-        ItemLine GetItemLineById(int id);
-        void CreateItemLine(ItemLine itemLine);
-        bool UpdateItemLine(int id, ItemLine itemLine);
+        IEnumerable<ItemLineModel> GetAllItemLines();
+        ItemLineModel GetItemLineById(int id);
+        void CreateItemLine(ItemLineModel itemLine);
+        bool UpdateItemLine(int id, ItemLineModel itemLine);
         bool DeleteItemLine(int id);
-        IEnumerable<ItemLine> GetItemLinesByGroupId(int groupId);
+        IEnumerable<ItemLineModel> GetItemLinesByGroupId(int groupId);
     }
 
     public class ItemLineService : IItemLineService
     {
-        private List<ItemLine> _itemLines;
+        private List<ItemLineModel> _itemLines;
         private int _nextId = 1;
 
         public ItemLineService()
         {
-            _itemLines = new List<ItemLine>
+            _itemLines = new List<ItemLineModel>
             {
-                new ItemLine
+                new ItemLineModel
                 {
                     id = 0,
                     name = "Default Line",
@@ -34,9 +34,9 @@ namespace CSharpAPI.Service
             _nextId = 1;
         }
 
-        public IEnumerable<ItemLine> GetAllItemLines() => _itemLines;
+        public IEnumerable<ItemLineModel> GetAllItemLines() => _itemLines;
 
-        public ItemLine GetItemLineById(int id)
+        public ItemLineModel GetItemLineById(int id)
         {
             var itemLine = _itemLines.FirstOrDefault(x => x.id == id);
             if (itemLine == null)
@@ -46,7 +46,7 @@ namespace CSharpAPI.Service
             return itemLine;
         }
 
-        public void CreateItemLine(ItemLine itemLine)
+        public void CreateItemLine(ItemLineModel itemLine)
         {
             itemLine.id = _nextId++;
             itemLine.created_at = DateTime.UtcNow;
@@ -54,7 +54,7 @@ namespace CSharpAPI.Service
             _itemLines.Add(itemLine);
         }
 
-        public bool UpdateItemLine(int id, ItemLine itemLine)
+        public bool UpdateItemLine(int id, ItemLineModel itemLine)
         {
             var existingItemLine = _itemLines.FirstOrDefault(x => x.id == id);
             if (existingItemLine == null) return false;
@@ -76,7 +76,7 @@ namespace CSharpAPI.Service
             return true;
         }
 
-        public IEnumerable<ItemLine> GetItemLinesByGroupId(int groupId)
+        public IEnumerable<ItemLineModel> GetItemLinesByGroupId(int groupId)
         {
             return _itemLines.Where(l => l.itemgroup_id == groupId);
         }

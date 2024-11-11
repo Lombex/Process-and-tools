@@ -39,7 +39,7 @@ namespace CShartpAPI.Controller
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateOrders(int id, [FromBody] OrdersModel orders)
+        public IActionResult UpdateOrders(int id, [FromBody] OrderModel orders)
         {
             if (orders == null) return BadRequest("Request is empty!");
             var updatedOrders = _orderService.UpdateOrders(id, orders);
@@ -48,7 +48,7 @@ namespace CShartpAPI.Controller
         }
 
         [HttpPost]
-        public IActionResult CreateOrder([FromBody] OrdersModel orders)
+        public IActionResult CreateOrder([FromBody] OrderModel orders)
         {
             if (orders == null) return BadRequest("Request is empty!");
             _orderService.CreateOrder(orders);

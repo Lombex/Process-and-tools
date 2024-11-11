@@ -35,7 +35,7 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] ItemType item)
+        public IActionResult Create([FromBody] ItemTypeModel item)
         {
             if (item == null) return BadRequest();
             _service.Add(item);
@@ -43,7 +43,7 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] ItemType item)
+        public IActionResult Update(int id, [FromBody] ItemTypeModel item)
         {
             if (item == null) return BadRequest();
             var result = _service.Update(id, item);

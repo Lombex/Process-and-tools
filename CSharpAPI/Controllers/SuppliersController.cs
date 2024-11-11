@@ -36,7 +36,7 @@ namespace CSharpAPI.Controller
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateSupplier(int id, [FromBody] SuppliersModel supplier)
+        public IActionResult UpdateSupplier(int id, [FromBody] SupplierModel supplier)
         {
             if (supplier == null) return BadRequest("Request is empty!");
             var updateSupplier = _supplierService.UpdateSupplier(id, supplier);
@@ -45,7 +45,7 @@ namespace CSharpAPI.Controller
         }
 
         [HttpPost]
-        public IActionResult CreateSupplier([FromBody] SuppliersModel supplier)
+        public IActionResult CreateSupplier([FromBody] SupplierModel supplier)
         {
             if (supplier == null) return BadRequest("Request is empty!");
             _supplierService.CreateSupplier(supplier);

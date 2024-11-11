@@ -35,7 +35,7 @@ public class ShipmentsController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult Create([FromBody] ShipmentsModel shipment)
+    public IActionResult Create([FromBody] ShipmentModel shipment)
     {
         if (shipment == null)
             return BadRequest("Request is empty!");
@@ -45,7 +45,7 @@ public class ShipmentsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public IActionResult Update(int id, [FromBody] ShipmentsModel shipment)
+    public IActionResult Update(int id, [FromBody] ShipmentModel shipment)
     {
         if (shipment == null)
             return BadRequest("Request is empty!");

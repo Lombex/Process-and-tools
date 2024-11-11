@@ -44,7 +44,7 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] ItemLine itemLine)
+        public IActionResult Create([FromBody] ItemLineModel itemLine)
         {
             if (itemLine == null) 
                 return BadRequest("Request is empty!");
@@ -54,7 +54,7 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] ItemLine itemLine)
+        public IActionResult Update(int id, [FromBody] ItemLineModel itemLine)
         {
             if (itemLine == null) 
                 return BadRequest("Request is empty!");

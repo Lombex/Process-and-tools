@@ -5,10 +5,10 @@ namespace CSharpAPI.Service
 {
     public interface IItemTypeService
     {
-        List<ItemType> GetAll();
-        ItemType GetById(int id);
-        void Add(ItemType itemType);
-        bool Update(int id, ItemType itemType);
+        List<ItemTypeModel> GetAll();
+        ItemTypeModel GetById(int id);
+        void Add(ItemTypeModel itemType);
+        bool Update(int id, ItemTypeModel itemType);
         bool Delete(int id);
     }
 
@@ -16,20 +16,20 @@ namespace CSharpAPI.Service
     {
         private readonly string dataPath = "data/itemtypes.json";
 
-        public List<ItemType> GetAll()
+        public List<ItemTypeModel> GetAll()
         {
-            if (!File.Exists(dataPath)) return new List<ItemType>();
-            return JsonConvert.DeserializeObject<List<ItemType>>(File.ReadAllText(dataPath)) ?? new List<ItemType>();
+            if (!File.Exists(dataPath)) return new List<ItemTypeModel>();
+            return JsonConvert.DeserializeObject<List<ItemTypeModel>>(File.ReadAllText(dataPath)) ?? new List<ItemTypeModel>();
         }
 
-        public ItemType GetById(int id)
+        public ItemTypeModel GetById(int id)
         {
             var itemType = GetAll().FirstOrDefault(x => x.id == id);
             if (itemType == null) throw new Exception($"ItemType {id} not found");
             return itemType;
         }
 
-        public void Add(ItemType itemType)
+        public void Add(ItemTypeModel itemType)
         {
             var items = GetAll();
             itemType.id = items.Count > 0 ? items.Max(x => x.id) + 1 : 1;
@@ -39,7 +39,7 @@ namespace CSharpAPI.Service
             File.WriteAllText(dataPath, JsonConvert.SerializeObject(items, Formatting.Indented));
         }
 
-        public bool Update(int id, ItemType itemType)
+        public bool Update(int id, ItemTypeModel itemType)
         {
             var items = GetAll();
             var existing = items.FirstOrDefault(x => x.id == id);

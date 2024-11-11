@@ -5,25 +5,25 @@ namespace CSharpAPI.Service
 {
     public interface IItemsService
     {
-        IEnumerable<ItemsModel> GetAllItems();
-        ItemsModel GetItemById(string uid);
-        void CreateItem(ItemsModel item);
-        bool UpdateItem(string uid, ItemsModel item);
+        IEnumerable<ItemModel> GetAllItems();
+        ItemModel GetItemById(string uid);
+        void CreateItem(ItemModel item);
+        bool UpdateItem(string uid, ItemModel item);
         bool DeleteItem(string uid);
-        IEnumerable<ItemsModel> GetItemsByLineId(int lineId);
-        IEnumerable<ItemsModel> GetItemsByGroupId(int groupId);
-        IEnumerable<ItemsModel> GetItemsBySupplierId(int supplierId);
+        IEnumerable<ItemModel> GetItemsByLineId(int lineId);
+        IEnumerable<ItemModel> GetItemsByGroupId(int groupId);
+        IEnumerable<ItemModel> GetItemsBySupplierId(int supplierId);
     }
 
     public class ItemsService : IItemsService
     {
-        private List<ItemsModel> _items;
+        private List<ItemModel> _items;
 
         public ItemsService()
         {
-            _items = new List<ItemsModel>
+            _items = new List<ItemModel>
             {
-                new ItemsModel
+                new ItemModel
                 {
                     uid = "ITEM001",
                     code = "DEFAULT001",
@@ -36,9 +36,9 @@ namespace CSharpAPI.Service
             };
         }
 
-        public IEnumerable<ItemsModel> GetAllItems() => _items;
+        public IEnumerable<ItemModel> GetAllItems() => _items;
 
-        public ItemsModel GetItemById(string uid)
+        public ItemModel GetItemById(string uid)
         {
             var item = _items.FirstOrDefault(x => x.uid == uid);
             if (item == null)
@@ -48,7 +48,7 @@ namespace CSharpAPI.Service
             return item;
         }
 
-        public void CreateItem(ItemsModel item)
+        public void CreateItem(ItemModel item)
         {
             item.uid = GenerateUniqueId(); 
             item.created_at = DateTime.UtcNow;
@@ -56,7 +56,7 @@ namespace CSharpAPI.Service
             _items.Add(item);
         }
 
-        public bool UpdateItem(string uid, ItemsModel item)
+        public bool UpdateItem(string uid, ItemModel item)
         {
             var existingItem = _items.FirstOrDefault(x => x.uid == uid);
             if (existingItem == null) return false;
@@ -90,17 +90,17 @@ namespace CSharpAPI.Service
             return true;
         }
 
-        public IEnumerable<ItemsModel> GetItemsByLineId(int lineId)
+        public IEnumerable<ItemModel> GetItemsByLineId(int lineId)
         {
             return _items.Where(i => i.item_line == lineId);
         }
 
-        public IEnumerable<ItemsModel> GetItemsByGroupId(int groupId)
+        public IEnumerable<ItemModel> GetItemsByGroupId(int groupId)
         {
             return _items.Where(i => i.item_group == groupId);
         }
 
-        public IEnumerable<ItemsModel> GetItemsBySupplierId(int supplierId)
+        public IEnumerable<ItemModel> GetItemsBySupplierId(int supplierId)
         {
             return _items.Where(i => i.supplier_id == supplierId);
         }

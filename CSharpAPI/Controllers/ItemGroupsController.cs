@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CSharpAPI.Controllers
 {
     [ApiController]
-    [Route("api/v1/itemgroups")]
+    [Route("api/v1/itemgroup")]
     public class ItemGroupsController : ControllerBase
     {
         private readonly IItemGroupService _service;
@@ -35,7 +35,7 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] ItemGroup item)
+        public IActionResult Create([FromBody] ItemGroupModel item)
         {
             if (item == null) return BadRequest();
             _service.Add(item);
@@ -43,7 +43,7 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] ItemGroup item)
+        public IActionResult Update(int id, [FromBody] ItemGroupModel item)
         {
             if (item == null) return BadRequest();
             var result = _service.Update(id, item);

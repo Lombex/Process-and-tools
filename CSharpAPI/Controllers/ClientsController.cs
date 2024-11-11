@@ -16,14 +16,14 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<ClientsModel>> GetAllClients()
+        public ActionResult<IEnumerable<ClientModel>> GetAllClients()
         {
             var clients = _clientsService.GetAllClients();
             return Ok(clients);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<ClientsModel> GetClientById(int id)
+        public ActionResult<ClientModel> GetClientById(int id)
         {
             var client = _clientsService.GetClientById(id);
             if (client == null)
@@ -34,14 +34,14 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult<ClientsModel> CreateClient([FromBody] ClientsModel client)
+        public ActionResult<ClientModel> CreateClient([FromBody] ClientModel client)
         {
             _clientsService.CreateClient(client);
             return CreatedAtAction(nameof(GetClientById), new { id = client.id }, client);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateClient(int id, [FromBody] ClientsModel client)
+        public IActionResult UpdateClient(int id, [FromBody] ClientModel client)
         {
             if (id != client.id)
             {

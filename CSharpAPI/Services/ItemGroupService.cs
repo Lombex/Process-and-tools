@@ -5,31 +5,31 @@ namespace CSharpAPI.Service
 {
     public interface IItemGroupService
     {
-        List<ItemGroup> GetAll();
-        ItemGroup GetById(int id);
-        void Add(ItemGroup itemGroup);
-        bool Update(int id, ItemGroup itemGroup);
+        List<ItemGroupModel> GetAll();
+        ItemGroupModel GetById(int id);
+        void Add(ItemGroupModel ItemGroupModel);
+        bool Update(int id, ItemGroupModel ItemGroupModel);
         bool Delete(int id);
     }
 
     public class ItemGroupService : IItemGroupService
     {
-        private readonly string dataPath = "data/itemgroups.json";
+        private readonly string dataPath = "data/ItemGroupModels.json";
 
-        public List<ItemGroup> GetAll()
+        public List<ItemGroupModel> GetAll()
         {
-            if (!File.Exists(dataPath)) return new List<ItemGroup>();
-            return JsonConvert.DeserializeObject<List<ItemGroup>>(File.ReadAllText(dataPath)) ?? new List<ItemGroup>();
+            if (!File.Exists(dataPath)) return new List<ItemGroupModel>();
+            return JsonConvert.DeserializeObject<List<ItemGroupModel>>(File.ReadAllText(dataPath)) ?? new List<ItemGroupModel>();
         }
 
-        public ItemGroup GetById(int id)
+        public ItemGroupModel GetById(int id)
         {
-            var itemGroup = GetAll().FirstOrDefault(x => x.id == id);
-            if (itemGroup == null) throw new Exception($"ItemGroup {id} not found");
-            return itemGroup;
+            var itemgroup = GetAll().FirstOrDefault(x => x.id == id);
+            if (itemgroup == null) throw new Exception($"ItemGroup {id} not found");
+            return itemgroup;
         }
 
-        public void Add(ItemGroup itemGroup)
+        public void Add(ItemGroupModel itemGroup)
         {
             var items = GetAll();
             itemGroup.id = items.Count > 0 ? items.Max(x => x.id) + 1 : 1;
@@ -39,7 +39,7 @@ namespace CSharpAPI.Service
             File.WriteAllText(dataPath, JsonConvert.SerializeObject(items, Formatting.Indented));
         }
 
-        public bool Update(int id, ItemGroup itemGroup)
+        public bool Update(int id, ItemGroupModel itemGroup)
         {
             var items = GetAll();
             var existing = items.FirstOrDefault(x => x.id == id);

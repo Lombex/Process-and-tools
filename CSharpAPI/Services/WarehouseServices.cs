@@ -12,26 +12,26 @@ namespace CSharpAPI.Service
             dataFolder = jsonFilePath;
         }
 
-        public List<Warehouse> GetAllWarehouses()
+        public List<WarehouseModel> GetAllWarehouses()
         {
             try
             {
                 if (!File.Exists(dataFolder))
-                    return new List<Warehouse>();
+                    return new List<WarehouseModel>();
 
                 var jsonContent = File.ReadAllText(dataFolder);
-                return JsonConvert.DeserializeObject<List<Warehouse>>(jsonContent) ?? new List<Warehouse>();
+                return JsonConvert.DeserializeObject<List<WarehouseModel>>(jsonContent) ?? new List<WarehouseModel>();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error reading file: {ex.Message}");
-                return new List<Warehouse>();
+                return new List<WarehouseModel>();
             }
         }
 
-        public Warehouse GetWarehouseById(int id) => GetAllWarehouses().FirstOrDefault(w => w.id == id);
+        public WarehouseModel GetWarehouseById(int id) => GetAllWarehouses().FirstOrDefault(w => w.id == id);
             
-        public void AddWarehouse(Warehouse newWarehouse)
+        public void AddWarehouse(WarehouseModel newWarehouse)
         {
             var warehouses = GetAllWarehouses();
             newWarehouse.id = warehouses.Count > 0 ? warehouses.Max(w => w.id) + 1 : 1; // Auto increment ID
@@ -39,7 +39,7 @@ namespace CSharpAPI.Service
             SaveWarehouses(warehouses);
         }
 
-        public bool UpdateWarehouse(int id, Warehouse updatedWarehouse)
+        public bool UpdateWarehouse(int id, WarehouseModel updatedWarehouse)
         {
             var warehouses = GetAllWarehouses();
             var existingWarehouse = warehouses.FirstOrDefault(w => w.id == id);
@@ -75,7 +75,7 @@ namespace CSharpAPI.Service
             return true;
         }
 
-        private void SaveWarehouses(List<Warehouse> warehouses)
+        private void SaveWarehouses(List<WarehouseModel> warehouses)
         {
             try
             {
@@ -90,10 +90,10 @@ namespace CSharpAPI.Service
     }
     public interface IWarehouseService
     {
-        List<Warehouse> GetAllWarehouses();
-        Warehouse GetWarehouseById(int id);
-        void AddWarehouse(Warehouse newWarehouse);
-        bool UpdateWarehouse(int id, Warehouse updatedWarehouse);
+        List<WarehouseModel> GetAllWarehouses();
+        WarehouseModel GetWarehouseById(int id);
+        void AddWarehouse(WarehouseModel newWarehouse);
+        bool UpdateWarehouse(int id, WarehouseModel updatedWarehouse);
         bool DeleteWarehouse(int id);
     }
 }

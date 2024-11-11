@@ -5,26 +5,26 @@ namespace CSharpAPI.Service
 {
     public interface IOrderService
     {
-        List<OrdersModel> GetAllOrders();
-        OrdersModel GetOrderById(int id);
+        List<OrderModel> GetAllOrders();
+        OrderModel GetOrderById(int id);
         List<Items> GetItemByOrderId(int id);
-        bool UpdateOrders(int id, OrdersModel updatedOrders);
-        void CreateOrder(OrdersModel orders);
+        bool UpdateOrders(int id, OrderModel updatedOrders);
+        void CreateOrder(OrderModel orders);
         bool DeleteOrder(int id);
     }
-    public class OrderService : OrdersModel
+    public class OrderService : IOrderService
     {
         private readonly string dummydata = "data/transfer.json";
 
-        public List<OrdersModel> GetAllOrders()
+        public List<OrderModel> GetAllOrders()
         {
-            if (!File.Exists(dummydata)) return new List<OrdersModel>();
-            return JsonConvert.DeserializeObject<List<OrdersModel>>(File.ReadAllText(dummydata)) ?? new List<OrdersModel>();
+            if (!File.Exists(dummydata)) return new List<OrderModel>();
+            return JsonConvert.DeserializeObject<List<OrderModel>>(File.ReadAllText(dummydata)) ?? new List<OrderModel>();
 
             // still returns our dummy data
         }
 
-        public OrdersModel GetOrderById(int id)
+        public OrderModel GetOrderById(int id)
         {
             var _order = GetAllOrders().FirstOrDefault(x => x.id == id);
             if (_order == null) throw new Exception("This Order does not exits!");
@@ -39,7 +39,7 @@ namespace CSharpAPI.Service
             return order.items;
         }
 
-        public bool UpdateOrders(int id, OrdersModel updatedOrders)
+        public bool UpdateOrders(int id, OrderModel updatedOrders)
         {
             var _order = GetAllOrders().FirstOrDefault(x => x.id == id);
             if (_order == null) return false;
@@ -70,7 +70,7 @@ namespace CSharpAPI.Service
             return true;
         }
 
-        public void CreateOrders(OrdersModel orders)
+        public void CreateOrder(OrderModel orders)
         {
             var AllOrders = GetAllOrders();
             orders.id = AllOrders.Count > 0 ? AllOrders.Max(x => x.id) + 1 : 1;
@@ -79,7 +79,7 @@ namespace CSharpAPI.Service
             // Update Database here.
         }
 
-        public bool DeleteOrders(int id)
+        public bool DeleteOrder(int id)
         {
             var _order = GetAllOrders().FirstOrDefault(x => x.id == id);
             if (_order == null) return false;

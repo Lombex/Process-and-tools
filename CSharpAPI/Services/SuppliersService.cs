@@ -6,24 +6,24 @@ namespace CSharpAPI.Service
 {
     public interface ISupplierService
     {
-        List<SuppliersModel> GetAllSuppliers();
-        SuppliersModel GetSupplierById(int id);
+        List<SupplierModel> GetAllSuppliers();
+        SupplierModel GetSupplierById(int id);
         List<Items> GetItemFromSupplierId(int id);
-        bool UpdateSupplier(int id, SuppliersModel supplier);
-        void CreateSupplier(SuppliersModel supplier);
+        bool UpdateSupplier(int id, SupplierModel supplier);
+        void CreateSupplier(SupplierModel supplier);
         bool DeleteSupplier(int id);
     }
     public class SupplierService : ISupplierService
     {
         private readonly string dummydata = "data/transfer.json";
 
-        public List<SuppliersModel> GetAllSuppliers()
+        public List<SupplierModel> GetAllSuppliers()
         {
-            if (!File.Exists(dummydata)) return new List<SuppliersModel>();
-            return JsonConvert.DeserializeObject<List<SuppliersModel>>(File.ReadAllText(dummydata)) ?? new List<SuppliersModel>();
+            if (!File.Exists(dummydata)) return new List<SupplierModel>();
+            return JsonConvert.DeserializeObject<List<SupplierModel>>(File.ReadAllText(dummydata)) ?? new List<SupplierModel>();
         }
 
-        public SuppliersModel GetSupplierById(int id)
+        public SupplierModel GetSupplierById(int id)
         {
             var _supplier = GetAllSuppliers().FirstOrDefault(x => x.id == id);
             if (_supplier == null) throw new Exception("This Supplier does not exits!");
@@ -39,7 +39,7 @@ namespace CSharpAPI.Service
             throw new NotImplementedException();
         }
 
-        public bool UpdateSupplier(int id, SuppliersModel updateSupplier)
+        public bool UpdateSupplier(int id, SupplierModel updateSupplier)
         {
             var _supplier = GetAllSuppliers().FirstOrDefault(_x => _x.id == id);
             if (_supplier == null) return false;
@@ -62,7 +62,7 @@ namespace CSharpAPI.Service
 
         }
 
-        public void CreateSupplier(SuppliersModel supplier)
+        public void CreateSupplier(SupplierModel supplier)
         {
             var AllSuppliers = GetAllSuppliers();
             supplier.id = AllSuppliers.Count > 0 ? AllSuppliers.Max(x => x.id) + 1 : 1;

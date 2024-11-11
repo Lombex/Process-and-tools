@@ -20,6 +20,7 @@ builder.Services.AddSingleton<IItemsService, ItemsService>();
 builder.Services.AddSingleton<ISupplierService, SupplierService>();
 builder.Services.AddSingleton<IInventoriesService, InventoriesService>();
 builder.Services.AddSingleton<IClientsService, ClientsService>();
+// builder.Services.AddSingleton<IOrderService, OrderService();
 
 
 

@@ -1,6 +1,6 @@
 namespace CSharpAPI.Models 
 {
-    public class LocationModel 
+    public class LocationModel
     {
         public int id { get; set; }
         public int warehouse_id { get; set; }

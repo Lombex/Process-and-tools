@@ -1,6 +1,6 @@
 namespace CSharpAPI.Models
 {
-    public class ItemLine
+    public class ItemLineModel
     {
         public int id { get; set; }
         public string? name { get; set; }

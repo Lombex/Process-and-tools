@@ -8,10 +8,10 @@ namespace CSharpAPI.Services
 {
     public interface IClientsService
     {
-        IEnumerable<ClientsModel> GetAllClients();
-        ClientsModel GetClientById(int id);
-        void CreateClient(ClientsModel client);
-        void UpdateClient(ClientsModel client);
+        IEnumerable<ClientModel> GetAllClients();
+        ClientModel GetClientById(int id);
+        void CreateClient(ClientModel client);
+        void UpdateClient(ClientModel client);
         void DeleteClient(int id);
     }
 
@@ -24,21 +24,21 @@ namespace CSharpAPI.Services
             dataFolder = jsonFilePath;
         }
 
-        public IEnumerable<ClientsModel> GetAllClients()
+        public IEnumerable<ClientModel> GetAllClients()
         {
             if (!File.Exists(dataFolder))
-                return new List<ClientsModel>();
+                return new List<ClientModel>();
 
             var jsonContent = File.ReadAllText(dataFolder);
-            return JsonConvert.DeserializeObject<List<ClientsModel>>(jsonContent) ?? new List<ClientsModel>();
+            return JsonConvert.DeserializeObject<List<ClientModel>>(jsonContent) ?? new List<ClientModel>();
         }
 
-        public ClientsModel GetClientById(int id)
+        public ClientModel GetClientById(int id)
         {
             return GetAllClients().FirstOrDefault(c => c.id == id);
         }
 
-        public void CreateClient(ClientsModel client)
+        public void CreateClient(ClientModel client)
         {
             var clients = GetAllClients().ToList();
             client.id = clients.Count > 0 ? clients.Max(c => c.id) + 1 : 1;
@@ -48,7 +48,7 @@ namespace CSharpAPI.Services
             SaveClients(clients);
         }
 
-        public void UpdateClient(ClientsModel client)
+        public void UpdateClient(ClientModel client)
         {
             var clients = GetAllClients().ToList();
             var existingClient = clients.FirstOrDefault(c => c.id == client.id);
@@ -79,7 +79,7 @@ namespace CSharpAPI.Services
             }
         }
 
-        private void SaveClients(List<ClientsModel> clients)
+        private void SaveClients(List<ClientModel> clients)
         {
             var jsonContent = JsonConvert.SerializeObject(clients, Formatting.Indented);
             File.WriteAllText(dataFolder, jsonContent);

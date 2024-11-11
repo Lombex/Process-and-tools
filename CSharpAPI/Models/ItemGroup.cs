@@ -1,7 +1,6 @@
 namespace CSharpAPI.Models
 {
-   
-    public class ItemGroup
+    public class ItemGroupModel
     {
         public int id { get; set; }
         public string? name { get; set; }
