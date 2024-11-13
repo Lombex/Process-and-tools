@@ -1,0 +1,72 @@
+name: CICDTestBranch Workflow
+
+on:
+  push:
+    branches: [ "CICDTestingBranch" ]
+
+jobs:
+  # Job 1: Build
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 httpx  # Added httpx here
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Lint with flake8
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+  # Job 2: Test
+  test:
+    needs: build  # This job will only run after the 'build' job has completed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest pytest-cov httpx  # Added httpx here
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Test with pytest
+        run: |
+          pytest  # Run the tests
+          pytest --cov --cov-report term --cov-report xml:coverage.xml  # Collect coverage and generate reports
+
+  # Job 3: Deployment to Production
+  deployment:
+    needs: test  # This job will run after the 'test' job has completed
+    runs-on: ubuntu-latest
+    environment: production 
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Install production dependencies
+      - name: Deploy to Production
+        run: |
+          echo "Deploying application to production environment..."
+          # Add your deployment-specific steps here
+          # For example, you might use SSH, AWS CLI, Docker, etc., depending on how you deploy
+          # Example:
+          # ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} 'bash /path/to/deploy.sh'
