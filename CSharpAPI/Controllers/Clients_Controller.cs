@@ -32,7 +32,7 @@ namespace CSharpAPI.Controllers
             return Ok(client);
         }
 
-        [HttpGet("{id}/orders")]
+        /*[HttpGet("{id}/orders")]
         public ActionResult<IEnumerable<OrdersModel>> GetClientOrders(int id)
         {
             var client = _clientsService.GetClientById(id);
@@ -43,7 +43,7 @@ namespace CSharpAPI.Controllers
 
             var orders = _clientsService.GetClientOrders(id);
             return Ok(orders);
-        }
+        }*/
 
         [HttpPost]
         public ActionResult<ClientsModel> CreateClient([FromBody] ClientsModel client)
