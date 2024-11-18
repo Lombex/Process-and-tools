@@ -1,9 +1,9 @@
-name: CICDTestingBranch
+name: CI Workflow
 
 on:
   push:
     branches: [ "CICDTestingBranch" ]
-
+##gasdasdfagsd
 jobs:
   # Job 1: Build
   build:
@@ -41,13 +41,32 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake8 pytest pytest-cov httpx requests  # Install dependencies for testing
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Test with pytest
+
+
+      # Start the API server in the background and log output
+      - name: Start API server
         run: |
-          coverage run -m pytest  # Run tests with coverage collection
+          mkdir -p PythonAPI/api/logs
+          nohup python PythonAPI/api/main.py > PythonAPI/api/logs/server.log 2>&1 &  # Run the server and log output
+          sleep 10  # Allow more time for the server to start up
+
+      # Check if the server is running
+      - name: Check if server is running
+        run: |
+          curl -f http://localhost:3000 || (tail -n 10 PythonAPI/api/logs/server.log && exit 1)  # Check if the server is responding
+
+      # Test with pytest, passing the API key as part of the request
+      - name: Test with pytest
+        env:
+          API_KEY: ${{ secrets.API_KEY }}  # Passing the secret API_KEY to the test
+        run: |
+          pytest  # Run the tests
+
       - name: Run code coverage
         run: |
           coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
           coverage report --fail-under=75  # Fail the build if coverage is below 75%
+
       - name: Store coverage report
         uses: actions/upload-artifact@v4
         with:
