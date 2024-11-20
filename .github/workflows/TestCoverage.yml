@@ -46,7 +46,7 @@ jobs:
       # Start the API server in the background and log output
       - name: Start API server
         run: |
-          python3 ./api/main.py
+          python3 api/main.py
 
       # Test with pytest, passing the API key as part of the request
       - name: Test with pytest
