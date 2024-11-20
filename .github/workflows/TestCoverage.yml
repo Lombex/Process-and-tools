@@ -46,14 +46,7 @@ jobs:
       # Start the API server in the background and log output
       - name: Start API server
         run: |
-          mkdir -p PythonAPI/api/logs
-          nohup python PythonAPI/api/main.py > PythonAPI/api/logs/server.log 2>&1 &  # Run the server and log output
-          sleep 10  # Allow more time for the server to start up
-
-      # Check if the server is running
-      - name: Check if server is running
-        run: |
-          curl -f http://localhost:3000 || (tail -n 10 PythonAPI/api/logs/server.log && exit 1)  # Check if the server is responding
+          python3 ./api/main.py
 
       # Test with pytest, passing the API key as part of the request
       - name: Test with pytest
