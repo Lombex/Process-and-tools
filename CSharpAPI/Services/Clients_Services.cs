@@ -30,12 +30,6 @@ namespace CSharpAPI.Services
             return GetAllClients().FirstOrDefault(c => c.id == id);
         }
 
-        public IEnumerable<OrdersModel> GetClientOrders(int id)
-        {
-            var client = GetClientById(id);
-            return client?.Orders ?? new List<OrdersModel>();
-        }
-
         public void CreateClient(ClientsModel client)
         {
             var clients = GetAllClients().ToList();
@@ -62,7 +56,6 @@ namespace CSharpAPI.Services
                 existingClient.province = client.province;
                 existingClient.country = client.country;
                 existingClient.contact_name = client.contact_name;
-                existingClient.Orders = client.Orders;
                 existingClient.updated_at = DateTime.Now;
                 SaveClients(clients);
             }
@@ -91,7 +84,6 @@ namespace CSharpAPI.Services
     {
         IEnumerable<ClientsModel> GetAllClients();
         ClientsModel GetClientById(int id);
-        IEnumerable<OrdersModel> GetClientOrders(int id);
         void CreateClient(ClientsModel client);
         void UpdateClient(ClientsModel client);
         void DeleteClient(int id);

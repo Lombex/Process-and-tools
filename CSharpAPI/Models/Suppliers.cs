@@ -14,4 +14,24 @@ namespace CSharpAPI.Models {
         public DateTime created_at { get; set; }
         public DateTime updated_at { get; set; }
     }
+
+    public class SuppliersTable 
+    {
+        public readonly string supplierQuery = @"
+            CREATE TABLE IF NOT EXISTS Supplier (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            code TEXT,
+            name TEXT,
+            address TEXT,
+            address_extra TEXT,
+            city TEXT,
+            zip_code TEXT,
+            province TEXT,
+            contact_name TEXT,
+            phonenumber TEXT,
+            reference TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+       )";
+    }
 }
