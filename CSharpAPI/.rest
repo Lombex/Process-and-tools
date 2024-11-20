@@ -1,2 +1,363 @@
-GET http://localhost:5001/
-###
+@baseUrl = http://localhost:5001/api/v1
+
+### ItemTypes ###
+
+### Get all item types
+GET {{baseUrl}}/itemtypes
+Accept: application/json
+
+### Get single item type
+GET {{baseUrl}}/itemtypes/2
+Accept: application/json
+
+### Create item type
+POST {{baseUrl}}/itemtypes
+Content-Type: application/json
+
+{
+    "name": "Test Type",
+    "description": "Test Type Description"
+}
+
+### Update item type
+PUT {{baseUrl}}/itemtypes/1
+Content-Type: application/json
+
+{
+    "name": "Updated Type",
+    "description": "Updated Type Description"
+}
+
+### Delete item type
+DELETE {{baseUrl}}/itemtypes/5
+
+### ItemGroups ###
+
+### Get all item groups
+GET {{baseUrl}}/itemgroups
+Accept: application/json
+
+### Get single item group
+GET {{baseUrl}}/itemgroups/1
+Accept: application/json
+
+### Create item group
+POST {{baseUrl}}/itemgroups
+Content-Type: application/json
+
+{
+    "name": "kaas Group",
+    "description": "Test Group Description",
+    "itemtype_id": 1
+}
+
+### Update item group
+PUT {{baseUrl}}/itemgroups/1
+Content-Type: application/json
+
+{
+    "name": "Updated Group",
+    "description": "Updated Group Description",
+    "itemtype_id": 1
+}
+
+### Delete item group
+DELETE {{baseUrl}}/itemgroups/1
+
+### ItemLines ###
+
+### Get all item lines
+GET {{baseUrl}}/itemlines
+Accept: application/json
+
+### Get single item line
+GET {{baseUrl}}/itemlines/1
+Accept: application/json
+
+### Create item line
+POST {{baseUrl}}/itemlines
+Content-Type: application/json
+
+{
+    "name": "Test Line",
+    "description": "Test Line Description",
+    "itemgroup_id": 1
+}
+
+### Update item line
+PUT {{baseUrl}}/itemlines/1
+Content-Type: application/json
+
+{
+    "name": "Updated Line",
+    "description": "Updated Line Description",
+    "itemgroup_id": 1
+}
+
+### Delete item line
+DELETE {{baseUrl}}/itemlines/1
+
+### Get item lines by group
+GET {{baseUrl}}/itemlines/bygroup/1
+Accept: application/json
+
+### Locations ###
+
+### Get all locations
+GET {{baseUrl}}/locations
+Accept: application/json
+
+### Get location by id
+GET {{baseUrl}}/locations/1
+Accept: application/json
+
+### Get locations by warehouse
+GET {{baseUrl}}/locations/warehouse/34547
+Accept: application/json
+
+### Create location
+POST {{baseUrl}}/locations
+Content-Type: application/json
+
+{
+    "warehouse_id": 1,
+    "code": "LOC004",
+    "name": "Test Location"
+}
+
+### Update location
+PUT {{baseUrl}}/locations/34547
+Content-Type: application/json
+
+{
+    "warehouse_id": 1,
+    "code": "LOC001-UPD",
+    "name": "Updated Location"
+}
+
+### Delete location
+DELETE {{baseUrl}}/locations/34547
+
+### Shipments ###
+
+### Get all shipments
+GET {{baseUrl}}/shipments
+Accept: application/json
+
+### Get shipment by id
+GET {{baseUrl}}/shipments/10107
+Accept: application/json
+
+### Create shipment
+POST {{baseUrl}}/shipments
+Content-Type: application/json
+
+{
+    "order_id": 1003,
+    "source_id": 1,
+    "order_date": "2024-11-07",
+    "request_date": "2024-11-08",
+    "shipment_date": "2024-11-09",
+    "shipment_type": "Standard",
+    "shipment_status": "New",
+    "notes": "Test shipment",
+    "carrier_code": "CAR001",
+    "carrier_description": "Test Carrier",
+    "service_code": "SVC001",
+    "payment_type": "Credit",
+    "transfer_mode": "Ground",
+    "total_package_count": 1,
+    "total_package_weight": 10.5
+}
+
+### Update shipment
+PUT {{baseUrl}}/shipments/1
+Content-Type: application/json
+
+{
+    "order_id": 1001,
+    "source_id": 1,
+    "order_date": "2024-11-07",
+    "request_date": "2024-11-08",
+    "shipment_date": "2024-11-09",
+    "shipment_type": "Express",
+    "shipment_status": "Processing",
+    "notes": "Updated shipment",
+    "carrier_code": "CAR001",
+    "carrier_description": "Updated Carrier",
+    "service_code": "SVC001",
+    "payment_type": "Credit",
+    "transfer_mode": "Ground",
+    "total_package_count": 2,
+    "total_package_weight": 20.5
+}
+
+### Delete shipment
+DELETE {{baseUrl}}/shipments/2
+
+### Items ###
+
+### Get all items
+GET {{baseUrl}}/items
+Accept: application/json
+
+### Get single item
+GET {{baseUrl}}/items/ITEM001
+Accept: application/json
+
+### Get items by line
+GET {{baseUrl}}/items/line/1
+Accept: application/json
+
+### Get items by group
+GET {{baseUrl}}/items/group/1
+Accept: application/json
+
+### Get items by supplier
+GET {{baseUrl}}/items/supplier/1
+Accept: application/json
+
+### Create item
+POST {{baseUrl}}/items
+Content-Type: application/json
+
+{
+    "code": "TEST001",
+    "description": "Test Item",
+    "short_description": "Test",
+    "upc_code": "123456789",
+    "model_number": "MDL001",
+    "commodity_code": "COM001",
+    "item_line": 1,
+    "item_group": 1,
+    "item_type": 1,
+    "unit_purchase_quantity": 1,
+    "unit_order_quantity": 10,
+    "pack_order_quantity": 100,
+    "supplier_id": 1,
+    "supplier_code": "SUP001",
+    "supplier_part_number": "PART001"
+}
+
+### Update item
+PUT {{baseUrl}}/items/ITEM001
+Content-Type: application/json
+
+{
+    "code": "TEST001-UPD",
+    "description": "Updated Test Item",
+    "short_description": "Updated Test",
+    "upc_code": "987654321",
+    "model_number": "MDL001-UPD",
+    "commodity_code": "COM001-UPD",
+    "item_line": 1,
+    "item_group": 1,
+    "item_type": 1,
+    "unit_purchase_quantity": 2,
+    "unit_order_quantity": 20,
+    "pack_order_quantity": 200,
+    "supplier_id": 1,
+    "supplier_code": "SUP001-UPD",
+    "supplier_part_number": "PART001-UPD"
+}
+
+### Delete item
+DELETE {{baseUrl}}/items/ITEM001
+
+### Inventories ###
+
+### Get all inventories
+GET {{baseUrl}}/inventories
+Accept: application/json
+
+### Get single inventory
+GET {{baseUrl}}/inventories/1
+Accept: application/json
+
+### Get inventories by item
+GET {{baseUrl}}/inventories/item/ITEM001
+Accept: application/json
+
+### Get inventories by location
+GET {{baseUrl}}/inventories/location/1
+Accept: application/json
+
+### Create inventory
+POST {{baseUrl}}/inventories
+Content-Type: application/json
+
+{
+    "item_id": "ITEM001",
+    "description": "Test Inventory",
+    "item_reference": "REF001",
+    "locations": [1, 2, 3],
+    "total_on_hand": 100,
+    "total_expected": 50,
+    "total_ordered": 25,
+    "total_allocated": 10,
+    "total_available": 115
+}
+
+### Update inventory
+PUT {{baseUrl}}/inventories/1
+Content-Type: application/json
+
+{
+    "item_id": "ITEM001",
+    "description": "Updated Test Inventory",
+    "item_reference": "REF001-UPD",
+    "locations": [1, 2, 3, 4],
+    "total_on_hand": 200,
+    "total_expected": 75,
+    "total_ordered": 50,
+    "total_allocated": 20,
+    "total_available": 205
+}
+
+### Delete inventory
+DELETE {{baseUrl}}/inventories/1
+
+
+### Get all clients
+GET {{baseUrl}}/clients
+Accept: application/json
+
+### Get single client
+GET {{baseUrl}}/clients/1
+Accept: application/json
+
+### Create client
+POST {{baseUrl}}/clients
+Content-Type: application/json
+
+{
+    "name": "Test Client",
+    "address": "Test Street 123",
+    "city": "Test City",
+    "zip_code": "1234 AB",
+    "province": "Test Province",
+    "country": "Test Country",
+    "contact_name": "John Doe",
+    "contact_phone": "1234567890",
+    "contact_email": "john@test.com"
+}
+
+### Update client
+PUT {{baseUrl}}/clients/1
+Content-Type: application/json
+
+{
+    "id": 1,
+    "name": "Updated Client",
+    "address": "Updated Street 123",
+    "city": "Updated City",
+    "zip_code": "5678 CD",
+    "province": "Updated Province",
+    "country": "Updated Country",
+    "contact_name": "Jane Doe",
+    "contact_phone": "0987654321",
+    "contact_email": "jane@test.com"
+}
+
+### Delete client
+DELETE {{baseUrl}}/clients/1
