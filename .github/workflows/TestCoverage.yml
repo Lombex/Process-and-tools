@@ -56,8 +56,8 @@ jobs:
       - name: Store coverage report
         uses: actions/upload-artifact@v4
         with:
-          path: coverage.xml  # Store the coverage XML report
-        if: ${{ failure() }}  # Upload only if the tests fail
+          path: coverage.xml  
+        if: ${{ failure() }}  
 
   # Job 3: Deployment to Production
   deployment:
