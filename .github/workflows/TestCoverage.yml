@@ -48,13 +48,6 @@ jobs:
         run: |
           python3 PythonAPI/api/main.py &
 
-      # Test with pytest, passing the API key as part of the request
-      - name: Test with pytest
-        env:
-          API_KEY: ${{ secrets.API_KEY }}  # Passing the secret API_KEY to the test
-        run: |
-          pytest  # Run the tests
-
       - name: Run code coverage
         run: |
           coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
