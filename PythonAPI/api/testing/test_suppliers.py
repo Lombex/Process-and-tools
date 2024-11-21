@@ -1,168 +1,133 @@
-# test_suppliers.py
 import pytest
 import httpx
-import json
 from datetime import datetime
-
-# Expliciete mock data voor suppliers
-MOCK_SUPPLIERS = {
-    "1": {
-        "supplier_id": "1",
-        "name": "Tech Supplies Inc",
-        "contact_name": "John Doe",
-        "email": "john@techsupplies.com",
-        "phone": "123-456-7890",
-        "address": "123 Tech Street",
-        "created_at": "2024-01-01T00:00:00",
-        "updated_at": "2024-01-01T00:00:00"
-    },
-    "2": {
-        "supplier_id": "2",
-        "name": "Office Furniture Co",
-        "contact_name": "Jane Smith",
-        "email": "jane@officefurniture.com",
-        "phone": "098-765-4321",
-        "address": "456 Office Road",
-        "created_at": "2024-01-02T00:00:00",
-        "updated_at": "2024-01-02T00:00:00"
-    }
-}
-
-class MockSupplierTable:
-    def __init__(self):
-        self.suppliers = MOCK_SUPPLIERS.copy()
-        
-    def create_supplier(self, supplier_data):
-        supplier_id = supplier_data.get('supplier_id')
-        self.suppliers[supplier_id] = {
-            **supplier_data,
-            'created_at': datetime.now().isoformat(),
-            'updated_at': datetime.now().isoformat()
-        }
-        return self.suppliers[supplier_id]
-    
-    def get_supplier(self, supplier_id):
-        return self.suppliers.get(supplier_id)
-    
-    def list_suppliers(self):
-        return list(self.suppliers.values())
-    
-    def update_supplier(self, supplier_id, supplier_data):
-        if supplier_id in self.suppliers:
-            self.suppliers[supplier_id] = {
-                **self.suppliers[supplier_id],
-                **supplier_data,
-                'updated_at': datetime.now().isoformat()
-            }
-            return self.suppliers[supplier_id]
-        return None
-    
-    def delete_supplier(self, supplier_id):
-        return self.suppliers.pop(supplier_id, None) is not None
+import uuid
 
 @pytest.fixture
-def mock_db():
-    return MockSupplierTable()
-
-@pytest.fixture
-def client(mock_db):
+def client():
+    """Fixture to create a real HTTP client with authentication."""
     headers = {
-        "API_KEY": "test_api_key",
+        "API_KEY": "a1b2c3d4e5",
         "Content-Type": "application/json"
     }
-    
-    client = httpx.Client(
-        base_url="http://localhost:3000",
+    return httpx.Client(
+        base_url="http://localhost:3000/api/v1",
         headers=headers,
         timeout=30.0
     )
-    
-    def mock_response(request):
-        path = request.url.path
-        method = request.method
-        
-        if path == "/api/v1/suppliers/" and method == "POST":
-            data = json.loads(request.content)
-            supplier = mock_db.create_supplier(data)
-            return httpx.Response(201, json=supplier)
-            
-        elif path.startswith("/api/v1/suppliers/"):
-            supplier_id = path.split("/")[-1]
-            if method == "GET":
-                if path == "/api/v1/suppliers/":
-                    suppliers = mock_db.list_suppliers()
-                    return httpx.Response(200, json=suppliers)
-                supplier = mock_db.get_supplier(supplier_id)
-                if supplier:
-                    return httpx.Response(200, json=supplier)
-                return httpx.Response(404, json={"error": "Supplier not found"})
-                
-            elif method == "PUT":
-                data = json.loads(request.content)
-                supplier = mock_db.update_supplier(supplier_id, data)
-                if supplier:
-                    return httpx.Response(200, json=supplier)
-                return httpx.Response(404, json={"error": "Supplier not found"})
-                
-            elif method == "DELETE":
-                if mock_db.delete_supplier(supplier_id):
-                    return httpx.Response(200, json={"message": "Supplier deleted"})
-                return httpx.Response(404, json={"error": "Supplier not found"})
-                
-        return httpx.Response(404)
-        
-    client._transport = httpx.MockTransport(mock_response)
-    return client
 
-def test_list_suppliers(client):
-    """Test: Get all suppliers"""
-    response = client.get("/api/v1/suppliers/")
-    assert response.status_code == 200
-    data = response.json()
-    assert len(data) == len(MOCK_SUPPLIERS)
-    assert any(supplier["name"] == "Tech Supplies Inc" for supplier in data)
-
-def test_get_supplier(client):
-    """Test: Get specific supplier"""
-    response = client.get("/api/v1/suppliers/1")
-    assert response.status_code == 200
-    data = response.json()
-    assert data["name"] == "Tech Supplies Inc"
-    assert data["email"] == "john@techsupplies.com"
-
-def test_create_supplier(client):
-    """Test: Create new supplier"""
-    new_supplier = {
-        "supplier_id": "3",
-        "name": "Electronics Wholesale Ltd",
-        "contact_name": "Bob Wilson",
-        "email": "bob@electronics.com",
-        "phone": "555-0123-4567",
-        "address": "789 Electronics Ave"
+@pytest.fixture
+def test_supplier_data():
+    """Fixture to generate unique test supplier data."""
+    test_id = f"TEST-{uuid.uuid4().hex[:8]}"
+    return {
+        "supplier_id": test_id,
+        "name": f"Test Supplier {test_id}",
+        "contact_name": "Test Contact",
+        "email": f"test_{test_id}@example.com",
+        "phone": "123-456-7890",
+        "address": "Test Address",
+        "test_flag": True  # To identify test data
     }
-    response = client.post("/api/v1/suppliers/", json=new_supplier)
+
+@pytest.fixture
+def created_supplier(client, test_supplier_data):
+    """Fixture to create and cleanup a test supplier."""
+    # Create the supplier
+    response = client.post("/suppliers/", json=test_supplier_data)
     assert response.status_code == 201
-    data = response.json()
-    assert data["name"] == "Electronics Wholesale Ltd"
-    assert "created_at" in data
+    created = response.json()
+    
+    # Return the created supplier for test use
+    yield created
+    
+    # Cleanup after test
+    try:
+        client.delete(f"/suppliers/{created['supplier_id']}")
+    except Exception as e:
+        print(f"Cleanup warning for supplier {created['supplier_id']}: {e}")
 
-def test_update_supplier(client):
-    """Test: Update existing supplier"""
-    update_data = {
-        "email": "updated@techsupplies.com",
-        "phone": "999-888-7777"
-    }
-    response = client.put("/api/v1/suppliers/1", json=update_data)
+def test_list_suppliers(client, created_supplier):
+    """Test getting all suppliers while ensuring our test supplier is included."""
+    response = client.get("/suppliers/")
     assert response.status_code == 200
-    data = response.json()
-    assert data["email"] == "updated@techsupplies.com"
-    assert data["phone"] == "999-888-7777"
+    suppliers = response.json()
+    
+    assert isinstance(suppliers, list)
+    test_supplier_found = any(
+        supplier['supplier_id'] == created_supplier['supplier_id'] 
+        for supplier in suppliers
+    )
+    assert test_supplier_found, "Test supplier not found in list"
 
-def test_delete_supplier(client):
-    """Test: Delete supplier"""
-    response = client.delete("/api/v1/suppliers/1")
+def test_get_supplier(client, created_supplier):
+    """Test getting a specific supplier."""
+    response = client.get(f"/suppliers/{created_supplier['supplier_id']}")
     assert response.status_code == 200
     
-    # Verify deletion
-    get_response = client.get("/api/v1/suppliers/1")
+    supplier = response.json()
+    assert supplier['supplier_id'] == created_supplier['supplier_id']
+    assert supplier['name'] == created_supplier['name']
+
+def test_create_supplier(client, test_supplier_data):
+    """Test creating a new supplier."""
+    response = client.post("/suppliers/", json=test_supplier_data)
+    assert response.status_code == 201
+    
+    created = response.json()
+    assert created['name'] == test_supplier_data['name']
+    assert created['email'] == test_supplier_data['email']
+    
+    # Cleanup
+    client.delete(f"/suppliers/{created['supplier_id']}")
+
+def test_update_supplier(client, created_supplier):
+    """Test updating an existing supplier."""
+    update_data = {
+        "email": f"updated_{created_supplier['supplier_id']}@example.com",
+        "phone": "999-999-9999"
+    }
+    
+    response = client.put(
+        f"/suppliers/{created_supplier['supplier_id']}", 
+        json=update_data
+    )
+    assert response.status_code == 200
+    
+    updated = response.json()
+    assert updated['email'] == update_data['email']
+    assert updated['phone'] == update_data['phone']
+    # Original fields should remain unchanged
+    assert updated['name'] == created_supplier['name']
+
+def test_delete_supplier(client, test_supplier_data):
+    """Test deleting a supplier."""
+    # First create a supplier to delete
+    create_response = client.post("/suppliers/", json=test_supplier_data)
+    assert create_response.status_code == 201
+    created = create_response.json()
+    
+    # Delete the supplier
+    delete_response = client.delete(f"/suppliers/{created['supplier_id']}")
+    assert delete_response.status_code == 200
+    
+    # Verify it's gone
+    get_response = client.get(f"/suppliers/{created['supplier_id']}")
     assert get_response.status_code == 404
+
+def test_get_nonexistent_supplier(client):
+    """Test getting a supplier that doesn't exist."""
+    nonexistent_id = f"NONEXISTENT-{uuid.uuid4().hex[:8]}"
+    response = client.get(f"/suppliers/{nonexistent_id}")
+    assert response.status_code == 404
+
+def test_create_invalid_supplier(client):
+    """Test creating a supplier with invalid data."""
+    invalid_data = {
+        "supplier_id": "",  # Invalid empty ID
+        "name": "",        # Invalid empty name
+        "email": "not-an-email"  # Invalid email format
+    }
+    
+    response = client.post("/suppliers/", json=invalid_data)
+    assert response.status_code == 400
