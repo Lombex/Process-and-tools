@@ -50,6 +50,7 @@ jobs:
 
       - name: Run code coverage
         run: |
+          coverage run -m pytest
           coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
           coverage report --fail-under=80  # Fail the build if coverage is below 80%
 
