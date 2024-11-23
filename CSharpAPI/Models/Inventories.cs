@@ -1,5 +1,5 @@
 namespace CSharpAPI.Models {
-    public class InventoriesModel {
+    public class InventorieModel {
         public int id { get; set; }
         public string? item_id { get; set; }
         public string? description { get; set; }

@@ -1,6 +1,6 @@
 namespace CSharpAPI.Models 
 {
-    public class OrdersModel 
+    public class OrderModel 
     {
         public int id { get; set; }
         public int source_id { get; set; }

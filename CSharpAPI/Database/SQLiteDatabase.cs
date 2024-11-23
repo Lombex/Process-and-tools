@@ -1,26 +1,28 @@
-using CSharpAPI.Models;
-using System.Data.SqlClient;
-using System.Data.SQLite;
+using CSharpAPI.Models;using Microsoft.Data.Sqlite;
 
-namespace CSharpAPI.Data
+namespace CSharpAPI.Data 
 {
     public class SQLiteDatabase
     {
         public readonly string dbPath = "./Database/Data.db";
+
         public void SetupDatabase()
         {
-            if (!System.IO.File.Exists(dbPath))
+            // Zorg dat de Database directory bestaat
+            var databaseDir = Path.GetDirectoryName(dbPath);
+            if (!Directory.Exists(databaseDir))
             {
-                SQLiteConnection.CreateFile(dbPath);
-                Console.WriteLine("Database has been created successfully!");
+                Directory.CreateDirectory(databaseDir!);
             }
 
+            // SQLite maakt automatisch de database aan als deze niet bestaat
             CreateTables();
+            Console.WriteLine("Database has been created/verified successfully!");
         }
 
         private void CreateTables()
         {
-            using (var connection = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
+            using (var connection = new SqliteConnection($"Data Source={dbPath}"))
             {
                 connection.Open();
 
@@ -35,30 +37,70 @@ namespace CSharpAPI.Data
                 TransferTable transferTable = new TransferTable();
                 WarehouseTable warehouseTable = new WarehouseTable();
 
-                using (var command = new SQLiteCommand(ClientTable.clientQuery, connection)) command.ExecuteNonQuery();
-                
-                using (var command = new SQLiteCommand(inventoriesTable.inventorieQuery, connection)) command.ExecuteNonQuery();
-                
-                using (var command = new SQLiteCommand(itemTable.itemsQuery, connection)) command.ExecuteNonQuery();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = ClientTable.clientQuery;
+                    command.ExecuteNonQuery();
+                }
 
-                using (var command = new SQLiteCommand(suppliersTable.supplierQuery, connection)) command.ExecuteNonQuery();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = inventoriesTable.inventorieQuery;
+                    command.ExecuteNonQuery();
+                }
 
-                using (var command = new SQLiteCommand(locationTable.locationQuery, connection)) command.ExecuteNonQuery();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = itemTable.itemsQuery;
+                    command.ExecuteNonQuery();
+                }
 
-                foreach (var table in XModelTable.xModelTableQuery) 
-                    using (var command = new SQLiteCommand(table.Value, connection)) command.ExecuteNonQuery();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = suppliersTable.supplierQuery;
+                    command.ExecuteNonQuery();
+                }
+
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = locationTable.locationQuery;
+                    command.ExecuteNonQuery();
+                }
+
+                foreach (var table in XModelTable.xModelTableQuery)
+                {
+                    using var command = connection.CreateCommand();
+                    command.CommandText = table.Value;
+                    command.ExecuteNonQuery();
+                }
 
                 foreach (var table in orderTable.orderQuery)
-                    using (var command = new SQLiteCommand(table.Value, connection)) command.ExecuteNonQuery();
+                {
+                    using var command = connection.CreateCommand();
+                    command.CommandText = table.Value;
+                    command.ExecuteNonQuery();
+                }
 
                 foreach (var table in shipmentTable.shipmentQuery)
-                    using (var command = new SQLiteCommand(table.Value, connection)) command.ExecuteNonQuery();
-   
-                foreach (var table in transferTable.transferQuery)
-                   using (var command = new SQLiteCommand(table.Value, connection)) command.ExecuteNonQuery();
+                {
+                    using var command = connection.CreateCommand();
+                    command.CommandText = table.Value;
+                    command.ExecuteNonQuery();
+                }
 
-                foreach (var table in warehouseTable.warhouseQuery) 
-                    using (var command = new SQLiteCommand(table.Value, connection)) command.ExecuteNonQuery();
+                foreach (var table in transferTable.transferQuery)
+                {
+                    using var command = connection.CreateCommand();
+                    command.CommandText = table.Value;
+                    command.ExecuteNonQuery();
+                }
+
+                foreach (var table in warehouseTable.warhouseQuery)
+                {
+                    using var command = connection.CreateCommand();
+                    command.CommandText = table.Value;
+                    command.ExecuteNonQuery();
+                }
             }
         }
     }

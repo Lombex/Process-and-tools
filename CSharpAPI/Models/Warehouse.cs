@@ -1,7 +1,7 @@
 
 namespace CSharpAPI.Models
 {
-    public class Warehouse
+    public class WarehouseModel
     {
         public int id { get; set; }
         public string? code { get; set; }
