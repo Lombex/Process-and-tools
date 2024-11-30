@@ -1,0 +1,23 @@
+ 
+on:
+  push:
+    branches:
+      - CICDTestingBranch
+ 
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+ 
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.x'
+ 
+    - name: Install dependencies
+      run: dotnet restore
+ 
+    - name: Build the project
+      run: dotnet build --no-restore --configuration Release
