@@ -2,7 +2,6 @@ using CSharpAPI.Service;
 using CSharpAPI.Services;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Mvc;
-
 using CSharpAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,12 +26,9 @@ builder.Services.AddSingleton<IItemsService, ItemsService>();
 builder.Services.AddSingleton<ISupplierService, SupplierService>();
 builder.Services.AddSingleton<IInventoriesService, InventoriesService>();
 builder.Services.AddSingleton<IClientsService, ClientsService>();
+builder.Services.AddSingleton<IOrderService, OrderService>(); // Correct service registration
 builder.Services.AddSingleton<SQLiteDatabase>();
-// builder.Services.AddSingleton<IOrderService, OrderService();
 
-
-SQLiteDatabase sQLiteDatabase = new SQLiteDatabase();
-sQLiteDatabase.SetupDatabase();
 // Add CORS
 builder.Services.AddCors(options =>
 {
@@ -45,7 +41,7 @@ builder.Services.AddCors(options =>
         });
 });
 
-// Add Authorization (nodig voor UseAuthorization)
+// Add Authorization
 builder.Services.AddAuthorization();
 
 // Add Swagger
@@ -66,7 +62,20 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "CSharp API V1");
     });
 }
-// Middleware in correcte volgorde
+
+// Ensure the database is set up
+SQLiteDatabase sQLiteDatabase = new SQLiteDatabase();
+sQLiteDatabase.SetupDatabase();
+
+// Insert warehouse data from JSON file into the database
+var suppliersService = app.Services.GetRequiredService<ISupplierService>();
+var orderService = app.Services.GetRequiredService<IOrderService>(); // Correct usage
+orderService.InsertOrdersFromJson();  // Call the method to insert orders
+
+suppliersService.InsertSuppliersIntoDatabase();
+
+
+// Middleware in correct order
 app.UseRouting();
 app.UseCors("AllowAll");
 app.UseAuthorization();

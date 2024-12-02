@@ -1,2 +1,9 @@
 GET http://localhost:5001/
-###
+### Test Get All Warehouses
+GET http://localhost:5001/api/v1/warehouses/all
+Accept: application/json
+
+### Test Get Warehouse by Id
+GET http://localhost:5001/api/v1/warehouses/1
+Accept: application/json
+### 

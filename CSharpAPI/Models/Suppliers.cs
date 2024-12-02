@@ -6,6 +6,7 @@ namespace CSharpAPI.Models {
         public string? address { get; set; }
         public string? address_extra { get; set; }
         public string? city { get; set; }
+        public string? country { get; set; }                  // Added country to match 
         public string? zip_code { get; set; }
         public string? province { get; set; }
         public string? contact_name { get; set; }
