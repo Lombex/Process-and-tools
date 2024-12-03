@@ -3,11 +3,17 @@ using CSharpAPI.Services;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
+using CSharpAPI.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add basic services
 builder.Services.AddControllers()
-    .AddNewtonsoftJson();
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    });
 
 // Register services
 builder.Services.AddSingleton<IWarehouseService, WarehouseService>();
@@ -21,9 +27,13 @@ builder.Services.AddSingleton<IItemsService, ItemsService>();
 builder.Services.AddSingleton<ISupplierService, SupplierService>();
 builder.Services.AddSingleton<IInventoriesService, InventoriesService>();
 builder.Services.AddSingleton<IClientsService, ClientsService>();
-// builder.Services.AddSingleton<IOrderService, OrderService();
+builder.Services.AddSingleton<SQLiteDatabase>();
 
+// Uncomment if needed
+// builder.Services.AddSingleton<IOrderService, OrderService>();
 
+SQLiteDatabase sQLiteDatabase = new SQLiteDatabase();
+sQLiteDatabase.SetupDatabase();
 
 // Add CORS
 builder.Services.AddCors(options =>
