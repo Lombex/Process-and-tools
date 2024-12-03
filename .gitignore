@@ -35,3 +35,13 @@
 /PythonAPI/api/providers/__pycache__/data_provider.cpython-313.pyc
 /PythonAPI/api/processors/__pycache__/notification_processor.cpython-313.pyc
 /PythonAPI/start-system.sh
+
+# Build outputs
+CSharpAPI/bin/
+CSharpAPI/obj/
+*.dll
+*.pdb
+*.cache
+*.json
+*.props
+*.targets
