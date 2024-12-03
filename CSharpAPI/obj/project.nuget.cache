@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "S4sSUAqWbbRSyVhJUO3lE8A2ySodNECRyFgVVmzTsyKxO6tfE8FOkRGV0qdre3czv3FyRIs27uQ2JYYw1cCxXQ==",
+  "dgSpecHash": "n1SkOcXzz2fvpmus3qk3IDROvd7GB7sbEtoVQflU1tCAhcvHEQ4nRwg6Sv8NTrwXikozRsOu2BTFgJAFMB346Q==",
   "success": true,
-  "projectFilePath": "/Users/steynhellendoorn/Informatica jaar twee (deel 2)/Software-construction/Merge (delete soon)/Software-Construction-1/CSharpAPI/CSharpAPI.csproj",
+  "projectFilePath": "/Users/steynhellendoorn/Informatica jaar twee (deel 2)/Software-construction/Master/Software-Construction/CSharpAPI/CSharpAPI.csproj",
   "expectedPackageFiles": [
     "/Users/steynhellendoorn/.nuget/packages/entityframework/6.4.4/entityframework.6.4.4.nupkg.sha512",
     "/Users/steynhellendoorn/.nuget/packages/microsoft.aspnetcore.jsonpatch/8.0.10/microsoft.aspnetcore.jsonpatch.8.0.10.nupkg.sha512",

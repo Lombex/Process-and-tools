@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/steynhellendoorn/Informatica jaar twee (deel 2)/Software-construction/Merge (delete soon)/Software-Construction-1/CSharpAPI/CSharpAPI.csproj": {}
+    "/Users/steynhellendoorn/Informatica jaar twee (deel 2)/Software-construction/Master/Software-Construction/CSharpAPI/CSharpAPI.csproj": {}
   },
   "projects": {
-    "/Users/steynhellendoorn/Informatica jaar twee (deel 2)/Software-construction/Merge (delete soon)/Software-Construction-1/CSharpAPI/CSharpAPI.csproj": {
+    "/Users/steynhellendoorn/Informatica jaar twee (deel 2)/Software-construction/Master/Software-Construction/CSharpAPI/CSharpAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/steynhellendoorn/Informatica jaar twee (deel 2)/Software-construction/Merge (delete soon)/Software-Construction-1/CSharpAPI/CSharpAPI.csproj",
+        "projectUniqueName": "/Users/steynhellendoorn/Informatica jaar twee (deel 2)/Software-construction/Master/Software-Construction/CSharpAPI/CSharpAPI.csproj",
         "projectName": "CSharpAPI",
-        "projectPath": "/Users/steynhellendoorn/Informatica jaar twee (deel 2)/Software-construction/Merge (delete soon)/Software-Construction-1/CSharpAPI/CSharpAPI.csproj",
+        "projectPath": "/Users/steynhellendoorn/Informatica jaar twee (deel 2)/Software-construction/Master/Software-Construction/CSharpAPI/CSharpAPI.csproj",
         "packagesPath": "/Users/steynhellendoorn/.nuget/packages/",
-        "outputPath": "/Users/steynhellendoorn/Informatica jaar twee (deel 2)/Software-construction/Merge (delete soon)/Software-Construction-1/CSharpAPI/obj/",
+        "outputPath": "/Users/steynhellendoorn/Informatica jaar twee (deel 2)/Software-construction/Master/Software-Construction/CSharpAPI/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/steynhellendoorn/.nuget/NuGet/NuGet.Config"
