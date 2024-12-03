@@ -27,8 +27,9 @@ builder.Services.AddSingleton<IItemsService, ItemsService>();
 builder.Services.AddSingleton<ISupplierService, SupplierService>();
 builder.Services.AddSingleton<IInventoriesService, InventoriesService>();
 builder.Services.AddSingleton<IClientsService, ClientsService>();
+builder.Services.AddSingleton<IOrderService, OrderService>();
 builder.Services.AddSingleton<SQLiteDatabase>();
-// builder.Services.AddSingleton<IOrderService, OrderService();
+
 
 
 SQLiteDatabase sQLiteDatabase = new SQLiteDatabase();

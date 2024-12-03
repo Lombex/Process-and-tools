@@ -1,0 +1,35 @@
+### Get All Locations
+GET http://localhost:5001/api/v1/locations/all
+Content-Type: application/json
+
+### Get Location by Id
+GET http://localhost:5001/api/v1/locations/34534
+Content-Type: application/json
+
+### Get warehouse from location
+GET http://localhost:5001/api/v1/locations/warehouse/1
+Content-Type: application/json
+
+### Create new Location
+POST http://localhost:5001/api/v1/locations
+Content-Type: application/json
+
+{
+  "warehouse_id": 1,
+  "code": "Q.25.3",
+  "name": "Newly created location"
+}
+
+### Update Location
+PUT http://localhost:5001/api/v1/locations/34534
+Content-Type: application/json
+
+{
+  "warehouse_id": 1,
+  "code": "Q.25.3",
+  "name": "Updated Location"
+}
+
+### Delete location
+DELETE http://localhost:5001/api/v1/locations/34534
+Content-Type: application/json

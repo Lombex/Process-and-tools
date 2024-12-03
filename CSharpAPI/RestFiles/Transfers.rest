@@ -1,0 +1,52 @@
+### Get all transfers
+
+GET http://localhost:5001/api/v1/transfers/all
+Content-Type: application/json
+
+### Get transfer by ID
+GET http://localhost:5001/api/v1/transfers/1
+Content-Type: application/json
+
+### Get transfer item
+GET http://localhost:5001/api/v1/transfers/1/items
+Content-Type: application/json
+
+### Create new Transfer
+POST http://localhost:5001/api/v1/transfers
+Content-Type: application/json
+
+{
+  "id": 1,
+  "reference": "Test",
+  "transfer_from": 1,
+  "transfer_to": 1,
+  "transfer_status": "Test Status",
+  "items": [
+    {
+      "item_id": "Test1",
+      "amount": 1
+    }
+  ]
+}
+
+### Update transfer
+PUT http://localhost:5001/api/v1/transfers/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "reference": "Updated Test",
+  "transfer_from": 1,
+  "transfer_to": 1,
+  "transfer_status": "Test Status",
+  "items": [
+    {
+      "item_id": "Test1",
+      "amount": 1
+    }
+  ]
+}
+
+### Delete transfer
+DELETE http://localhost:5001/api/v1/transfers/1
+Content-Type: application/json

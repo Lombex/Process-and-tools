@@ -1,0 +1,51 @@
+### Get All Suppliers
+GET http://localhost:5001/api/v1/suppliers/all
+Content-Type: application/json
+
+### Get Supplier By ID
+GET http://localhost:5001/api/v1/suppliers/1
+Content-Type: application/json
+
+### Get Item from supplier
+GET http://localhost:5001/api/v1/suppliers/1/items
+Content-Type: application/json
+
+### Create a supplier
+POST http://localhost:5001/api/v1/suppliers
+Content-Type: application/json
+
+{
+    "code": "SUP0001",
+    "name": "Lee, Parks and Johnson",
+    "address": "5989 Sullivan Drives",
+    "address_extra": "Apt. 996",
+    "city": "Port Anitaburgh",
+    "zip_code": "91688",
+    "province": "Illinois",
+    "country": "Czech Republic",
+    "contact_name": "Toni Barnett",
+    "phonenumber": "363.541.7282x36825",
+    "reference": "LPaJ-SUP0001"
+}
+
+### Update a supplier
+POST http://localhost:5001/api/v1/suppliers/1
+Content-Type: application/json
+
+{
+    "code": "SUP0001",
+    "name": "Updated Supplier!!",
+    "address": "5989 Sullivan Drives",
+    "address_extra": "Apt. 996",
+    "city": "Port Anitaburgh",
+    "zip_code": "91688",
+    "province": "Illinois",
+    "country": "Czech Republic",
+    "contact_name": "Toni Barnett",
+    "phonenumber": "363.541.7282x36825",
+    "reference": "LPaJ-SUP0001"
+}
+
+### Delete supplier
+DELETE http://localhost:5001/api/v1/suppliers/1
+Content-Type: application/json
