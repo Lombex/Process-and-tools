@@ -3,7 +3,7 @@ using CSharpAPI.Services;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
-using CSharpAPI.Data;
+// using CSharpAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,12 +28,12 @@ builder.Services.AddSingleton<ISupplierService, SupplierService>();
 builder.Services.AddSingleton<IInventoriesService, InventoriesService>();
 builder.Services.AddSingleton<IClientsService, ClientsService>();
 builder.Services.AddSingleton<IOrderService, OrderService>();
-builder.Services.AddSingleton<SQLiteDatabase>();
+// builder.Services.AddSingleton<SQLiteDatabase>();
 
 
 
-SQLiteDatabase sQLiteDatabase = new SQLiteDatabase();
-sQLiteDatabase.SetupDatabase();
+// SQLiteDatabase sQLiteDatabase = new SQLiteDatabase();
+// sQLiteDatabase.SetupDatabase();
 // Add CORS
 builder.Services.AddCors(options =>
 {
