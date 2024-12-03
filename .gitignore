@@ -43,7 +43,6 @@ CSharpAPI/obj/
 
 *.dll
 *.pdb
-*.cache
 *.csproj.FileListAbsolute.txt
 *.genruntimeconfig.cache
 *.assets.cache
