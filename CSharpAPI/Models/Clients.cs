@@ -13,4 +13,23 @@ namespace CSharpAPI.Models {
         public DateTime created_at { get; set; }
         public DateTime updated_at { get; set; }
     }
+
+    public class ClientTable
+    {
+        public readonly string clientQuery = 
+            @"CREATE TABLE IF NOT EXISTS Client (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT,
+                address TEXT,
+                city TEXT,
+                zip_code TEXT,
+                province TEXT,
+                country TEXT,
+                contact_name TEXT,
+                contact_phone TEXT,
+                contact_email TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )";
+    }
 }
