@@ -53,3 +53,11 @@ CSharpAPI/obj/
 *.json
 *.props
 *.targets
+
+.vs/
+**/bin/
+**/obj/
+*.user
+*.userosscache
+*.suo
+*.cache
