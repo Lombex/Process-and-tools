@@ -45,3 +45,12 @@ CSharpAPI/obj/
 *.json
 *.props
 *.targets
+
+# Build directories
+CSharpAPI/bin/
+CSharpAPI/obj/
+
+# Build artifacts
+*.cache
+*.editorconfig
+project.assets.json
