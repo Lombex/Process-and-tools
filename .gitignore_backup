@@ -1,7 +1,9 @@
-################################################################################
+﻿################################################################################
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
+CSharpAPI/bin/
+CSharpAPI/obj/
 /CSharpAPI/.vs/CSharpAPI/DesignTimeBuild/.dtbcache.v2
 /CSharpAPI/.vs/CSharpAPI/FileContentIndex/7e8e3067-d093-40ef-a5a1-4a0b2ceb5eb4.vsidx
 /CSharpAPI/.vs/CSharpAPI/FileContentIndex/a0a03a4e-b7cb-4f65-9c23-5b7242a35bc5.vsidx
@@ -36,21 +38,26 @@
 /PythonAPI/api/processors/__pycache__/notification_processor.cpython-313.pyc
 /PythonAPI/start-system.sh
 
-# Build outputs
-CSharpAPI/bin/
-CSharpAPI/obj/
+**/bin/
+**/obj/
+
 *.dll
 *.pdb
+*.csproj.FileListAbsolute.txt
+*.genruntimeconfig.cache
+*.assets.cache
+
+**/staticwebassets/
+
 *.cache
 *.json
 *.props
 *.targets
 
-# Build directories
-CSharpAPI/bin/
-CSharpAPI/obj/
-
-# Build artifacts
+.vs/
+**/bin/
+**/obj/
+*.user
+*.userosscache
+*.suo
 *.cache
-*.editorconfig
-project.assets.json
