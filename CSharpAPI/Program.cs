@@ -27,14 +27,13 @@ builder.Services.AddSingleton<IItemsService, ItemsService>();
 builder.Services.AddSingleton<ISupplierService, SupplierService>();
 builder.Services.AddSingleton<IInventoriesService, InventoriesService>();
 builder.Services.AddSingleton<IClientsService, ClientsService>();
+builder.Services.AddSingleton<IOrderService, OrderService>();
 builder.Services.AddSingleton<SQLiteDatabase>();
 
-// Uncomment if needed
-// builder.Services.AddSingleton<IOrderService, OrderService>();
+
 
 SQLiteDatabase sQLiteDatabase = new SQLiteDatabase();
 sQLiteDatabase.SetupDatabase();
-
 // Add CORS
 builder.Services.AddCors(options =>
 {
@@ -68,7 +67,6 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "CSharp API V1");
     });
 }
-
 // Middleware in correcte volgorde
 app.UseRouting();
 app.UseCors("AllowAll");
