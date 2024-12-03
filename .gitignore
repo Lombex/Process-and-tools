@@ -2,6 +2,8 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
+CSharpAPI/bin/
+CSharpAPI/obj/
 /CSharpAPI/.vs/CSharpAPI/DesignTimeBuild/.dtbcache.v2
 /CSharpAPI/.vs/CSharpAPI/FileContentIndex/7e8e3067-d093-40ef-a5a1-4a0b2ceb5eb4.vsidx
 /CSharpAPI/.vs/CSharpAPI/FileContentIndex/a0a03a4e-b7cb-4f65-9c23-5b7242a35bc5.vsidx
@@ -48,5 +50,7 @@
 
 **/staticwebassets/
 
-CSharpAPI/bin/
-CSharpAPI/obj/
+*.cache
+*.json
+*.props
+*.targets
