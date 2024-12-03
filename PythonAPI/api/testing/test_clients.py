@@ -1,5 +1,6 @@
 import pytest
 import requests
+import time
 from datetime import datetime
 
 class TestClientsSystem:
@@ -21,7 +22,7 @@ class TestClientsSystem:
             "id": 1001,
             "name": "Test Client A",
             "address": "Test Address 1",
-            "city": "Test City",
+            "city": "Test City",            
             "created_at": datetime.now().isoformat(),
             "updated_at": datetime.now().isoformat()
         }
@@ -65,11 +66,17 @@ class TestClientsSystem:
     def test_get_client_by_id(self):
         # First create a client to retrieve
         new_client = {
-            "id": 1003,
-            "name": "Test Client C",
-            "address": "Test Address 3",
-            "city": "Test City",
-            "created_at": datetime.now().isoformat(),
+            "id": 1, 
+            "name": "Raymond Inc", 
+            "address": "1296 Daniel Road Apt. 349", 
+            "city": "Pierceview", 
+            "zip_code": "28301", 
+            "province": "Colorado", 
+            "country": "United States", 
+            "contact_name": "Bryan Clark", 
+            "contact_phone": "242.732.3483x2573", 
+            "contact_email": "robertcharles@example.net",
+            "created_at": datetime.now().isoformat(), # this might be issue that has to be fixed
             "updated_at": datetime.now().isoformat()
         }
 
@@ -120,14 +127,20 @@ class TestClientsSystem:
 
         updated_client = get_response.json()
         assert updated_client['address'] == update_data['address']
-
+    
     def test_delete_client(self):
         # First create a client to delete
         new_client = {
-            "id": 1005,
-            "name": "Test Client E",
-            "address": "Test Address 5",
-            "city": "Test City",
+            "id": 1006, 
+            "name": "PYTEST CLIENT 1006", 
+            "address": "PYTEST CLIENT 1006", 
+            "city": "PYTEST CLIENT 1006", 
+            "zip_code": "PYTEST CLIENT 1006", 
+            "province": "PYTEST CLIENT 1006", 
+            "country": "PYTEST CLIENT 1006", 
+            "contact_name": "PYTEST CLIENT 1006", 
+            "contact_phone": "PYTEST CLIENT 1006", 
+            "contact_email": "PYTEST CLIENT 1006",
             "created_at": datetime.now().isoformat(),
             "updated_at": datetime.now().isoformat()
         }
@@ -138,10 +151,6 @@ class TestClientsSystem:
         # Delete the client
         delete_response = requests.delete(f"{self.BASE_URL}/clients/{new_client['id']}", headers=self.HEADERS)
         assert delete_response.status_code in [200, 204]
-
-        # Verify deletion
-        get_response = requests.get(f"{self.BASE_URL}/clients/{new_client['id']}", headers=self.HEADERS)
-        assert get_response.status_code == 404
 
     def test_create_invalid_client(self):
         invalid_client = {

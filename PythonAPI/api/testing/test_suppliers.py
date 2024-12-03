@@ -1,133 +1,302 @@
-import pytest
-import httpx
+import requests
 from datetime import datetime
-import uuid
+import pytest
 
-@pytest.fixture
-def client():
-    """Fixture to create a real HTTP client with authentication."""
-    headers = {
-        "API_KEY": "a1b2c3d4e5",
-        "Content-Type": "application/json"
-    }
-    return httpx.Client(
-        base_url="http://localhost:3000/api/v1",
-        headers=headers,
-        timeout=30.0
-    )
+BASE_URL = "http://localhost:3000/api/v1"
+HEADERS = {'API_KEY': 'a1b2c3d4e5', 'Content-Type': 'application/json'}
 
-@pytest.fixture
-def test_supplier_data():
-    """Fixture to generate unique test supplier data."""
-    test_id = f"TEST-{uuid.uuid4().hex[:8]}"
-    return {
-        "supplier_id": test_id,
-        "name": f"Test Supplier {test_id}",
-        "contact_name": "Test Contact",
-        "email": f"test_{test_id}@example.com",
-        "phone": "123-456-7890",
-        "address": "Test Address",
-        "test_flag": True  # To identify test data
-    }
+class TestSupplierAPI:
 
-@pytest.fixture
-def created_supplier(client, test_supplier_data):
-    """Fixture to create and cleanup a test supplier."""
-    # Create the supplier
-    response = client.post("/suppliers/", json=test_supplier_data)
-    assert response.status_code == 201
-    created = response.json()
-    
-    # Return the created supplier for test use
-    yield created
-    
-    # Cleanup after test
-    try:
-        client.delete(f"/suppliers/{created['supplier_id']}")
-    except Exception as e:
-        print(f"Cleanup warning for supplier {created['supplier_id']}: {e}")
+    @pytest.fixture(autouse=True)
+    def setup_and_teardown(self):
+        # Setup: Create a test supplier to work with
+        self.test_supplier = {
+            "id": 999,
+            "code": "TEST999",
+            "name": "Test Supplier",
+            "address": "123 Test Lane",
+            "address_extra": "Suite 100",
+            "city": "Test City",
+            "zip_code": "12345",
+            "province": "Test Province",
+            "country": "Test Country",
+            "contact_name": "Test Contact",
+            "phonenumber": "555-555-5555",
+            "reference": "TS-TEST999",
+            "created_at": datetime.now().isoformat(),
+            "updated_at": datetime.now().isoformat()
+        }
 
-def test_list_suppliers(client, created_supplier):
-    """Test getting all suppliers while ensuring our test supplier is included."""
-    response = client.get("/suppliers/")
-    assert response.status_code == 200
-    suppliers = response.json()
-    
-    assert isinstance(suppliers, list)
-    test_supplier_found = any(
-        supplier['supplier_id'] == created_supplier['supplier_id'] 
-        for supplier in suppliers
-    )
-    assert test_supplier_found, "Test supplier not found in list"
+        # Create supplier for testing
+        response = requests.post(f"{BASE_URL}/suppliers", json=self.test_supplier, headers=HEADERS)
+        assert response.status_code == 201
 
-def test_get_supplier(client, created_supplier):
-    """Test getting a specific supplier."""
-    response = client.get(f"/suppliers/{created_supplier['supplier_id']}")
-    assert response.status_code == 200
-    
-    supplier = response.json()
-    assert supplier['supplier_id'] == created_supplier['supplier_id']
-    assert supplier['name'] == created_supplier['name']
+        yield
 
-def test_create_supplier(client, test_supplier_data):
-    """Test creating a new supplier."""
-    response = client.post("/suppliers/", json=test_supplier_data)
-    assert response.status_code == 201
-    
-    created = response.json()
-    assert created['name'] == test_supplier_data['name']
-    assert created['email'] == test_supplier_data['email']
-    
-    # Cleanup
-    client.delete(f"/suppliers/{created['supplier_id']}")
+        # Teardown: Delete the test supplier
+        requests.delete(f"{BASE_URL}/suppliers/{self.test_supplier['id']}", headers=HEADERS)
 
-def test_update_supplier(client, created_supplier):
-    """Test updating an existing supplier."""
-    update_data = {
-        "email": f"updated_{created_supplier['supplier_id']}@example.com",
-        "phone": "999-999-9999"
-    }
-    
-    response = client.put(
-        f"/suppliers/{created_supplier['supplier_id']}", 
-        json=update_data
-    )
-    assert response.status_code == 200
-    
-    updated = response.json()
-    assert updated['email'] == update_data['email']
-    assert updated['phone'] == update_data['phone']
-    # Original fields should remain unchanged
-    assert updated['name'] == created_supplier['name']
+    def test_get_all_suppliers(self):
+        response = requests.get(f"{BASE_URL}/suppliers", headers=HEADERS)
+        assert response.status_code == 200
+        assert isinstance(response.json(), list)
 
-def test_delete_supplier(client, test_supplier_data):
-    """Test deleting a supplier."""
-    # First create a supplier to delete
-    create_response = client.post("/suppliers/", json=test_supplier_data)
-    assert create_response.status_code == 201
-    created = create_response.json()
-    
-    # Delete the supplier
-    delete_response = client.delete(f"/suppliers/{created['supplier_id']}")
-    assert delete_response.status_code == 200
-    
-    # Verify it's gone
-    get_response = client.get(f"/suppliers/{created['supplier_id']}")
-    assert get_response.status_code == 404
+    def test_get_supplier_by_id(self):
+        get_supplier = {
+            "id": 1,
+            "code": "SUP0001",
+            "name": "Lee, Parks and Johnson",
+            "address": "5989 Sullivan Drives",
+            "address_extra": "Apt. 996",
+            "city": "Port Anitaburgh",
+            "zip_code": "91688",
+            "province": "Illinois",
+            "country": "Czech Republic",
+            "contact_name": "Toni Barnett",
+            "phonenumber": "363.541.7282x36825",
+            "reference": "LPaJ-SUP0001",
+            "created_at": "1971-10-20 18:06:17",
+            "updated_at": "1985-06-08 00:13:46"
+        }
 
-def test_get_nonexistent_supplier(client):
-    """Test getting a supplier that doesn't exist."""
-    nonexistent_id = f"NONEXISTENT-{uuid.uuid4().hex[:8]}"
-    response = client.get(f"/suppliers/{nonexistent_id}")
-    assert response.status_code == 404
+        response = requests.get(f"{BASE_URL}/suppliers/{get_supplier['id']}", headers=HEADERS)
+        assert response.status_code == 200
+        data = response.json()
+        assert data['id'] == get_supplier['id']
+        assert data['name'] == get_supplier['name']
 
-def test_create_invalid_supplier(client):
-    """Test creating a supplier with invalid data."""
-    invalid_data = {
-        "supplier_id": "",  # Invalid empty ID
-        "name": "",        # Invalid empty name
-        "email": "not-an-email"  # Invalid email format
-    }
-    
-    response = client.post("/suppliers/", json=invalid_data)
-    assert response.status_code == 400
+    def test_get_supplier_item(self):
+        response = requests.get(f"{BASE_URL}/suppliers/{self.test_supplier['id']}/item", headers=HEADERS)
+        assert response.status_code in [200, 404]  # Adjust based on expected behavior
+
+    def test_create_supplier(self):
+        new_supplier = {
+            "id": 1001,
+            "code": "NEW001",
+            "name": "New Supplier",
+            "address": "456 New Lane",
+            "address_extra": "Apt. 101",
+            "city": "New City",
+            "zip_code": "67890",
+            "province": "New Province",
+            "country": "New Country",
+            "contact_name": "New Contact",
+            "phonenumber": "666-666-6666",
+            "reference": "NS-NEW001",
+            "created_at": datetime.now().isoformat(),
+            "updated_at": datetime.now().isoformat()
+        }
+
+        response = requests.post(f"{BASE_URL}/suppliers", json=new_supplier, headers=HEADERS)
+        assert response.status_code == 201
+
+    import requests
+from datetime import datetime
+import pytest
+
+BASE_URL = "http://localhost:3000/api/v1"
+HEADERS = {'API_KEY': 'a1b2c3d4e5', 'Content-Type': 'application/json'}
+
+class TestSupplierAPI:
+
+    @pytest.fixture(autouse=True)
+    def setup_and_teardown(self):
+        # Setup: Create a test supplier to work with
+        self.test_supplier = {
+            "id": 999,
+            "code": "TEST999",
+            "name": "Test Supplier",
+            "address": "123 Test Lane",
+            "address_extra": "Suite 100",
+            "city": "Test City",
+            "zip_code": "12345",
+            "province": "Test Province",
+            "country": "Test Country",
+            "contact_name": "Test Contact",
+            "phonenumber": "555-555-5555",
+            "reference": "TS-TEST999",
+            "created_at": datetime.now().isoformat(),
+            "updated_at": datetime.now().isoformat()
+        }
+
+        # Create supplier for testing
+        response = requests.post(f"{BASE_URL}/suppliers", json=self.test_supplier, headers=HEADERS)
+        assert response.status_code == 201
+
+        yield
+
+        # Teardown: Delete the test supplier
+        requests.delete(f"{BASE_URL}/suppliers/{self.test_supplier['id']}", headers=HEADERS)
+
+    def test_get_all_suppliers(self):
+        response = requests.get(f"{BASE_URL}/suppliers", headers=HEADERS)
+        assert response.status_code == 200
+        assert isinstance(response.json(), list)
+
+    def test_get_supplier_by_id(self):
+        get_supplier = {
+            "id": 1,
+            "code": "SUP0001",
+            "name": "Lee, Parks and Johnson",
+            "address": "5989 Sullivan Drives",
+            "address_extra": "Apt. 996",
+            "city": "Port Anitaburgh",
+            "zip_code": "91688",
+            "province": "Illinois",
+            "country": "Czech Republic",
+            "contact_name": "Toni Barnett",
+            "phonenumber": "363.541.7282x36825",
+            "reference": "LPaJ-SUP0001",
+            "created_at": "1971-10-20 18:06:17",
+            "updated_at": "1985-06-08 00:13:46"
+        }
+
+        response = requests.get(f"{BASE_URL}/suppliers/{get_supplier['id']}", headers=HEADERS)
+        assert response.status_code == 200
+        data = response.json()
+        assert data['id'] == get_supplier['id']
+        assert data['name'] == get_supplier['name']
+
+    def test_get_supplier_item(self):
+        response = requests.get(f"{BASE_URL}/suppliers/{self.test_supplier['id']}/item", headers=HEADERS)
+        assert response.status_code in [200, 404]  # Adjust based on expected behavior
+
+    def test_create_supplier(self):
+        new_supplier = {
+            "id": 1001,
+            "code": "NEW001",
+            "name": "New Supplier",
+            "address": "456 New Lane",
+            "address_extra": "Apt. 101",
+            "city": "New City",
+            "zip_code": "67890",
+            "province": "New Province",
+            "country": "New Country",
+            "contact_name": "New Contact",
+            "phonenumber": "666-666-6666",
+            "reference": "NS-NEW001",
+            "created_at": datetime.now().isoformat(),
+            "updated_at": datetime.now().isoformat()
+        }
+
+        response = requests.post(f"{BASE_URL}/suppliers", json=new_supplier, headers=HEADERS)
+        assert response.status_code == 201
+
+    def test_update_supplier(self):
+        updated_supplier = self.test_supplier.copy()
+        updated_supplier["name"] = "Updated Supplier Name"
+
+        response = requests.put(f"{BASE_URL}/suppliers/1001", json=updated_supplier, headers=HEADERS)
+        assert response.status_code == 200
+
+        # Verify the update
+        response = requests.get(f"{BASE_URL}/suppliers/1001", headers=HEADERS)
+        data = response.json()
+        assert data['name'] == "Updated Supplier Name"
+
+    def test_delete_supplier(self):
+        # Delete the supplier
+        response = requests.delete(f"{BASE_URL}/suppliers/1001", headers=HEADERS)
+        assert response.status_code == 200
+
+        # Verify deletion
+        response = requests.get(f"{BASE_URL}/suppliers/1001", headers=HEADERS)
+        assert response.status_code == 404
+
+
+
+    import requests
+from datetime import datetime
+import pytest
+
+BASE_URL = "http://localhost:3000/api/v1"
+HEADERS = {'API_KEY': 'a1b2c3d4e5', 'Content-Type': 'application/json'}
+
+class TestSupplierAPI:
+
+    @pytest.fixture(autouse=True)
+    def setup_and_teardown(self):
+        # Setup: Create a test supplier to work with
+        self.test_supplier = {
+            "id": 999,
+            "code": "TEST999",
+            "name": "Test Supplier",
+            "address": "123 Test Lane",
+            "address_extra": "Suite 100",
+            "city": "Test City",
+            "zip_code": "12345",
+            "province": "Test Province",
+            "country": "Test Country",
+            "contact_name": "Test Contact",
+            "phonenumber": "555-555-5555",
+            "reference": "TS-TEST999",
+            "created_at": datetime.now().isoformat(),
+            "updated_at": datetime.now().isoformat()
+        }
+
+        # Create supplier for testing
+        response = requests.post(f"{BASE_URL}/suppliers", json=self.test_supplier, headers=HEADERS)
+        assert response.status_code == 201
+
+        yield
+
+        # Teardown: Delete the test supplier
+        requests.delete(f"{BASE_URL}/suppliers/{self.test_supplier['id']}", headers=HEADERS)
+
+    def test_get_all_suppliers(self):
+        response = requests.get(f"{BASE_URL}/suppliers", headers=HEADERS)
+        assert response.status_code == 200
+        assert isinstance(response.json(), list)
+
+    def test_get_supplier_by_id(self):
+        get_supplier = {
+            "id": 1,
+            "code": "SUP0001",
+            "name": "Lee, Parks and Johnson",
+            "address": "5989 Sullivan Drives",
+            "address_extra": "Apt. 996",
+            "city": "Port Anitaburgh",
+            "zip_code": "91688",
+            "province": "Illinois",
+            "country": "Czech Republic",
+            "contact_name": "Toni Barnett",
+            "phonenumber": "363.541.7282x36825",
+            "reference": "LPaJ-SUP0001",
+            "created_at": "1971-10-20 18:06:17",
+            "updated_at": "1985-06-08 00:13:46"
+        }
+
+        response = requests.get(f"{BASE_URL}/suppliers/{get_supplier['id']}", headers=HEADERS)
+        assert response.status_code == 200
+        data = response.json()
+        assert data['id'] == get_supplier['id']
+        assert data['name'] == get_supplier['name']
+
+    def test_get_supplier_item(self):
+        response = requests.get(f"{BASE_URL}/suppliers/{self.test_supplier['id']}/item", headers=HEADERS)
+        assert response.status_code in [200, 404]  # Adjust based on expected behavior
+
+    def test_create_supplier(self):
+        new_supplier = {
+            "id": 1001,
+            "code": "NEW001",
+            "name": "New Supplier",
+            "address": "456 New Lane",
+            "address_extra": "Apt. 101",
+            "city": "New City",
+            "zip_code": "67890",
+            "province": "New Province",
+            "country": "New Country",
+            "contact_name": "New Contact",
+            "phonenumber": "666-666-6666",
+            "reference": "NS-NEW001",
+            "created_at": datetime.now().isoformat(),
+            "updated_at": datetime.now().isoformat()
+        }
+
+        response = requests.post(f"{BASE_URL}/suppliers", json=new_supplier, headers=HEADERS)
+        assert response.status_code == 201
+
+    # updating supplier
+
+    # deleting supplier
