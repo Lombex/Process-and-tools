@@ -12,7 +12,7 @@ namespace CSharpAPI.Controller {
             _transferSerivces = transfersService;
         }
 
-        [HttpGet()]
+        [HttpGet("all")]
         public IActionResult GetAllTransfers() {
             var transfers = _transferSerivces.GetAllTransfers();
             return Ok(transfers);

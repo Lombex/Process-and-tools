@@ -14,7 +14,7 @@ namespace CSharpAPI.Controller
             _supplierService = supplierService;
         }
 
-        [HttpGet()]
+        [HttpGet("all")]
         public IActionResult GetAllSuppliers()
         {
             var suppliers = _supplierService.GetAllSuppliers();

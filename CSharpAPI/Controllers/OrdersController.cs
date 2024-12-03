@@ -15,7 +15,7 @@ namespace CShartpAPI.Controller
             _orderService = orderService;
         }
 
-        [HttpGet()]
+        [HttpGet("all")]
         public IActionResult GetAllOrders()
         {
             var orders = _orderService.GetAllOrders();

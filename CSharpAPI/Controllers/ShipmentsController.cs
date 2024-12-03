@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CSharpAPI.Controllers
 {
-    [ApiController]
+
+[ApiController]
 [Route("api/v1/shipments")]
 public class ShipmentsController : ControllerBase
 {
@@ -15,7 +16,7 @@ public class ShipmentsController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
+    [HttpGet("all")]
     public IActionResult GetAll()
     {
         return Ok(_service.GetAll());
