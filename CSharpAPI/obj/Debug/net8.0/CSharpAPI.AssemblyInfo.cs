@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CSharpAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+df78f045b95578e0ba15c577dc2f0ddca7f15dc3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a9a65b3c58b6e973e985f73e181245e4120aa8a0")]
 [assembly: System.Reflection.AssemblyProductAttribute("CSharpAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CSharpAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
