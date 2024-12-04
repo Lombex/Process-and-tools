@@ -15,7 +15,7 @@ namespace CSharpAPI.Controllers
             _inventoriesService = inventoriesService;
         }
 
-        [HttpGet]
+        [HttpGet("all")]
         public ActionResult<IEnumerable<InventorieModel>> GetAllInventories()
         {
             return Ok(_inventoriesService.GetAllInventories());

@@ -15,7 +15,7 @@ namespace CSharpAPI.Controllers
             _clientsService = clientsService;
         }
 
-        [HttpGet]
+        [HttpGet("all")]
         public ActionResult<IEnumerable<ClientModel>> GetAllClients()
         {
             var clients = _clientsService.GetAllClients();

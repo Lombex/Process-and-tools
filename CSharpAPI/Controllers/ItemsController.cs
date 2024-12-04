@@ -15,7 +15,7 @@ namespace CSharpAPI.Controllers
             _itemsService = itemsService;
         }
 
-        [HttpGet]
+        [HttpGet("all")]
         public ActionResult<IEnumerable<ItemModel>> GetAllItems()
         {
             return Ok(_itemsService.GetAllItems());

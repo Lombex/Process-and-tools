@@ -15,7 +15,7 @@ namespace CSharpAPI.Controllers
             _service = service;
         }
 
-        [HttpGet]
+        [HttpGet("all")]
         public IActionResult GetAll()
         {
             return Ok(_service.GetAll());

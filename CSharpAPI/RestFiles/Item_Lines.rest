@@ -1,0 +1,29 @@
+### Get all ItemTypes
+GET http://localhost:5001/api/v1/itemlines/all
+Content-Type: application/json
+
+### Get ItemType by ID
+GET http://localhost:5001/api/v1/itemlines/0
+Content-Type: application/json
+
+### Create ItemType
+POST http://localhost:5001/api/v1/itemlines
+Content-Type: application/json
+
+{
+    "name": "New Testtype",
+    "description": "Test Type Description"
+}
+
+### Update ItemType
+PUT http://localhost:5001/api/v1/itemlines/13
+Content-Type: application/json
+
+{
+    "name": "Updated Type",
+    "description": "Test Type Description"
+}
+
+### Delete itemtype
+DELETE http://localhost:5001/api/v1/itemlines/13
+Content-Type: application/json

@@ -1,0 +1,44 @@
+### Get all client 
+GET http://localhost:5001/api/v1/clients/all
+Content-Type: application/json
+
+### Get client by id
+GET http://localhost:5001/api/v1/clients/9821
+Content-Type: application/json
+
+### Create new Client
+POST http://localhost:5001/api/v1/clients
+Content-Type: application/json
+
+{
+  "name": "Zdennick Test",
+  "address": "1296 Daniel Road Apt. 349",
+  "city": "Pierceview",
+  "zip_code": "28301",
+  "province": "Colorado",
+  "country": "United States",
+  "contact_name": "Bryan Clark",
+  "contact_phone": "242.732.3483x2573",
+  "contact_email": "robertcharles@example.net"
+}
+
+### Update client
+### WERKT NIET!!!
+PUT http://localhost:5001/api/v1/clients/9821
+Content-Type: application/json
+
+{
+  "name": "Test Updated",
+  "address": "1296 Daniel Road Apt. 349",
+  "city": "Pierceview",
+  "zip_code": "28301",
+  "province": "Colorado",
+  "country": "United States",
+  "contact_name": "Bryan Clark",
+  "contact_phone": "242.732.3483x2573",
+  "contact_email": "robertcharles@example.net"
+}
+
+### Delete client
+DELETE http://localhost:5001/api/v1/clients/9821
+Content-Type: application/json
