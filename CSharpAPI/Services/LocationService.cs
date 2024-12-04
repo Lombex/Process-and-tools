@@ -1,113 +1,85 @@
 using CSharpAPI.Models;
-using Newtonsoft.Json;
+using CSharpAPI.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace CSharpAPI.Service
 {
     public interface ILocationService
     {
-        List<LocationModel> GetAll();
-        LocationModel GetById(int id);
-        void Add(LocationModel location);
-        bool Update(int id, LocationModel location);
-        bool Delete(int id);
-        List<LocationModel> GetByWarehouseId(int warehouseId);
+        Task<List<LocationModel>> GetAll();
+        Task<LocationModel> GetById(int id);
+        Task Add(LocationModel location);
+        Task<bool> Update(int id, LocationModel location);
+        Task<bool> Delete(int id);
+        Task<List<LocationModel>> GetByWarehouseId(int warehouseId);
     }
 
     public class LocationService : ILocationService
     {
-        private readonly string dataPath = "data/locations.json";
-        private static readonly List<LocationModel> _testData = new()
-        {
-            new LocationModel
-            {
-                id = 1,
-                warehouse_id = 1,
-                code = "LOC001",
-                name = "Warehouse A Section 1",
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
-            },
-            new LocationModel
-            {
-                id = 2,
-                warehouse_id = 1,
-                code = "LOC002",
-                name = "Warehouse A Section 2",
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
-            },
-            new LocationModel
-            {
-                id = 3,
-                warehouse_id = 2,
-                code = "LOC003",
-                name = "Warehouse B Section 1",
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
-            }
-        };
+        private readonly SQLiteDatabase _Db;
 
-        public List<LocationModel> GetAll()
+        public LocationService(SQLiteDatabase db)
         {
-            if (!File.Exists(dataPath)) 
-                return _testData;
-
-            var jsonContent = File.ReadAllText(dataPath);
-            return JsonConvert.DeserializeObject<List<LocationModel>>(jsonContent) ?? _testData;
+            _Db = db;
         }
 
-        public LocationModel GetById(int id)
+        public async Task<List<LocationModel>> GetAll()
         {
-            var location = GetAll().FirstOrDefault(x => x.id == id);
-            if (location == null) throw new Exception($"Location {id} not found");
+            return await _Db.Location.ToListAsync();
+        }
+
+        public async Task<LocationModel> GetById(int id)
+        {
+            var location = await _Db.Location.FirstOrDefaultAsync(x => x.id == id);
+            if (location == null)
+            {
+                throw new Exception($"Location {id} not found");
+            }
             return location;
         }
 
-        public List<LocationModel> GetByWarehouseId(int warehouseId)
+        public async Task Add(LocationModel location)
         {
-            return GetAll().Where(x => x.warehouse_id == warehouseId).ToList();
-        }
-
-        public void Add(LocationModel location)
-        {
-            var items = GetAll();
-            location.id = items.Count > 0 ? items.Max(x => x.id) + 1 : 1;
             location.created_at = DateTime.UtcNow;
             location.updated_at = DateTime.UtcNow;
-            items.Add(location);
-            SaveToFile(items);
+            await _Db.Location.AddAsync(location);
+            await _Db.SaveChangesAsync();
         }
 
-        public bool Update(int id, LocationModel location)
+        public async Task<bool> Update(int id, LocationModel location)
         {
-            var items = GetAll();
-            var existing = items.FirstOrDefault(x => x.id == id);
-            if (existing == null) return false;
+            var existingLocation = await _Db.Location.FirstOrDefaultAsync(x => x.id == id);
+            if (existingLocation == null)
+            {
+                return false;
+            }
 
-            existing.warehouse_id = location.warehouse_id;
-            existing.code = location.code;
-            existing.name = location.name;
-            existing.updated_at = DateTime.UtcNow;
+            existingLocation.warehouse_id = location.warehouse_id;
+            existingLocation.code = location.code;
+            existingLocation.name = location.name;
+            existingLocation.updated_at = DateTime.UtcNow;
 
-            SaveToFile(items);
+            _Db.Location.Update(existingLocation);
+            await _Db.SaveChangesAsync();
             return true;
         }
 
-        public bool Delete(int id)
+        public async Task<bool> Delete(int id)
         {
-            var items = GetAll();
-            var item = items.FirstOrDefault(x => x.id == id);
-            if (item == null) return false;
+            var location = await _Db.Location.FirstOrDefaultAsync(x => x.id == id);
+            if (location == null)
+            {
+                return false;
+            }
 
-            items.Remove(item);
-            SaveToFile(items);
+            _Db.Location.Remove(location);
+            await _Db.SaveChangesAsync();
             return true;
         }
 
-        private void SaveToFile(List<LocationModel> items)
+        public async Task<List<LocationModel>> GetByWarehouseId(int warehouseId)
         {
-            var jsonContent = JsonConvert.SerializeObject(items, Formatting.Indented);
-            File.WriteAllText(dataPath, jsonContent);
+            return await _Db.Location.Where(x => x.warehouse_id == warehouseId).ToListAsync();
         }
     }
 }

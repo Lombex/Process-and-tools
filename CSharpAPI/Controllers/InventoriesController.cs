@@ -16,17 +16,19 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet("all")]
-        public ActionResult<IEnumerable<InventorieModel>> GetAllInventories()
+        public async Task<ActionResult<IEnumerable<InventorieModel>>> GetAllInventories()
         {
-            return Ok(_inventoriesService.GetAllInventories());
+            var inventories = await _inventoriesService.GetAllInventories();
+            return Ok(inventories);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<InventorieModel> GetInventoryById(int id)
+        public async Task<ActionResult<InventorieModel>> GetInventoryById(int id)
         {
             try
             {
-                return Ok(_inventoriesService.GetInventoryById(id));
+                var inventory = await _inventoriesService.GetInventoryById(id);
+                return Ok(inventory);
             }
             catch (Exception ex)
             {
@@ -35,38 +37,54 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult<InventorieModel> CreateInventory(InventorieModel inventory)
+        public async Task<ActionResult<InventorieModel>> CreateInventory([FromBody] InventorieModel inventory)
         {
-            _inventoriesService.CreateInventory(inventory);
+            if (inventory == null)
+            {
+                return BadRequest("Inventory data is null.");
+            }
+
+            await _inventoriesService.AddInventory(inventory);
             return CreatedAtAction(nameof(GetInventoryById), new { id = inventory.id }, inventory);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateInventory(int id, InventorieModel inventory)
+        public async Task<IActionResult> UpdateInventory(int id, [FromBody] InventorieModel inventory)
         {
-            if (_inventoriesService.UpdateInventory(id, inventory))
+            if (inventory == null)
+            {
+                return BadRequest("Invalid inventory data.");
+            }
+
+            var result = await _inventoriesService.UpdateInventory(id, inventory);
+            if (result)
                 return NoContent();
-            return NotFound();
+
+            return NotFound($"Inventory with id {id} not found.");
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteInventory(int id)
+        public async Task<IActionResult> DeleteInventory(int id)
         {
-            if (_inventoriesService.DeleteInventory(id))
+            var result = await _inventoriesService.DeleteInventory(id);
+            if (result)
                 return NoContent();
-            return NotFound();
+
+            return NotFound($"Inventory with id {id} not found.");
         }
 
         [HttpGet("item/{itemId}")]
-        public ActionResult<IEnumerable<InventorieModel>> GetInventoriesByItemId(string itemId)
+        public async Task<ActionResult<IEnumerable<InventorieModel>>> GetInventoriesByItemId(string itemId)
         {
-            return Ok(_inventoriesService.GetInventoriesByItemId(itemId));
+            var inventories = await _inventoriesService.GetInventoriesByItemId(itemId);
+            return Ok(inventories);
         }
 
         [HttpGet("location/{locationId}")]
-        public ActionResult<IEnumerable<InventorieModel>> GetInventoriesByLocation(int locationId)
+        public async Task<ActionResult<IEnumerable<InventorieModel>>> GetInventoriesByLocation(int locationId)
         {
-            return Ok(_inventoriesService.GetInventoriesByLocation(locationId));
+            var inventories = await _inventoriesService.GetInventoriesByLocation(locationId);
+            return Ok(inventories);
         }
     }
 }

@@ -1,46 +1,37 @@
 using CSharpAPI.Models;
-using Newtonsoft.Json;
+using CSharpAPI.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace CSharpAPI.Service
 {   
      public interface IInventoriesService
     {
-        IEnumerable<InventorieModel> GetAllInventories();
-        InventorieModel GetInventoryById(int id);
-        void CreateInventory(InventorieModel inventory);
-        bool UpdateInventory(int id, InventorieModel inventory);
-        bool DeleteInventory(int id);
-        IEnumerable<InventorieModel> GetInventoriesByItemId(string itemId);
-        IEnumerable<InventorieModel> GetInventoriesByLocation(int locationId);
+        Task<List<InventorieModel>> GetAllInventories();
+        Task<InventorieModel> GetInventoryById(int id);
+        Task AddInventory(InventorieModel inventory);
+        Task<bool> UpdateInventory(int id, InventorieModel inventory);
+        Task<bool> DeleteInventory(int id);
+        Task<List<InventorieModel>> GetInventoriesByItemId(string itemId);
+        Task<List<InventorieModel>> GetInventoriesByLocation(int locationId);
     }
 
     public class InventoriesService : IInventoriesService
     {
-        private List<InventorieModel> _inventories;
-        private int _nextId = 1;
+        private readonly SQLiteDatabase _Db;
 
-        public InventoriesService()
+        public InventoriesService(SQLiteDatabase sQLite)
         {
-            _inventories = new List<InventorieModel>
-            {
-                new InventorieModel
-                {
-                    id = 0,
-                    item_id = "ITEM001",
-                    description = "Default Inventory",
-                    locations = new List<int> { 0 },
-                    created_at = DateTime.UtcNow,
-                    updated_at = DateTime.UtcNow
-                }
-            };
-            _nextId = 1;
+            _Db = sQLite;
         }
 
-        public IEnumerable<InventorieModel> GetAllInventories() => _inventories;
-
-        public InventorieModel GetInventoryById(int id)
+        public async Task<List<InventorieModel>> GetAllInventories()
         {
-            var inventory = _inventories.FirstOrDefault(x => x.id == id);
+            return await _Db.Inventors.ToListAsync();
+        }
+
+        public async Task<InventorieModel> GetInventoryById(int id)
+        {
+            var inventory = await _Db.Inventors.FirstOrDefaultAsync(x => x.id == id);
             if (inventory == null)
             {
                 throw new Exception($"Inventory with id {id} not found");
@@ -48,17 +39,18 @@ namespace CSharpAPI.Service
             return inventory;
         }
 
-        public void CreateInventory(InventorieModel inventory)
+        public async Task AddInventory(InventorieModel inventory)
         {
-            inventory.id = _nextId++;
             inventory.created_at = DateTime.UtcNow;
             inventory.updated_at = DateTime.UtcNow;
-            _inventories.Add(inventory);
+
+            await _Db.Inventors.AddAsync(inventory);
+            await _Db.SaveChangesAsync();
         }
 
-        public bool UpdateInventory(int id, InventorieModel inventory)
+        public async Task<bool> UpdateInventory(int id, InventorieModel inventory)
         {
-            var existingInventory = _inventories.FirstOrDefault(x => x.id == id);
+            var existingInventory = await _Db.Inventors.FirstOrDefaultAsync(x => x.id == id);
             if (existingInventory == null) return false;
 
             existingInventory.item_id = inventory.item_id;
@@ -72,26 +64,31 @@ namespace CSharpAPI.Service
             existingInventory.total_available = inventory.total_available;
             existingInventory.updated_at = DateTime.UtcNow;
 
+            _Db.Inventors.Update(existingInventory);
+            await _Db.SaveChangesAsync();
+
             return true;
         }
 
-        public bool DeleteInventory(int id)
+        public async Task<bool> DeleteInventory(int id)
         {
-            var inventory = _inventories.FirstOrDefault(x => x.id == id);
+            var inventory = await _Db.Inventors.FirstOrDefaultAsync(x => x.id == id);
             if (inventory == null) return false;
 
-            _inventories.Remove(inventory);
+            _Db.Inventors.Remove(inventory);
+            await _Db.SaveChangesAsync();
+
             return true;
         }
 
-        public IEnumerable<InventorieModel> GetInventoriesByItemId(string itemId)
+        public async Task<List<InventorieModel>> GetInventoriesByItemId(string itemId)
         {
-            return _inventories.Where(i => i.item_id == itemId);
+            return await _Db.Inventors.Where(i => i.item_id == itemId).ToListAsync();
         }
 
-        public IEnumerable<InventorieModel> GetInventoriesByLocation(int locationId)
+        public async Task<List<InventorieModel>> GetInventoriesByLocation(int locationId)
         {
-            return _inventories.Where(i => i.locations != null && i.locations.Contains(locationId));
+            return await _Db.Inventors.Where(i => i.locations.Contains(locationId)).ToListAsync();
         }
     }
 }

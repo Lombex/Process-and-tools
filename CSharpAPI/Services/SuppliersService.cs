@@ -1,48 +1,47 @@
+using CSharpAPI.Data;
 using CSharpAPI.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace CSharpAPI.Service
 {
     public interface ISupplierService
     {
-        List<SupplierModel> GetAllSuppliers();
-        SupplierModel GetSupplierById(int id);
-        List<Items> GetItemFromSupplierId(int id);
-        bool UpdateSupplier(int id, SupplierModel supplier);
-        void CreateSupplier(SupplierModel supplier);
-        bool DeleteSupplier(int id);
+        Task<List<SupplierModel>> GetAllSuppliers();
+        Task<SupplierModel> GetSupplierById(int id);
+        Task<List<Items>> GetItemFromSupplierId(int id);
+        Task UpdateSupplier(int id, SupplierModel supplier);
+        Task CreateSupplier(SupplierModel supplier);
+        Task DeleteSupplier(int id);
     }
     public class SupplierService : ISupplierService
     {
-        private readonly string dummydata = "data/transfer.json";
+        private readonly SQLiteDatabase _Db;
 
-        public List<SupplierModel> GetAllSuppliers()
+        public SupplierService(SQLiteDatabase sQLite)
         {
-            if (!File.Exists(dummydata)) return new List<SupplierModel>();
-            return JsonConvert.DeserializeObject<List<SupplierModel>>(File.ReadAllText(dummydata)) ?? new List<SupplierModel>();
+            _Db = sQLite;
         }
 
-        public SupplierModel GetSupplierById(int id)
+        public async Task<List<SupplierModel>> GetAllSuppliers() => await _Db.Suppliers.AsQueryable().ToListAsync();
+
+        public async Task<SupplierModel> GetSupplierById(int id)
         {
-            var _supplier = GetAllSuppliers().FirstOrDefault(x => x.id == id);
-            if (_supplier == null) throw new Exception("This Supplier does not exits!");
+            var _supplier = await _Db.Suppliers.FirstOrDefaultAsync(x => x.id == id);
+            if (_supplier == null) throw new Exception("Supplier not found!");
             return _supplier;
         }
 
-        public List<Items> GetItemFromSupplierId(int id)
+        // Has to be implemented
+        public async Task<List<Items>> GetItemFromSupplierId(int id)
         {
-            var _supplier = GetAllSuppliers().FirstOrDefault(x => x.id == id);
-            if (_supplier == null) throw new Exception("This Supplier does not exits!");
-            // Get list of items and get value of "supplier_id"
-            // if "supplier_id" is same as _supplier.id return it.
             throw new NotImplementedException();
         }
 
-        public bool UpdateSupplier(int id, SupplierModel updateSupplier)
+        public async Task UpdateSupplier(int id, SupplierModel updateSupplier)
         {
-            var _supplier = GetAllSuppliers().FirstOrDefault(_x => _x.id == id);
-            if (_supplier == null) return false;
+            var _supplier = await GetSupplierById(id);
 
             updateSupplier.id = _supplier.id;
             updateSupplier.code = _supplier.code;
@@ -55,27 +54,24 @@ namespace CSharpAPI.Service
             updateSupplier.contact_name = _supplier.contact_name;
             updateSupplier.phonenumber = _supplier.phonenumber;
             updateSupplier.reference = _supplier.reference;
-
             updateSupplier.updated_at = DateTime.Now;
 
-            return true;
-
+            _Db.Suppliers.Update(updateSupplier);
+            await _Db.SaveChangesAsync();
         }
 
-        public void CreateSupplier(SupplierModel supplier)
+        public async Task CreateSupplier(SupplierModel supplier)
         {
-            var AllSuppliers = GetAllSuppliers();
-            supplier.id = AllSuppliers.Count > 0 ? AllSuppliers.Max(x => x.id) + 1 : 1;
-            AllSuppliers.Add(supplier);
+            if (supplier == null) throw new ArgumentNullException(nameof(supplier));
+            await _Db.Suppliers.AddAsync(supplier);
+            await _Db.SaveChangesAsync();
         }
 
-        public bool DeleteSupplier(int id)
+        public async Task DeleteSupplier(int id)
         {
-            var _supplier = GetAllSuppliers().FirstOrDefault(x => x.id == id);
-            if (_supplier == null) return false;
-            // Change Database
-
-            return true;
+            var _supplier = await GetSupplierById(id);
+            _Db.Suppliers.Remove(_supplier);
+            await _Db.SaveChangesAsync();
         }
     }
 } 

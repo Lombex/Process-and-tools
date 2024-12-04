@@ -23,18 +23,19 @@ builder.Services.AddDbContext<SQLiteDatabase>(options =>
 
 // Register services
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();
+builder.Services.AddScoped<ITransfersService, TransferSerivce>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IItemsService, ItemsService>();
+builder.Services.AddScoped<IShipmentService, ShipmentService>();
+builder.Services.AddScoped<ILocationService, LocationService>();
+builder.Services.AddScoped<IInventoriesService, InventoriesService>();
+builder.Services.AddScoped<IClientsService, ClientsService>();
+builder.Services.AddScoped<IItemTypeService, ItemTypeService>();
+builder.Services.AddScoped<IItemLineService, ItemLineService>();
 
-builder.Services.AddSingleton<IItemTypeService, ItemTypeService>();
+// --- 
 builder.Services.AddSingleton<IItemGroupService, ItemGroupService>();
-builder.Services.AddSingleton<IItemLineService, ItemLineService>();
-builder.Services.AddSingleton<ITransfersService, TransferSerivce>();
-builder.Services.AddSingleton<IShipmentService, ShipmentService>();
-builder.Services.AddSingleton<ILocationService, LocationService>();
-builder.Services.AddSingleton<IItemsService, ItemsService>();
-builder.Services.AddSingleton<ISupplierService, SupplierService>();
-builder.Services.AddSingleton<IInventoriesService, InventoriesService>();
-builder.Services.AddSingleton<IClientsService, ClientsService>();
-builder.Services.AddSingleton<IOrderService, OrderService>();
 
 
 // Add CORS

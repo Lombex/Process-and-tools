@@ -15,48 +15,46 @@ namespace CSharpAPI.Controller
         }
 
         [HttpGet("all")]
-        public IActionResult GetAllSuppliers()
+        public async Task<IActionResult> GetAllSuppliers()
         {
-            var suppliers = _supplierService.GetAllSuppliers();
+            var suppliers = await _supplierService.GetAllSuppliers();
             return Ok(suppliers);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetSupplierById(int id)
+        public async Task<IActionResult> GetSupplierById(int id)
         {
-            var supplier = _supplierService.GetSupplierById(id);
+            var supplier = await _supplierService.GetSupplierById(id);
             if (supplier == null) return NotFound($"Supplier with id {id} not found.");
             return Ok(supplier);
         }
 
         [HttpGet("{id}/items")]
-        public IActionResult GetItemFromSupplierId(int id)
+        public async Task<IActionResult> GetItemFromSupplierId(int id)
         {
             throw new NotImplementedException("Getting item from Supplier not implemented!");
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateSupplier(int id, [FromBody] SupplierModel supplier)
+        public async Task<IActionResult> UpdateSupplier(int id, [FromBody] SupplierModel supplier)
         {
             if (supplier == null) return BadRequest("Request is empty!");
-            var updateSupplier = _supplierService.UpdateSupplier(id, supplier);
-            if (!updateSupplier) return NotFound($"Supplier with id {id} not found!");
+            await _supplierService.UpdateSupplier(id, supplier);
             return Ok($"Supplier {supplier.name} has been updated!");
         }
 
         [HttpPost]
-        public IActionResult CreateSupplier([FromBody] SupplierModel supplier)
+        public async Task<IActionResult> CreateSupplier([FromBody] SupplierModel supplier)
         {
             if (supplier == null) return BadRequest("Request is empty!");
-            _supplierService.CreateSupplier(supplier);
+            await _supplierService.CreateSupplier(supplier);
             return CreatedAtAction(nameof(GetSupplierById), new { id = supplier.id }, supplier);
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteSupplier(int id)
+        public async Task<IActionResult> DeleteSupplier(int id)
         {
-            var supplier = _supplierService.DeleteSupplier(id);
-            if (!supplier) return NotFound($"Supplier with id {id} not found!");
+            await _supplierService.DeleteSupplier(id);
             return Ok("Supplier has been deleted.");
         }
     }

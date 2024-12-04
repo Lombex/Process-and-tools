@@ -3,7 +3,7 @@ GET http://localhost:5001/api/v1/warehouses/all
 Content-Type: application/json
 
 ### Get Warehouse By ID
-GET http://localhost:5001/api/v1/warehouses/1
+GET http://localhost:5001/api/v1/warehouses/2
 Content-Type: application/json
 
 ### Create new Warehouse
@@ -26,7 +26,7 @@ Content-Type: application/json
 }
 
 ### Update existing warehouse
-PUT http://localhost:5001/api/v1/warehouses/1
+PUT http://localhost:5001/api/v1/warehouses/2
 Content-Type: application/json
 
 {

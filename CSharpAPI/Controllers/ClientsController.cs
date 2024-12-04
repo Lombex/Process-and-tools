@@ -16,59 +16,58 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet("all")]
-        public ActionResult<IEnumerable<ClientModel>> GetAllClients()
+        public async Task<ActionResult<IEnumerable<ClientModel>>> GetAllClients()
         {
-            var clients = _clientsService.GetAllClients();
+            var clients = await _clientsService.GetAllClients();
             return Ok(clients);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<ClientModel> GetClientById(int id)
+        public async Task<ActionResult<ClientModel>> GetClientById(int id)
         {
-            var client = _clientsService.GetClientById(id);
+            var client = await _clientsService.GetClientById(id);
             if (client == null)
             {
-                return NotFound();
+                return NotFound($"Client with id {id} not found.");
             }
             return Ok(client);
         }
 
         [HttpPost]
-        public ActionResult<ClientModel> CreateClient([FromBody] ClientModel client)
+        public async Task<ActionResult<ClientModel>> CreateClient([FromBody] ClientModel client)
         {
-            _clientsService.CreateClient(client);
+            if (client == null) return BadRequest("Client data is null.");
+
+            await _clientsService.AddClient(client);
             return CreatedAtAction(nameof(GetClientById), new { id = client.id }, client);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateClient(int id, [FromBody] ClientModel client)
+        public async Task<IActionResult> UpdateClient(int id, [FromBody] ClientModel client)
         {
-            if (id != client.id)
-            {
-                return BadRequest();
-            }
+            if (client == null) return BadRequest("Invalid client data.");
 
-            var existingClient = _clientsService.GetClientById(id);
+            var existingClient = await _clientsService.GetClientById(id);
             if (existingClient == null)
             {
-                return NotFound();
+                return NotFound($"Client with id {id} not found.");
             }
 
-            _clientsService.UpdateClient(client);
-            return NoContent();
+            await _clientsService.UpdateClient(id, client);
+            return NoContent(); // No content to return after a successful update
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteClient(int id)
+        public async Task<IActionResult> DeleteClient(int id)
         {
-            var client = _clientsService.GetClientById(id);
-            if (client == null)
+            var existingClient = await _clientsService.GetClientById(id);
+            if (existingClient == null)
             {
-                return NotFound();
+                return NotFound($"Client with id {id} not found.");
             }
 
-            _clientsService.DeleteClient(id);
-            return NoContent();
+            await _clientsService.DeleteClient(id);
+            return NoContent(); // No content to return after a successful delete
         }
     }
 }

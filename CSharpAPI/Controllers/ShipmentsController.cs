@@ -17,54 +17,40 @@ public class ShipmentsController : ControllerBase
     }
 
     [HttpGet("all")]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        return Ok(_service.GetAll());
+        var shipments = await _service.GetAll();
+        return Ok(shipments);
     }
 
     [HttpGet("{id}")]
-    public IActionResult GetById(int id)
+    public async Task<IActionResult> GetById(int id)
     {
-        try
-        {
-            return Ok(_service.GetById(id));
-        }
-        catch (Exception ex)
-        {
-            return NotFound(ex.Message);
-        }
+        var shipment = await _service.GetById(id);
+        if (shipment == null) return NotFound($"Shipment with id {id} not found.");
+        return Ok(shipment);    
     }
 
     [HttpPost]
-    public IActionResult Create([FromBody] ShipmentModel shipment)
+    public async Task<IActionResult> Create([FromBody] ShipmentModel shipment)
     {
-        if (shipment == null)
-            return BadRequest("Request is empty!");
-
-        _service.Add(shipment);
+        if (shipment == null) return BadRequest("Request is empty!");
+        await _service.Add(shipment);
         return CreatedAtAction(nameof(GetById), new { id = shipment.id }, shipment);
     }
 
     [HttpPut("{id}")]
-    public IActionResult Update(int id, [FromBody] ShipmentModel shipment)
+    public async Task<IActionResult> Update(int id, [FromBody] ShipmentModel shipment)
     {
-        if (shipment == null)
-            return BadRequest("Request is empty!");
-
-        var result = _service.Update(id, shipment);
-        if (!result)
-            return NotFound($"Shipment {id} not found");
-
+        if (shipment == null) return BadRequest("Request is empty!");
+        await _service.Update(id, shipment);
         return Ok("Shipment has been updated!");
     }
 
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        var result = _service.Delete(id);
-        if (!result)
-            return NotFound($"Shipment {id} not found");
-
+        await _service.Delete(id);
         return Ok("Shipment has been deleted!");
     }
 }

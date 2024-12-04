@@ -16,17 +16,19 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet("all")]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(_service.GetAll());
+            var locations = await _service.GetAll();
+            return Ok(locations);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
             try
             {
-                return Ok(_service.GetById(id));
+                var location = await _service.GetById(id);
+                return Ok(location);
             }
             catch (Exception ex)
             {
@@ -35,32 +37,33 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet("warehouse/{warehouseId}")]
-        public IActionResult GetByWarehouseId(int warehouseId)
+        public async Task<IActionResult> GetByWarehouseId(int warehouseId)
         {
-            return Ok(_service.GetByWarehouseId(warehouseId));
+            var locations = await _service.GetByWarehouseId(warehouseId);
+            return Ok(locations);
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] LocationModel location)
+        public async Task<IActionResult> Create([FromBody] LocationModel location)
         {
             if (location == null) return BadRequest("Request is empty!");
-            _service.Add(location);
+            await _service.Add(location);
             return CreatedAtAction(nameof(GetById), new { id = location.id }, location);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] LocationModel location)
+        public async Task<IActionResult> Update(int id, [FromBody] LocationModel location)
         {
             if (location == null) return BadRequest("Request is empty!");
-            var result = _service.Update(id, location);
+            var result = await _service.Update(id, location);
             if (!result) return NotFound($"Location {id} not found");
             return Ok("Location has been updated!");
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var result = _service.Delete(id);
+            var result = await _service.Delete(id);
             if (!result) return NotFound($"Location {id} not found");
             return Ok("Location has been deleted!");
         }

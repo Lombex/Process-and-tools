@@ -1,77 +1,73 @@
 using CSharpAPI.Models;
+using CSharpAPI.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace CSharpAPI.Service
 {
     public interface IItemLineService
     {
-        IEnumerable<ItemLineModel> GetAllItemLines();
-        ItemLineModel GetItemLineById(int id);
-        void CreateItemLine(ItemLineModel itemLine);
-        bool UpdateItemLine(int id, ItemLineModel itemLine);
-        bool DeleteItemLine(int id);
+        Task<IEnumerable<ItemLineModel>> GetAllItemLines();
+        Task<ItemLineModel> GetItemLineById(int id);
+        Task CreateItemLine(ItemLineModel itemLine);
+        Task<bool> UpdateItemLine(int id, ItemLineModel itemLine);
+        Task<bool> DeleteItemLine(int id);
     }
 
     public class ItemLineService : IItemLineService
     {
-        private List<ItemLineModel> _itemLines;
-        private int _nextId = 1;
+        private readonly SQLiteDatabase _Db;
 
-        public ItemLineService()
+
+        public ItemLineService(SQLiteDatabase context)
         {
-            _itemLines = new List<ItemLineModel>
-            {
-                new ItemLineModel
-                {
-                    id = 0,
-                    name = "Default Line",
-                    description = "Default Line Description",
-                    created_at = DateTime.UtcNow,
-                    updated_at = DateTime.UtcNow
-                }
-            };
-            _nextId = 1;
+            _Db = context;
         }
 
-        public IEnumerable<ItemLineModel> GetAllItemLines() => _itemLines;
-
-        public ItemLineModel GetItemLineById(int id)
+        public async Task<IEnumerable<ItemLineModel>> GetAllItemLines()
         {
-            var itemLine = _itemLines.FirstOrDefault(x => x.id == id);
+            return await _Db.ItemLine.ToListAsync();
+        }
+
+        public async Task<ItemLineModel> GetItemLineById(int id)
+        {
+            var itemLine = await _Db.ItemLine.FirstOrDefaultAsync(x => x.id == id);
             if (itemLine == null)
             {
-                throw new Exception($"ItemLine with id {id} not found");
+                throw new Exception($"ItemLine with id {id} not found.");
             }
             return itemLine;
         }
 
-        public void CreateItemLine(ItemLineModel itemLine)
+        public async Task CreateItemLine(ItemLineModel itemLine)
         {
-            itemLine.id = _nextId++;
             itemLine.created_at = DateTime.UtcNow;
             itemLine.updated_at = DateTime.UtcNow;
-            _itemLines.Add(itemLine);
+            await _Db.ItemLine.AddAsync(itemLine);
+            await _Db.SaveChangesAsync();
         }
 
-        public bool UpdateItemLine(int id, ItemLineModel itemLine)
+        public async Task<bool> UpdateItemLine(int id, ItemLineModel itemLine)
         {
-            var existingItemLine = _itemLines.FirstOrDefault(x => x.id == id);
+            var existingItemLine = await _Db.ItemLine.FirstOrDefaultAsync(x => x.id == id);
             if (existingItemLine == null) return false;
 
             existingItemLine.name = itemLine.name;
             existingItemLine.description = itemLine.description;
             existingItemLine.updated_at = DateTime.UtcNow;
 
+            _Db.ItemLine.Update(existingItemLine);
+            await _Db.SaveChangesAsync();
             return true;
         }
 
-        public bool DeleteItemLine(int id)
+        public async Task<bool> DeleteItemLine(int id)
         {
-            var itemLine = _itemLines.FirstOrDefault(x => x.id == id);
+            var itemLine = await _Db.ItemLine.FirstOrDefaultAsync(x => x.id == id);
             if (itemLine == null) return false;
 
-            _itemLines.Remove(itemLine);
+            _Db.ItemLine.Remove(itemLine);
+            await _Db.SaveChangesAsync();
             return true;
         }
-
     }
 }

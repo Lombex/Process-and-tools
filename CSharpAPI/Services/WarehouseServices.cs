@@ -32,7 +32,6 @@ namespace CSharpAPI.Service
         public async Task UpdateWarehouse(int id, WarehouseModel model)
         {
             var _warehouse = await GetWarehouseById(id);
-            if (_warehouse == null) throw new Exception("Warehouse not found!");
 
             _warehouse.code = model.code;
             _warehouse.name = model.name;
@@ -42,6 +41,7 @@ namespace CSharpAPI.Service
             _warehouse.province = model.province;
             _warehouse.country = model.country;
             _warehouse.contact = model.contact;
+            _warehouse.updated_at = DateTime.Now;
 
             _Db.Warehouse.Update(_warehouse);
             await _Db.SaveChangesAsync();
@@ -50,7 +50,6 @@ namespace CSharpAPI.Service
         public async Task DeleteWarehouse(int id)
         {
             var _warehouse = await GetWarehouseById(id);
-            if (_warehouse == null) throw new Exception("Warehouse not found!");
             _Db.Warehouse.Remove(_warehouse);
             await _Db.SaveChangesAsync();
         }

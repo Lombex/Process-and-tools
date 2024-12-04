@@ -16,18 +16,18 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet("all")]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var itemLines = _service.GetAllItemLines();
+            var itemLines = await _service.GetAllItemLines();
             return Ok(itemLines);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
             try
             {
-                var itemLine = _service.GetItemLineById(id);
+                var itemLine = await _service.GetItemLineById(id);
                 return Ok(itemLine);
             }
             catch (Exception)
@@ -37,33 +37,34 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] ItemLineModel itemLine)
+        public async Task<IActionResult> Create([FromBody] ItemLineModel itemLine)
         {
-            if (itemLine == null) 
+            if (itemLine == null)
                 return BadRequest("Request is empty!");
 
-            _service.CreateItemLine(itemLine);
+            await _service.CreateItemLine(itemLine);
             return CreatedAtAction(nameof(GetById), new { id = itemLine.id }, itemLine);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] ItemLineModel itemLine)
+        public async Task<IActionResult> Update(int id, [FromBody] ItemLineModel itemLine)
         {
-            if (itemLine == null) 
+            if (itemLine == null)
                 return BadRequest("Request is empty!");
 
-            var updated = _service.UpdateItemLine(id, itemLine);
-            if (!updated) 
+            var updated = await _service.UpdateItemLine(id, itemLine);
+            if (!updated)
                 return NotFound($"ItemLine with id {id} not found.");
 
             return Ok($"ItemLine {id} has been updated!");
         }
 
+
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var deleted = _service.DeleteItemLine(id);
-            if (!deleted) 
+            var deleted = await _service.DeleteItemLine(id);
+            if (!deleted)
                 return NotFound($"ItemLine with id {id} not found!");
 
             return Ok("ItemLine has been deleted.");
