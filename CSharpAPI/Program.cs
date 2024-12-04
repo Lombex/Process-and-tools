@@ -33,9 +33,7 @@ builder.Services.AddScoped<IInventoriesService, InventoriesService>();
 builder.Services.AddScoped<IClientsService, ClientsService>();
 builder.Services.AddScoped<IItemTypeService, ItemTypeService>();
 builder.Services.AddScoped<IItemLineService, ItemLineService>();
-
-// --- 
-builder.Services.AddSingleton<IItemGroupService, ItemGroupService>();
+builder.Services.AddScoped<IItemGroupService, ItemGroupService>();
 
 
 // Add CORS
