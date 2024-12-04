@@ -3,7 +3,7 @@ GET http://localhost:5001/api/v1/warehouses/all
 Content-Type: application/json
 
 ### Get Warehouse By ID
-GET http://localhost:5001/api/v1/warehouses/64
+GET http://localhost:5001/api/v1/warehouses/1
 Content-Type: application/json
 
 ### Create new Warehouse
@@ -26,7 +26,7 @@ Content-Type: application/json
 }
 
 ### Update existing warehouse
-PUT http://localhost:5001/api/v1/warehouses/64
+PUT http://localhost:5001/api/v1/warehouses/1
 Content-Type: application/json
 
 {
@@ -41,9 +41,9 @@ Content-Type: application/json
     "name": "John Doe",
     "phone": "123-456-7890",
     "email": "john.doe@example.com"
-  }
+  } 
 }
 
 ### Delete Warehouse
-DELETE http://localhost:5001/api/v1/warehouses/63
+DELETE http://localhost:5001/api/v1/warehouses/1
 Content-Type: application/json

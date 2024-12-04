@@ -28,6 +28,8 @@ namespace CSharpAPI.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<WarehouseModel>().OwnsOne(w => w.contact);
+
             base.OnModelCreating(modelBuilder);
         }
     }

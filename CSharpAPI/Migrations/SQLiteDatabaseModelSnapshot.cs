@@ -61,22 +61,6 @@ namespace CSharpAPI.Migrations
                     b.ToTable("ClientModels");
                 });
 
-            modelBuilder.Entity("CSharpAPI.Models.Contact", b =>
-                {
-                    b.Property<string>("name")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("email")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("phone")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("name");
-
-                    b.ToTable("contacts");
-                });
-
             modelBuilder.Entity("CSharpAPI.Models.InventorieModel", b =>
                 {
                     b.Property<int>("id")
@@ -529,9 +513,6 @@ namespace CSharpAPI.Migrations
                     b.Property<string>("code")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("contactname")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("country")
                         .HasColumnType("TEXT");
 
@@ -551,8 +532,6 @@ namespace CSharpAPI.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("id");
-
-                    b.HasIndex("contactname");
 
                     b.ToTable("Warehouse");
                 });
@@ -574,9 +553,27 @@ namespace CSharpAPI.Migrations
 
             modelBuilder.Entity("CSharpAPI.Models.WarehouseModel", b =>
                 {
-                    b.HasOne("CSharpAPI.Models.Contact", "contact")
-                        .WithMany()
-                        .HasForeignKey("contactname");
+                    b.OwnsOne("CSharpAPI.Models.Contact", "contact", b1 =>
+                        {
+                            b1.Property<int>("WarehouseModelid")
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<string>("email")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("name")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("phone")
+                                .HasColumnType("TEXT");
+
+                            b1.HasKey("WarehouseModelid");
+
+                            b1.ToTable("contacts");
+
+                            b1.WithOwner()
+                                .HasForeignKey("WarehouseModelid");
+                        });
 
                     b.Navigation("contact");
                 });

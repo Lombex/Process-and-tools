@@ -1,4 +1,5 @@
 
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace CSharpAPI.Models
@@ -18,9 +19,9 @@ namespace CSharpAPI.Models
         public DateTime updated_at { get; set; }
     }
 
+    [Owned]
     public class Contact
     {
-        [Key]
         public string? name { get; set; }
         public string? phone { get; set; }
         public string? email { get; set; }

@@ -22,7 +22,8 @@ builder.Services.AddDbContext<SQLiteDatabase>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Register services
-builder.Services.AddSingleton<IWarehouseService, WarehouseService>();
+builder.Services.AddScoped<IWarehouseService, WarehouseService>();
+
 builder.Services.AddSingleton<IItemTypeService, ItemTypeService>();
 builder.Services.AddSingleton<IItemGroupService, ItemGroupService>();
 builder.Services.AddSingleton<IItemLineService, ItemLineService>();
