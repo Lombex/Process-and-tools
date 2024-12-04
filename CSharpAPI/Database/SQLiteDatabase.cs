@@ -23,7 +23,7 @@ namespace CSharpAPI.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured) optionsBuilder.UseSqlite("Data Source=Data.db");
+            if (!optionsBuilder.IsConfigured) optionsBuilder.UseSqlite("Data Source=./Database/Data.db");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

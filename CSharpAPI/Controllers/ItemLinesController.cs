@@ -36,13 +36,6 @@ namespace CSharpAPI.Controllers
             }
         }
 
-        [HttpGet("bygroup/{groupId}")]
-        public IActionResult GetByGroupId(int groupId)
-        {
-            var itemLines = _service.GetItemLinesByGroupId(groupId);
-            return Ok(itemLines);
-        }
-
         [HttpPost]
         public IActionResult Create([FromBody] ItemLineModel itemLine)
         {

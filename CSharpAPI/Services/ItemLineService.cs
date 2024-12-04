@@ -9,7 +9,6 @@ namespace CSharpAPI.Service
         void CreateItemLine(ItemLineModel itemLine);
         bool UpdateItemLine(int id, ItemLineModel itemLine);
         bool DeleteItemLine(int id);
-        IEnumerable<ItemLineModel> GetItemLinesByGroupId(int groupId);
     }
 
     public class ItemLineService : IItemLineService
@@ -26,7 +25,6 @@ namespace CSharpAPI.Service
                     id = 0,
                     name = "Default Line",
                     description = "Default Line Description",
-                    itemgroup_id = 0,
                     created_at = DateTime.UtcNow,
                     updated_at = DateTime.UtcNow
                 }
@@ -61,7 +59,6 @@ namespace CSharpAPI.Service
 
             existingItemLine.name = itemLine.name;
             existingItemLine.description = itemLine.description;
-            existingItemLine.itemgroup_id = itemLine.itemgroup_id;
             existingItemLine.updated_at = DateTime.UtcNow;
 
             return true;
@@ -76,9 +73,5 @@ namespace CSharpAPI.Service
             return true;
         }
 
-        public IEnumerable<ItemLineModel> GetItemLinesByGroupId(int groupId)
-        {
-            return _itemLines.Where(l => l.itemgroup_id == groupId);
-        }
     }
 }

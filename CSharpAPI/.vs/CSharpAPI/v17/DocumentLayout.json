@@ -3,20 +3,32 @@
   "WorkspaceRootPath": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\database\\sqlitedatabase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:database\\sqlitedatabase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\models\\items.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:models\\items.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\models\\warehouse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:models\\warehouse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\database\\sqlitedatabase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:database\\sqlitedatabase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\models\\itemline.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:models\\itemline.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\controllers\\itemlinescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:controllers\\itemlinescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\services\\itemlineservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:services\\itemlineservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,7 +38,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -46,54 +58,93 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Items.cs",
-              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Models\\Items.cs",
-              "RelativeDocumentMoniker": "Models\\Items.cs",
-              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Models\\Items.cs",
-              "RelativeToolTip": "Models\\Items.cs",
-              "ViewState": "AQIAABYAAAAAAAAAAAAywBoAAAANAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-04T13:37:29.885Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Warehouse.cs",
-              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Models\\Warehouse.cs",
-              "RelativeDocumentMoniker": "Models\\Warehouse.cs",
-              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Models\\Warehouse.cs",
-              "RelativeToolTip": "Models\\Warehouse.cs",
-              "ViewState": "AQIAABIAAAAAAAAAAAAcwBYAAAAMAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-04T13:36:56.552Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AQIAAD8AAAAAAAAAAAAAAFQAAAAEAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-04T13:34:07.508Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
               "Title": "SQLiteDatabase.cs",
               "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Database\\SQLiteDatabase.cs",
               "RelativeDocumentMoniker": "Database\\SQLiteDatabase.cs",
               "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Database\\SQLiteDatabase.cs",
               "RelativeToolTip": "Database\\SQLiteDatabase.cs",
-              "ViewState": "AQIAABIAAAAAAAAAAAA4wCEAAAABAAAA",
+              "ViewState": "AQIAAA8AAAAAAAAAAAAuwCAAAAAFAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-12-04T13:25:40.299Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "appsettings.Development.json",
+              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\appsettings.Development.json",
+              "RelativeDocumentMoniker": "appsettings.Development.json",
+              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\appsettings.Development.json",
+              "RelativeToolTip": "appsettings.Development.json",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAIAAAA4AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2024-12-04T14:10:08.224Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAwAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2024-12-04T14:09:49.575Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ItemLine.cs",
+              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Models\\ItemLine.cs",
+              "RelativeDocumentMoniker": "Models\\ItemLine.cs",
+              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Models\\ItemLine.cs",
+              "RelativeToolTip": "Models\\ItemLine.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAYAAAAwAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-04T14:09:19.015Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ItemLineService.cs",
+              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Services\\ItemLineService.cs",
+              "RelativeDocumentMoniker": "Services\\ItemLineService.cs",
+              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Services\\ItemLineService.cs",
+              "RelativeToolTip": "Services\\ItemLineService.cs",
+              "ViewState": "AQIAADoAAAAAAAAAAAAcwDwAAABAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-04T14:08:15.743Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AQIAAAMAAAAAAAAAAAAAAFYAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-04T13:54:24.378Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ItemLinesController.cs",
+              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Controllers\\ItemLinesController.cs",
+              "RelativeDocumentMoniker": "Controllers\\ItemLinesController.cs",
+              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Controllers\\ItemLinesController.cs",
+              "RelativeToolTip": "Controllers\\ItemLinesController.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAACQAAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-04T14:08:53.423Z",
               "EditorCaption": ""
             }
           ]
