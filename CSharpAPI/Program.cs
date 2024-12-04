@@ -3,6 +3,8 @@ using CSharpAPI.Services;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using CSharpAPI.Data;
+using Microsoft.EntityFrameworkCore;
+using System;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +16,10 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
         options.JsonSerializerOptions.PropertyNamingPolicy = null;
     });
+
+// Add DbContext for SQLite
+builder.Services.AddDbContext<SQLiteDatabase>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Register services
 builder.Services.AddSingleton<IWarehouseService, WarehouseService>();
@@ -28,12 +34,8 @@ builder.Services.AddSingleton<ISupplierService, SupplierService>();
 builder.Services.AddSingleton<IInventoriesService, InventoriesService>();
 builder.Services.AddSingleton<IClientsService, ClientsService>();
 builder.Services.AddSingleton<IOrderService, OrderService>();
-builder.Services.AddSingleton<SQLiteDatabase>();
 
 
-
-SQLiteDatabase sQLiteDatabase = new SQLiteDatabase();
-sQLiteDatabase.SetupDatabase();
 // Add CORS
 builder.Services.AddCors(options =>
 {
@@ -75,5 +77,13 @@ app.MapControllers();
 
 // Set URL
 app.Urls.Add("http://localhost:5001");
+
+// Configure Database
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<SQLiteDatabase>();
+    dbContext.Database.Migrate();
+}
+
 
 app.Run();

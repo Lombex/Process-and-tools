@@ -1,4 +1,6 @@
 
+using System.ComponentModel.DataAnnotations;
+
 namespace CSharpAPI.Models
 {
     public class WarehouseModel
@@ -18,38 +20,9 @@ namespace CSharpAPI.Models
 
     public class Contact
     {
+        [Key]
         public string? name { get; set; }
         public string? phone { get; set; }
         public string? email { get; set; }
-    }
-
-    public class WarehouseTable
-    {
-        public readonly Dictionary<string, string> warhouseQuery = new Dictionary<string, string>()
-        {
-            {
-                "Warehouse",
-                @"CREATE TABLE IF NOT EXISTS Warehouse (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    code TEXT,
-                    name TEXT,
-                    address TEXT,
-                    zip TEXT,
-                    city TEXT,
-                    province TEXT,
-                    country TEXT,
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                )"
-            },
-            {
-                "WarehouseContact",
-                @"CREATE TABLE IF NOT EXISTS Contact (
-                    name TEXT,
-                    phone TEXT,
-                    email TEXT
-                )"
-            }
-        };
     }
 }

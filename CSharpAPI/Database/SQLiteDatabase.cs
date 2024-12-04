@@ -1,107 +1,34 @@
-using CSharpAPI.Models;using Microsoft.Data.Sqlite;
+using CSharpAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CSharpAPI.Data 
 {
-    public class SQLiteDatabase
+    public class SQLiteDatabase : DbContext
     {
-        public readonly string dbPath = "./Database/Data.db";
+        public SQLiteDatabase(DbContextOptions<SQLiteDatabase> options) : base(options) { }
+        public DbSet<WarehouseModel> Warehouse { get; set; }
+        public DbSet<TransferModel> Transfer { get; set; }
+        public DbSet<SupplierModel> Suppliers { get; set; }
+        public DbSet<ShipmentModel> Shipment { get; set; }
+        public DbSet<OrderModel> Order { get; set; }
+        public DbSet<LocationModel> Location { get; set; }
+        public DbSet<ItemGroupModel> ItemGroups { get; set; }
+        public DbSet<ItemLineModel> ItemLine { get; set; }
+        public DbSet<ItemTypeModel> ItemType { get; set; }
+        public DbSet<ItemModel> itemModels { get; set; }
+        public DbSet<Items> Items { get; set; }
+        public DbSet<InventorieModel> Inventors { get; set; }
+        public DbSet<ClientModel> ClientModels { get; set; }
+        public DbSet<Contact> contacts { get; set; }
 
-        public void SetupDatabase()
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // Zorg dat de Database directory bestaat
-            var databaseDir = Path.GetDirectoryName(dbPath);
-            if (!Directory.Exists(databaseDir))
-            {
-                Directory.CreateDirectory(databaseDir!);
-            }
-
-            // SQLite maakt automatisch de database aan als deze niet bestaat
-            CreateTables();
-            Console.WriteLine("Database has been created/verified successfully!");
+            if (!optionsBuilder.IsConfigured) optionsBuilder.UseSqlite("Data Source=Data.db");
         }
 
-        private void CreateTables()
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            using (var connection = new SqliteConnection($"Data Source={dbPath}"))
-            {
-                connection.Open();
-
-                ClientTable ClientTable = new ClientTable();
-                InventoriesTable inventoriesTable = new InventoriesTable();
-                ItemTable itemTable = new ItemTable();
-                XModelTable XModelTable = new XModelTable();
-                LocationTable locationTable = new LocationTable();
-                OrderTable orderTable = new OrderTable();
-                ShipmentTable shipmentTable = new ShipmentTable();
-                SuppliersTable suppliersTable = new SuppliersTable();
-                TransferTable transferTable = new TransferTable();
-                WarehouseTable warehouseTable = new WarehouseTable();
-
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = ClientTable.clientQuery;
-                    command.ExecuteNonQuery();
-                }
-
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = inventoriesTable.inventorieQuery;
-                    command.ExecuteNonQuery();
-                }
-
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = itemTable.itemsQuery;
-                    command.ExecuteNonQuery();
-                }
-
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = suppliersTable.supplierQuery;
-                    command.ExecuteNonQuery();
-                }
-
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = locationTable.locationQuery;
-                    command.ExecuteNonQuery();
-                }
-
-                foreach (var table in XModelTable.xModelTableQuery)
-                {
-                    using var command = connection.CreateCommand();
-                    command.CommandText = table.Value;
-                    command.ExecuteNonQuery();
-                }
-
-                foreach (var table in orderTable.orderQuery)
-                {
-                    using var command = connection.CreateCommand();
-                    command.CommandText = table.Value;
-                    command.ExecuteNonQuery();
-                }
-
-                foreach (var table in shipmentTable.shipmentQuery)
-                {
-                    using var command = connection.CreateCommand();
-                    command.CommandText = table.Value;
-                    command.ExecuteNonQuery();
-                }
-
-                foreach (var table in transferTable.transferQuery)
-                {
-                    using var command = connection.CreateCommand();
-                    command.CommandText = table.Value;
-                    command.ExecuteNonQuery();
-                }
-
-                foreach (var table in warehouseTable.warhouseQuery)
-                {
-                    using var command = connection.CreateCommand();
-                    command.CommandText = table.Value;
-                    command.ExecuteNonQuery();
-                }
-            }
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
