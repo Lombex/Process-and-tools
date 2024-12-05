@@ -243,20 +243,10 @@ namespace CSharpAPI.Migrations
                     b.Property<string>("item_id")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("OrderModelid")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("ShipmentModelid")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("amount")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("item_id");
-
-                    b.HasIndex("OrderModelid");
-
-                    b.HasIndex("ShipmentModelid");
 
                     b.ToTable("Items");
                 });
@@ -297,6 +287,9 @@ namespace CSharpAPI.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("created_at")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("items")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("notes")
@@ -368,6 +361,9 @@ namespace CSharpAPI.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("created_at")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("items")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("notes")
@@ -534,17 +530,6 @@ namespace CSharpAPI.Migrations
                     b.ToTable("Warehouse");
                 });
 
-            modelBuilder.Entity("CSharpAPI.Models.Items", b =>
-                {
-                    b.HasOne("CSharpAPI.Models.OrderModel", null)
-                        .WithMany("items")
-                        .HasForeignKey("OrderModelid");
-
-                    b.HasOne("CSharpAPI.Models.ShipmentModel", null)
-                        .WithMany("items")
-                        .HasForeignKey("ShipmentModelid");
-                });
-
             modelBuilder.Entity("CSharpAPI.Models.WarehouseModel", b =>
                 {
                     b.OwnsOne("CSharpAPI.Models.Contact", "contact", b1 =>
@@ -570,16 +555,6 @@ namespace CSharpAPI.Migrations
                         });
 
                     b.Navigation("contact");
-                });
-
-            modelBuilder.Entity("CSharpAPI.Models.OrderModel", b =>
-                {
-                    b.Navigation("items");
-                });
-
-            modelBuilder.Entity("CSharpAPI.Models.ShipmentModel", b =>
-                {
-                    b.Navigation("items");
                 });
 #pragma warning restore 612, 618
         }

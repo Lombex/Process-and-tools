@@ -39,7 +39,6 @@ namespace CSharpAPI.Service
         {
             var _order = await GetOrderById(id);
 
-            _order.id = updatedOrders.id;
             _order.source_id = updatedOrders.source_id;
             _order.order_date = updatedOrders.order_date;
             _order.request_date = updatedOrders.request_date;

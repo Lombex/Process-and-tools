@@ -119,6 +119,18 @@ namespace CSharpAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Items",
+                columns: table => new
+                {
+                    item_id = table.Column<string>(type: "TEXT", nullable: false),
+                    amount = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Items", x => x.item_id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ItemType",
                 columns: table => new
                 {
@@ -175,7 +187,8 @@ namespace CSharpAPI.Migrations
                     total_tax = table.Column<float>(type: "REAL", nullable: false),
                     total_surcharge = table.Column<float>(type: "REAL", nullable: false),
                     created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    items = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -204,7 +217,8 @@ namespace CSharpAPI.Migrations
                     total_package_count = table.Column<int>(type: "INTEGER", nullable: false),
                     total_package_weight = table.Column<float>(type: "REAL", nullable: false),
                     created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    items = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -276,30 +290,6 @@ namespace CSharpAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Items",
-                columns: table => new
-                {
-                    item_id = table.Column<string>(type: "TEXT", nullable: false),
-                    amount = table.Column<int>(type: "INTEGER", nullable: false),
-                    OrderModelid = table.Column<int>(type: "INTEGER", nullable: true),
-                    ShipmentModelid = table.Column<int>(type: "INTEGER", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Items", x => x.item_id);
-                    table.ForeignKey(
-                        name: "FK_Items_Order_OrderModelid",
-                        column: x => x.OrderModelid,
-                        principalTable: "Order",
-                        principalColumn: "id");
-                    table.ForeignKey(
-                        name: "FK_Items_Shipment_ShipmentModelid",
-                        column: x => x.ShipmentModelid,
-                        principalTable: "Shipment",
-                        principalColumn: "id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "contacts",
                 columns: table => new
                 {
@@ -318,16 +308,6 @@ namespace CSharpAPI.Migrations
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Items_OrderModelid",
-                table: "Items",
-                column: "OrderModelid");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Items_ShipmentModelid",
-                table: "Items",
-                column: "ShipmentModelid");
         }
 
         /// <inheritdoc />
@@ -361,6 +341,12 @@ namespace CSharpAPI.Migrations
                 name: "Location");
 
             migrationBuilder.DropTable(
+                name: "Order");
+
+            migrationBuilder.DropTable(
+                name: "Shipment");
+
+            migrationBuilder.DropTable(
                 name: "Suppliers");
 
             migrationBuilder.DropTable(
@@ -368,12 +354,6 @@ namespace CSharpAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "Warehouse");
-
-            migrationBuilder.DropTable(
-                name: "Order");
-
-            migrationBuilder.DropTable(
-                name: "Shipment");
         }
     }
 }

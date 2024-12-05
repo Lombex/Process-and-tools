@@ -35,6 +35,12 @@ namespace CSharpAPI.Data
             modelBuilder.Entity<TransferModel>().Property(x => x.items).HasConversion(new ValueConverter<List<Items>, string>(
                 i => JsonConvert.SerializeObject(i), i => JsonConvert.DeserializeObject<List<Items>>(i)));
 
+            modelBuilder.Entity<ShipmentModel>().Property(x => x.items).HasConversion(new ValueConverter<List<Items>, string>(
+                i => JsonConvert.SerializeObject(i), i => JsonConvert.DeserializeObject<List<Items>>(i)));
+
+            modelBuilder.Entity<OrderModel>().Property(x => x.items).HasConversion(new ValueConverter<List<Items>, string>(
+                i => JsonConvert.SerializeObject(i), i => JsonConvert.DeserializeObject<List<Items>>(i)));
+
             base.OnModelCreating(modelBuilder);
         }
     }

@@ -15,7 +15,7 @@ Content-Type: application/json
   "description": "Default Inventory",
   "item_reference": null,
   "locations": [
-    0
+    0,1,2,3
   ],
   "total_on_hand": 0,
   "total_expected": 0,
@@ -43,7 +43,7 @@ Content-Type: application/json
 }
 
 ### Delete Inventorie
-DELETE http://localhost:5001/api/v1/inventories/2
+DELETE http://localhost:5001/api/v1/inventories/1
 Content-Type: application/json
 
 

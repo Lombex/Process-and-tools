@@ -43,20 +43,19 @@ namespace CSharpAPI.Service
         {
             var _supplier = await GetSupplierById(id);
 
-            updateSupplier.id = _supplier.id;
-            updateSupplier.code = _supplier.code;
-            updateSupplier.name = _supplier.name;
-            updateSupplier.address = _supplier.address;
-            updateSupplier.address_extra = _supplier.address_extra;
-            updateSupplier.city = _supplier.city;
-            updateSupplier.zip_code = _supplier.zip_code;
-            updateSupplier.province = _supplier.province;
-            updateSupplier.contact_name = _supplier.contact_name;
-            updateSupplier.phonenumber = _supplier.phonenumber;
-            updateSupplier.reference = _supplier.reference;
-            updateSupplier.updated_at = DateTime.Now;
+            _supplier.code = updateSupplier.code;
+            _supplier.name = updateSupplier.name;
+            _supplier.address = updateSupplier.address;
+            _supplier.address_extra = updateSupplier.address_extra;
+            _supplier.city = updateSupplier.city;
+            _supplier.zip_code = updateSupplier.zip_code;
+            _supplier.province = updateSupplier.province;
+            _supplier.contact_name = updateSupplier.contact_name;
+            _supplier.phonenumber = updateSupplier.phonenumber;
+            _supplier.reference = updateSupplier.reference;
+            _supplier.updated_at = DateTime.Now;
 
-            _Db.Suppliers.Update(updateSupplier);
+            _Db.Suppliers.Update(_supplier);
             await _Db.SaveChangesAsync();
         }
 

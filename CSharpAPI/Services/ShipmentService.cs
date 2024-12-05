@@ -61,7 +61,7 @@ namespace CSharpAPI.Service
             _shipment.items = shipment.items;
             _shipment.updated_at = DateTime.Now;
 
-            _Db.Shipment.Update(shipment);
+            _Db.Shipment.Update(_shipment);
             await _Db.SaveChangesAsync();
         }
 

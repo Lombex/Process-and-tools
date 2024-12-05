@@ -4,7 +4,7 @@ Content-Type: application/json
 
 
 ### Get shipment by id
-GET http://localhost:5001/api/v1/shipments/10103
+GET http://localhost:5001/api/v1/shipments/1
 Content-Type: application/json
 
 ### Create shipment
@@ -42,7 +42,7 @@ Content-Type: application/json
 }
 
 ### Update shipment
-PUT http://localhost:5001/api/v1/shipments/10103
+PUT http://localhost:5001/api/v1/shipments/5
 Content-Type: application/json
 
 {
@@ -76,5 +76,5 @@ Content-Type: application/json
 }
 
 ### Delete shipment
-DELETE http://localhost:5001/api/v1/shipments/10103
+DELETE http://localhost:5001/api/v1/shipments/5
 Content-Type: application/json

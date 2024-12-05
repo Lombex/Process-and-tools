@@ -35,6 +35,10 @@ namespace CSharpAPI.Service
         public async Task CreateItem(ItemModel item)
         {
             if (item == null) throw new ArgumentNullException(nameof(item));
+
+            var amount = await GetAllItems();
+            item.uid = $"P{(amount.Count + 1).ToString("D6")}";
+
             await _Db.itemModels.AddAsync(item);
             await _Db.SaveChangesAsync();
         }
