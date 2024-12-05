@@ -44,6 +44,9 @@ namespace CSharpAPI.Service {
             _transfer.transfer_status = model.transfer_status;
             _transfer.updated_at = DateTime.Now;
             _transfer.items = model.items;
+
+            _Db.Transfer.Update(_transfer);
+            await _Db.SaveChangesAsync();
         }
 
         // Has to be implemented 

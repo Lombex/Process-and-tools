@@ -249,9 +249,6 @@ namespace CSharpAPI.Migrations
                     b.Property<int?>("ShipmentModelid")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("TransferModelid")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("amount")
                         .HasColumnType("INTEGER");
 
@@ -260,8 +257,6 @@ namespace CSharpAPI.Migrations
                     b.HasIndex("OrderModelid");
 
                     b.HasIndex("ShipmentModelid");
-
-                    b.HasIndex("TransferModelid");
 
                     b.ToTable("Items");
                 });
@@ -478,6 +473,9 @@ namespace CSharpAPI.Migrations
                     b.Property<DateTime>("created_at")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("items")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("reference")
                         .HasColumnType("TEXT");
 
@@ -545,10 +543,6 @@ namespace CSharpAPI.Migrations
                     b.HasOne("CSharpAPI.Models.ShipmentModel", null)
                         .WithMany("items")
                         .HasForeignKey("ShipmentModelid");
-
-                    b.HasOne("CSharpAPI.Models.TransferModel", null)
-                        .WithMany("items")
-                        .HasForeignKey("TransferModelid");
                 });
 
             modelBuilder.Entity("CSharpAPI.Models.WarehouseModel", b =>
@@ -584,11 +578,6 @@ namespace CSharpAPI.Migrations
                 });
 
             modelBuilder.Entity("CSharpAPI.Models.ShipmentModel", b =>
-                {
-                    b.Navigation("items");
-                });
-
-            modelBuilder.Entity("CSharpAPI.Models.TransferModel", b =>
                 {
                     b.Navigation("items");
                 });

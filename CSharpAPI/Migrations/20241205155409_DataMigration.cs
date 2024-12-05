@@ -246,7 +246,8 @@ namespace CSharpAPI.Migrations
                     transfer_to = table.Column<int>(type: "INTEGER", nullable: false),
                     transfer_status = table.Column<string>(type: "TEXT", nullable: true),
                     created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    items = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -281,8 +282,7 @@ namespace CSharpAPI.Migrations
                     item_id = table.Column<string>(type: "TEXT", nullable: false),
                     amount = table.Column<int>(type: "INTEGER", nullable: false),
                     OrderModelid = table.Column<int>(type: "INTEGER", nullable: true),
-                    ShipmentModelid = table.Column<int>(type: "INTEGER", nullable: true),
-                    TransferModelid = table.Column<int>(type: "INTEGER", nullable: true)
+                    ShipmentModelid = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -296,11 +296,6 @@ namespace CSharpAPI.Migrations
                         name: "FK_Items_Shipment_ShipmentModelid",
                         column: x => x.ShipmentModelid,
                         principalTable: "Shipment",
-                        principalColumn: "id");
-                    table.ForeignKey(
-                        name: "FK_Items_Transfer_TransferModelid",
-                        column: x => x.TransferModelid,
-                        principalTable: "Transfer",
                         principalColumn: "id");
                 });
 
@@ -333,11 +328,6 @@ namespace CSharpAPI.Migrations
                 name: "IX_Items_ShipmentModelid",
                 table: "Items",
                 column: "ShipmentModelid");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Items_TransferModelid",
-                table: "Items",
-                column: "TransferModelid");
         }
 
         /// <inheritdoc />
@@ -374,6 +364,9 @@ namespace CSharpAPI.Migrations
                 name: "Suppliers");
 
             migrationBuilder.DropTable(
+                name: "Transfer");
+
+            migrationBuilder.DropTable(
                 name: "Warehouse");
 
             migrationBuilder.DropTable(
@@ -381,9 +374,6 @@ namespace CSharpAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "Shipment");
-
-            migrationBuilder.DropTable(
-                name: "Transfer");
         }
     }
 }

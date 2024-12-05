@@ -1,5 +1,7 @@
 using CSharpAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Newtonsoft.Json;
 
 namespace CSharpAPI.Data 
 {
@@ -29,6 +31,9 @@ namespace CSharpAPI.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<WarehouseModel>().OwnsOne(w => w.contact);
+
+            modelBuilder.Entity<TransferModel>().Property(x => x.items).HasConversion(new ValueConverter<List<Items>, string>(
+                i => JsonConvert.SerializeObject(i), i => JsonConvert.DeserializeObject<List<Items>>(i)));
 
             base.OnModelCreating(modelBuilder);
         }
