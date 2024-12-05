@@ -33,6 +33,14 @@ namespace CSharpAPI.Controllers
             return Ok(client);
         }
 
+        [HttpGet("{id}/orders")]
+        public async Task<IActionResult> ClientOrders(int id)
+        {
+            var _order = await _clientsService.GetClientOrders(id);
+            if (_order == null) return NotFound($"Order with {id} not found");
+            return Ok(_order);
+        }
+
         [HttpPost]
         public async Task<ActionResult<ClientModel>> CreateClient([FromBody] ClientModel client)
         {

@@ -6,6 +6,10 @@ Content-Type: application/json
 GET http://localhost:5001/api/v1/clients/9821
 Content-Type: application/json
 
+### Get order by client id
+GET http://localhost:5001/api/v1/clients/3/orders
+Content-Type: application/json
+
 ### Create new Client
 POST http://localhost:5001/api/v1/clients
 Content-Type: application/json

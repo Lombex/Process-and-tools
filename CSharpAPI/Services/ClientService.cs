@@ -8,6 +8,7 @@ namespace CSharpAPI.Services
     {
         Task<List<ClientModel>> GetAllClients();
         Task<ClientModel> GetClientById(int id);
+        Task<List<OrderModel>> GetClientOrders(int id);
         Task AddClient(ClientModel client);
         Task UpdateClient(int id, ClientModel client);
         Task DeleteClient(int id);
@@ -32,6 +33,13 @@ namespace CSharpAPI.Services
             var client = await _Db.ClientModels.FirstOrDefaultAsync(c => c.id == id);
             if (client == null) throw new Exception("Client not found!");
             return client;
+        }
+
+        public async Task<List<OrderModel>> GetClientOrders(int id)
+        {
+            var _client = await GetClientById(id);
+            var _order = await _Db.Order.Where(x => x.bill_to == _client.id || x.ship_to == _client.id).ToListAsync();
+            return _order;
         }
 
         public async Task AddClient(ClientModel client)
