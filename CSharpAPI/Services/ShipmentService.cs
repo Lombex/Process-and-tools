@@ -9,6 +9,9 @@ namespace CSharpAPI.Service
     {
         Task<List<ShipmentModel>> GetAll();
         Task<ShipmentModel> GetById(int id);
+        Task<List<Items>> GetItems(int id);
+        Task UpdateItems(int id, ShipmentModel model);
+        Task<OrderModel> GetOrderByshipmentId(int id);
         Task Add(ShipmentModel shipment);
         Task Update(int id, ShipmentModel shipment);
         Task Delete(int id);
@@ -30,6 +33,28 @@ namespace CSharpAPI.Service
             var _shipment = await _Db.Shipment.FirstOrDefaultAsync(x => x.id == id);
             if (_shipment == null) throw new Exception("Shipment not found!");
             return _shipment;
+        }
+
+        public async Task<List<Items>> GetItems(int id)
+        {
+            var _shipment = await GetById(id);
+            return _shipment.items;
+        }
+
+        public async Task UpdateItems(int id, ShipmentModel model)
+        {
+            var _shipment = await GetById(id);
+            _shipment.items = model.items;
+
+            _Db.Shipment.Update(_shipment);
+            await _Db.SaveChangesAsync();
+        } 
+
+        public async Task<OrderModel> GetOrderByshipmentId(int id)
+        {
+            var _order = await _Db.Order.FirstOrDefaultAsync(x => x.shipment_id == id);
+            if (_order == null) throw new Exception("Order not found!");
+            return _order;
         }
 
         public async Task Add(ShipmentModel shipment)

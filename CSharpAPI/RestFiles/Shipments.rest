@@ -2,9 +2,16 @@
 GET http://localhost:5001/api/v1/shipments/all
 Content-Type: application/json
 
-
 ### Get shipment by id
 GET http://localhost:5001/api/v1/shipments/1
+Content-Type: application/json
+
+### Get shipment items by id
+GET http://localhost:5001/api/v1/shipments/1/items
+Content-Type: application/json
+
+### Get shipments by order id
+GET http://localhost:5001/api/v1/shipments/1/orders
 Content-Type: application/json
 
 ### Create shipment
@@ -72,6 +79,56 @@ Content-Type: application/json
       "item_id": "P009557",
       "amount": 1
     }
+  ]
+}
+
+### update items
+PUT http://localhost:5001/api/v1/shipments/1/items
+Content-Type: application/json
+
+{
+  "items": 
+  [
+      {
+          "item_id": "P002181",
+          "amount": 33
+      },
+      {
+          "item_id": "P004732",
+          "amount": 21
+      },
+      {
+          "item_id": "P007613",
+          "amount": 7
+      },
+      {
+          "item_id": "P000060",
+          "amount": 3
+      },
+      {
+          "item_id": "P004959",
+          "amount": 7
+      },
+      {
+          "item_id": "P004394",
+          "amount": 47
+      },
+      {
+          "item_id": "P000832",
+          "amount": 2
+      },
+      {
+          "item_id": "P005823",
+          "amount": 49
+      },
+      {
+          "item_id": "P006835",
+          "amount": 13
+      },
+      {
+          "item_id": "P003474",
+          "amount": 20
+      }
   ]
 }
 

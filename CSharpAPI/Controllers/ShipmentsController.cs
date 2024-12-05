@@ -31,6 +31,21 @@ public class ShipmentsController : ControllerBase
         return Ok(shipment);    
     }
 
+    [HttpGet("{id}/items")]
+    public async Task<IActionResult> GetItems(int id)
+    {
+        var items = await _service.GetItems(id);
+        if (items == null) return NotFound($"Items with id {id} not found.");
+        return Ok(items);
+    }
+
+    [HttpGet("{id}/orders")]
+    public async Task<IActionResult> GetOrderByShipmentId(int id)
+    {
+        var order = await _service.GetOrderByshipmentId(id);
+        return Ok(order);
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] ShipmentModel shipment)
     {
@@ -45,6 +60,14 @@ public class ShipmentsController : ControllerBase
         if (shipment == null) return BadRequest("Request is empty!");
         await _service.Update(id, shipment);
         return Ok("Shipment has been updated!");
+    }
+
+    [HttpPut("{id}/items")]
+    public async Task<IActionResult> UpdateItems(int id, [FromBody] ShipmentModel shipment)
+    {
+        if (shipment == null) return BadRequest("Request is empty!");
+        await _service.UpdateItems(id, shipment);
+        return Ok("Updated");
     }
 
     [HttpDelete("{id}")]
