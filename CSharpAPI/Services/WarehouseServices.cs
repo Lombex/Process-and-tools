@@ -20,15 +20,19 @@ namespace CSharpAPI.Service
             var _warehouse = await _Db.Warehouse.FirstOrDefaultAsync(x => x.id == id);
             if (_warehouse == null) throw new Exception("Warehouse not found!");
             return _warehouse;
+        } 
+        public async Task<List<LocationModel>> GetLocationFromWarehouseID(int id)
+        {
+            var _warehouse = await GetWarehouseById(id);
+            var _locations = await _Db.Location.Where(x => x.warehouse_id == _warehouse.id).ToListAsync();
+            return _locations;
         }
-
         public async Task AddWarehouse(WarehouseModel model)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
             await _Db.Warehouse.AddAsync(model);
             await _Db.SaveChangesAsync();
         }
-
         public async Task UpdateWarehouse(int id, WarehouseModel model)
         {
             var _warehouse = await GetWarehouseById(id);
@@ -46,7 +50,6 @@ namespace CSharpAPI.Service
             _Db.Warehouse.Update(_warehouse);
             await _Db.SaveChangesAsync();
         }
-
         public async Task DeleteWarehouse(int id)
         {
             var _warehouse = await GetWarehouseById(id);
@@ -58,6 +61,7 @@ namespace CSharpAPI.Service
     {
         Task<List<WarehouseModel>> GetAllWarehouses();
         Task<WarehouseModel> GetWarehouseById(int id);
+        Task<List<LocationModel>> GetLocationFromWarehouseID(int id);
         Task AddWarehouse(WarehouseModel model);
         Task UpdateWarehouse(int id, WarehouseModel model);
         Task DeleteWarehouse(int id);

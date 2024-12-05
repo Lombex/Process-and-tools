@@ -6,6 +6,10 @@ Content-Type: application/json
 GET http://localhost:5001/api/v1/warehouses/2
 Content-Type: application/json
 
+### Get Location from warehouse
+GET http://localhost:5001/api/v1/warehouses/1/location
+Content-Type: application/json
+
 ### Create new Warehouse
 POST http://localhost:5001/api/v1/warehouses
 Content-Type: application/json

@@ -31,6 +31,15 @@ namespace CSharpAPI.Controller
             return Ok(warehouse);
         }
 
+        [HttpGet("{id}/location")]
+        public async Task<IActionResult> LocationFromWarehouseID(int id)
+        {
+            var location = await _warehouseService.GetLocationFromWarehouseID(id);
+            if (location == null) return NotFound($"Location with id {id} not found.");
+            return Ok(location);
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] WarehouseModel warehouse)
         {
