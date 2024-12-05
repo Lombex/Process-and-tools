@@ -32,7 +32,9 @@ namespace CSharpAPI.Controller
         [HttpGet("{id}/items")]
         public async Task<IActionResult> GetItemFromSupplierId(int id)
         {
-            throw new NotImplementedException("Getting item from Supplier not implemented!");
+            var item = await _supplierService.GetItemFromSupplierId(id);
+            if (item == null) return NotFound($"Item with id {id} not found.");
+            return Ok(item);
         }
 
         [HttpPut("{id}")]

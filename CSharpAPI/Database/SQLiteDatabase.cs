@@ -32,6 +32,8 @@ namespace CSharpAPI.Data
         {
             modelBuilder.Entity<WarehouseModel>().OwnsOne(w => w.contact);
 
+            #pragma warning disable 
+
             modelBuilder.Entity<TransferModel>().Property(x => x.items).HasConversion(new ValueConverter<List<Items>, string>(
                 i => JsonConvert.SerializeObject(i), i => JsonConvert.DeserializeObject<List<Items>>(i)));
 
@@ -40,6 +42,7 @@ namespace CSharpAPI.Data
 
             modelBuilder.Entity<OrderModel>().Property(x => x.items).HasConversion(new ValueConverter<List<Items>, string>(
                 i => JsonConvert.SerializeObject(i), i => JsonConvert.DeserializeObject<List<Items>>(i)));
+            #pragma warning restore
 
             base.OnModelCreating(modelBuilder);
         }

@@ -24,7 +24,8 @@ namespace CSharpAPI.Service {
         // Has to be implemented
         public async Task<List<Items>> GetItemFromTransferId(int id)
         {
-            throw new NotImplementedException();
+            var _transfer = await GetTransferById(id);
+            return _transfer.items;
         }
 
         public async Task CreateTransfer(TransferModel model)

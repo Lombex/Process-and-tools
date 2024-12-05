@@ -10,7 +10,7 @@ namespace CSharpAPI.Service
     {
         Task<List<SupplierModel>> GetAllSuppliers();
         Task<SupplierModel> GetSupplierById(int id);
-        Task<List<Items>> GetItemFromSupplierId(int id);
+        Task<List<ItemModel>> GetItemFromSupplierId(int id);
         Task UpdateSupplier(int id, SupplierModel supplier);
         Task CreateSupplier(SupplierModel supplier);
         Task DeleteSupplier(int id);
@@ -34,9 +34,11 @@ namespace CSharpAPI.Service
         }
 
         // Has to be implemented
-        public async Task<List<Items>> GetItemFromSupplierId(int id)
+        public async Task<List<ItemModel>> GetItemFromSupplierId(int id)
         {
-            throw new NotImplementedException();
+            var _supplierid = await GetSupplierById(id);
+            var _items = await _Db.itemModels.Where(x => x.supplier_id == _supplierid.id).ToListAsync();
+            return _items;
         }
 
         public async Task UpdateSupplier(int id, SupplierModel updateSupplier)
