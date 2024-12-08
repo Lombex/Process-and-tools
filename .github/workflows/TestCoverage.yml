@@ -28,7 +28,7 @@ jobs:
   # Job 2: Test
   test:
     needs: build  # This job will only run after the 'build' job has completed
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.10
@@ -63,7 +63,7 @@ jobs:
   # Job 3: Deployment to Production
   deployment:
     needs: test  # This job will run after the 'test' job has completed
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     environment: production  # This is where the deployment happens
     steps:
       - name: Checkout the repository
