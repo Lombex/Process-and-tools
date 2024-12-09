@@ -1,0 +1,56 @@
+### Get all inventories
+GET http://localhost:5001/api/v1/inventories/all
+Content-Type: application/json
+
+### Get inventorie id
+GET http://localhost:5001/api/v1/inventories/0
+Content-Type: application/json
+
+### Create new Inventorie
+POST http://localhost:5001/api/v1/inventories
+Content-Type: application/json
+
+{
+  "item_id": "ITEM001",
+  "description": "Default Inventory",
+  "item_reference": null,
+  "locations": [
+    0,1,2,3
+  ],
+  "total_on_hand": 0,
+  "total_expected": 0,
+  "total_ordered": 0,
+  "total_allocated": 0,
+  "total_available": 0
+}
+
+###  Update Inventorie
+PUT http://localhost:5001/api/v1/inventories/2
+Content-Type: application/json
+
+{
+  "item_id": "ITEM001",
+  "description": "Updated Inventorie",
+  "item_reference": null,
+  "locations": [
+    0
+  ],
+  "total_on_hand": 0,
+  "total_expected": 0,
+  "total_ordered": 0,
+  "total_allocated": 0,
+  "total_available": 0
+}
+
+### Delete Inventorie
+DELETE http://localhost:5001/api/v1/inventories/1
+Content-Type: application/json
+
+
+### Get Inventorie item
+GET http://localhost:5001/api/v1/inventories/item/ITEM001
+Content-Type: application/json
+
+### Get Inventorie location
+GET http://localhost:5001/api/v1/inventories/location/0
+Content-Type: application/json

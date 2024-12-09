@@ -3,6 +3,8 @@ using CSharpAPI.Services;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using CSharpAPI.Data;
+using Microsoft.EntityFrameworkCore;
+using System;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,25 +17,25 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNamingPolicy = null;
     });
 
+// Add DbContext for SQLite
+builder.Services.AddDbContext<SQLiteDatabase>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 // Register services
-builder.Services.AddSingleton<IWarehouseService, WarehouseService>();
-builder.Services.AddSingleton<IItemTypeService, ItemTypeService>();
-builder.Services.AddSingleton<IItemGroupService, ItemGroupService>();
-builder.Services.AddSingleton<IItemLineService, ItemLineService>();
-builder.Services.AddSingleton<ITransfersService, TransferSerivce>();
-builder.Services.AddSingleton<IShipmentService, ShipmentService>();
-builder.Services.AddSingleton<ILocationService, LocationService>();
-builder.Services.AddSingleton<IItemsService, ItemsService>();
-builder.Services.AddSingleton<ISupplierService, SupplierService>();
-builder.Services.AddSingleton<IInventoriesService, InventoriesService>();
-builder.Services.AddSingleton<IClientsService, ClientsService>();
-builder.Services.AddSingleton<IOrderService, OrderService>();
-builder.Services.AddSingleton<SQLiteDatabase>();
+builder.Services.AddScoped<IWarehouseService, WarehouseService>();
+builder.Services.AddScoped<ITransfersService, TransferSerivce>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IItemsService, ItemsService>();
+builder.Services.AddScoped<IShipmentService, ShipmentService>();
+builder.Services.AddScoped<ILocationService, LocationService>();
+builder.Services.AddScoped<IInventoriesService, InventoriesService>();
+builder.Services.AddScoped<IClientsService, ClientsService>();
+builder.Services.AddScoped<IItemTypeService, ItemTypeService>();
+builder.Services.AddScoped<IItemLineService, ItemLineService>();
+builder.Services.AddScoped<IItemGroupService, ItemGroupService>();
 
 
-
-SQLiteDatabase sQLiteDatabase = new SQLiteDatabase();
-sQLiteDatabase.SetupDatabase();
 // Add CORS
 builder.Services.AddCors(options =>
 {
@@ -75,5 +77,12 @@ app.MapControllers();
 
 // Set URL
 app.Urls.Add("http://localhost:5001");
+
+// Configure Database
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<SQLiteDatabase>();
+    dbContext.Database.Migrate();
+}
 
 app.Run();

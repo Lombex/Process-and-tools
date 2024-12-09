@@ -15,48 +15,42 @@ namespace CSharpAPI.Controllers
             _service = service;
         }
 
-        [HttpGet]
-        public IActionResult GetAll()
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(_service.GetAll());
+            var _itemtype = await _service.GetAll();
+            return Ok(_itemtype);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                return Ok(_service.GetById(id));
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex.Message);
-            }
+            var _itemtype = await _service.GetById(id);
+            if (_itemtype == null) return NotFound($"ItemType with id {id} not found!");
+            return Ok(_itemtype);
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] ItemTypeModel item)
+        public async Task<IActionResult> Create([FromBody] ItemTypeModel item)
         {
-            if (item == null) return BadRequest();
-            _service.Add(item);
-            return Ok(item);
+            if (item == null) return BadRequest("Itemtype is empty");
+            await _service.Add(item);
+            return CreatedAtAction(nameof(GetById), new { id = item.id }, item);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] ItemTypeModel item)
+        public async Task<IActionResult> Update(int id, [FromBody] ItemTypeModel item)
         {
-            if (item == null) return BadRequest();
-            var result = _service.Update(id, item);
-            if (!result) return NotFound($"ItemType {id} not found");
-            return Ok();
+            if (item == null) return BadRequest(new { message = "Invalid warehouse data." });
+            await _service.Update(id, item);
+            return Ok(new { message = "ItemTypes has been updated!" });
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var result = _service.Delete(id);
-            if (!result) return NotFound($"ItemType {id} not found");
-            return Ok();
+            await _service.Delete(id);
+            return Ok(new { message = "Itemtype has been deleted!" });
         }
     }
 }

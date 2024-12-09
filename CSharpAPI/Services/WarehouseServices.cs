@@ -1,99 +1,69 @@
 ﻿using Newtonsoft.Json;
 using CSharpAPI.Models;
+using CSharpAPI.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace CSharpAPI.Service
 {
     public class WarehouseService : IWarehouseService
     {
-        private readonly string dataFolder;
+        private readonly SQLiteDatabase _Db;
 
-        public WarehouseService(string jsonFilePath = "data/warehouses.json")
+        public WarehouseService(SQLiteDatabase sQLite)
         {
-            dataFolder = jsonFilePath;
+            _Db = sQLite;
         }
 
-        public List<WarehouseModel> GetAllWarehouses()
+        public async Task<List<WarehouseModel>> GetAllWarehouses() => await _Db.Warehouse.AsQueryable().ToListAsync();  
+        public async Task<WarehouseModel> GetWarehouseById(int id)
         {
-            try
-            {
-                if (!File.Exists(dataFolder))
-                    return new List<WarehouseModel>();
-
-                var jsonContent = File.ReadAllText(dataFolder);
-                return JsonConvert.DeserializeObject<List<WarehouseModel>>(jsonContent) ?? new List<WarehouseModel>();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error reading file: {ex.Message}");
-                return new List<WarehouseModel>();
-            }
+            var _warehouse = await _Db.Warehouse.FirstOrDefaultAsync(x => x.id == id);
+            if (_warehouse == null) throw new Exception("Warehouse not found!");
+            return _warehouse;
+        } 
+        public async Task<List<LocationModel>> GetLocationFromWarehouseID(int id)
+        {
+            var _warehouse = await GetWarehouseById(id);
+            var _locations = await _Db.Location.Where(x => x.warehouse_id == _warehouse.id).ToListAsync();
+            return _locations;
         }
-
-        public WarehouseModel GetWarehouseById(int id) => GetAllWarehouses().FirstOrDefault(w => w.id == id);
-            
-        public void AddWarehouse(WarehouseModel newWarehouse)
+        public async Task AddWarehouse(WarehouseModel model)
         {
-            var warehouses = GetAllWarehouses();
-            newWarehouse.id = warehouses.Count > 0 ? warehouses.Max(w => w.id) + 1 : 1; // Auto increment ID
-            warehouses.Add(newWarehouse);
-            SaveWarehouses(warehouses);
+            if (model == null) throw new ArgumentNullException(nameof(model));
+            await _Db.Warehouse.AddAsync(model);
+            await _Db.SaveChangesAsync();
         }
-
-        public bool UpdateWarehouse(int id, WarehouseModel updatedWarehouse)
+        public async Task UpdateWarehouse(int id, WarehouseModel model)
         {
-            var warehouses = GetAllWarehouses();
-            var existingWarehouse = warehouses.FirstOrDefault(w => w.id == id);
+            var _warehouse = await GetWarehouseById(id);
 
-            if (existingWarehouse == null)
-                return false;
+            _warehouse.code = model.code;
+            _warehouse.name = model.name;
+            _warehouse.address = model.address;
+            _warehouse.zip = model.zip;
+            _warehouse.city = model.city;
+            _warehouse.province = model.province;
+            _warehouse.country = model.country;
+            _warehouse.contact = model.contact;
+            _warehouse.updated_at = DateTime.Now;
 
-            existingWarehouse.code = updatedWarehouse.code;
-            existingWarehouse.name = updatedWarehouse.name;
-            existingWarehouse.address = updatedWarehouse.address;
-            existingWarehouse.zip = updatedWarehouse.zip;
-            existingWarehouse.city = updatedWarehouse.city;
-            existingWarehouse.province = updatedWarehouse.province;
-            existingWarehouse.country = updatedWarehouse.country;
-            existingWarehouse.contact = updatedWarehouse.contact;
-            existingWarehouse.created_at = updatedWarehouse.created_at;
-            existingWarehouse.updated_at = updatedWarehouse.updated_at;
-
-            SaveWarehouses(warehouses);
-            return true;
+            _Db.Warehouse.Update(_warehouse);
+            await _Db.SaveChangesAsync();
         }
-
-        public bool DeleteWarehouse(int id)
+        public async Task DeleteWarehouse(int id)
         {
-            var warehouses = GetAllWarehouses();
-            var warehouseToDelete = warehouses.FirstOrDefault(w => w.id == id);
-
-            if (warehouseToDelete == null)
-                return false;
-
-            warehouses.Remove(warehouseToDelete);
-            SaveWarehouses(warehouses);
-            return true;
-        }
-
-        private void SaveWarehouses(List<WarehouseModel> warehouses)
-        {
-            try
-            {
-                var jsonContent = JsonConvert.SerializeObject(warehouses, Formatting.Indented);
-                File.WriteAllText(dataFolder, jsonContent);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error writing to file: {ex.Message}");
-            }
+            var _warehouse = await GetWarehouseById(id);
+            _Db.Warehouse.Remove(_warehouse);
+            await _Db.SaveChangesAsync();
         }
     }
     public interface IWarehouseService
     {
-        List<WarehouseModel> GetAllWarehouses();
-        WarehouseModel GetWarehouseById(int id);
-        void AddWarehouse(WarehouseModel newWarehouse);
-        bool UpdateWarehouse(int id, WarehouseModel updatedWarehouse);
-        bool DeleteWarehouse(int id);
+        Task<List<WarehouseModel>> GetAllWarehouses();
+        Task<WarehouseModel> GetWarehouseById(int id);
+        Task<List<LocationModel>> GetLocationFromWarehouseID(int id);
+        Task AddWarehouse(WarehouseModel model);
+        Task UpdateWarehouse(int id, WarehouseModel model);
+        Task DeleteWarehouse(int id);
     }
 }

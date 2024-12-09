@@ -13,23 +13,4 @@ namespace CSharpAPI.Models {
         public DateTime created_at { get; set; }
         public DateTime updated_at { get; set; }
     }
-
-    public class InventoriesTable
-    {
-        public readonly string inventorieQuery = @"
-            CREATE TABLE IF NOT EXISTS Inventories (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            item_id TEXT,
-            description TEXT,
-            item_reference TEXT,
-            locations TEXT, -- Stores locations as string (need to build logic for it.)
-            total_on_hand INTEGER,
-            total_expected INTEGER,
-            total_ordered INTEGER,
-            total_allocated INTEGER,
-            total_available INTEGER,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )";
-    }
 }

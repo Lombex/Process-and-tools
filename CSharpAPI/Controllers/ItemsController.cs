@@ -15,64 +15,66 @@ namespace CSharpAPI.Controllers
             _itemsService = itemsService;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<ItemModel>> GetAllItems()
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllItems()
         {
-            return Ok(_itemsService.GetAllItems());
+            var _items = await _itemsService.GetAllItems();
+            return Ok(_items);
         }
 
         [HttpGet("{uid}")]
-        public ActionResult<ItemModel> GetItemById(string uid)
+        public async Task<IActionResult> GetItemById(string uid)
         {
-            try
-            {
-                return Ok(_itemsService.GetItemById(uid));
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex.Message);
-            }
+            var _item = await _itemsService.GetItemById(uid);
+            if (_item == null) return NotFound($"Item with uid {uid} not found.");
+            return Ok(_item);
         }
 
         [HttpPost]
-        public ActionResult<ItemModel> CreateItem(ItemModel item)
+        public async Task<IActionResult> CreateItem(ItemModel item)
         {
-            _itemsService.CreateItem(item);
+            if (item == null) return BadRequest("Request is empty!");
+            await _itemsService.CreateItem(item);
             return CreatedAtAction(nameof(GetItemById), new { uid = item.uid }, item);
         }
 
         [HttpPut("{uid}")]
-        public IActionResult UpdateItem(string uid, ItemModel item)
+        public async Task<IActionResult> UpdateItem(string uid, ItemModel item)
         {
-            if (_itemsService.UpdateItem(uid, item))
-                return NoContent();
-            return NotFound();
+            if (item == null) return BadRequest("Request is empty!");
+            await _itemsService.UpdateItem(uid, item);
+            return Ok($"Item {uid} has been updated!");
         }
 
         [HttpDelete("{uid}")]
-        public IActionResult DeleteItem(string uid)
+        public async Task<IActionResult> DeleteItem(string uid)
         {
-            if (_itemsService.DeleteItem(uid))
-                return NoContent();
-            return NotFound();
+            await _itemsService.DeleteItem(uid);
+            return Ok("Item has been deleted!");
         }
 
         [HttpGet("line/{lineId}")]
-        public ActionResult<IEnumerable<ItemModel>> GetItemsByLineId(int lineId)
+        public async Task<IActionResult> GetItemsByLineId(int lineId)
         {
-            return Ok(_itemsService.GetItemsByLineId(lineId));
+            var _itemline = await _itemsService.GetItemsByLineId(lineId);
+            if (_itemline == null) return NotFound("Itemline not found!");
+            return Ok(_itemline);
         }
 
         [HttpGet("group/{groupId}")]
-        public ActionResult<IEnumerable<ItemModel>> GetItemsByGroupId(int groupId)
+        public async Task<IActionResult> GetItemsByGroupId(int groupId)
         {
-            return Ok(_itemsService.GetItemsByGroupId(groupId));
+            var _itemgroup = await _itemsService.GetItemsByGroupId(groupId);
+            if (_itemgroup == null) return NotFound("Itemgroup not found!");
+            return Ok(_itemgroup);
         }
 
         [HttpGet("supplier/{supplierId}")]
-        public ActionResult<IEnumerable<ItemModel>> GetItemsBySupplierId(int supplierId)
+        public async Task<IActionResult> GetItemsBySupplierId(int supplierId)
         {
-            return Ok(_itemsService.GetItemsBySupplierId(supplierId));
+            var _supplierId = await _itemsService.GetItemsBySupplierId(supplierId);
+            if (_supplierId == null) return NotFound("Supplier not found!");
+            return Ok(_supplierId);
         }
     }
 

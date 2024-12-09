@@ -1,0 +1,67 @@
+### Get all Items
+GET http://localhost:5001/api/v1/items/all
+Content-Type: application/json
+
+### Get Item by uid
+GET http://localhost:5001/api/v1/items/P000001
+Content-Type: application/json
+
+### Create Item
+POST http://localhost:5001/api/v1/items
+Content-Type: application/json
+
+{
+  "code": "DEFAULT001",
+  "description": "Default Item",
+  "short_description": null,
+  "upc_code": null,
+  "model_number": null,
+  "commodity_code": null,
+  "item_line": 0,
+  "item_group": 0,
+  "item_type": 0,
+  "unit_purchase_quantity": 0,
+  "unit_order_quantity": 0,
+  "pack_order_quantity": 0,
+  "supplier_id": 0,
+  "supplier_code": null,
+  "supplier_part_number": null
+}
+
+### Update Item
+PUT http://localhost:5001/api/v1/items/P000001
+Content-Type: application/json
+
+{
+  "code": "DEFAULT001",
+  "description": "UPDATED!!",
+  "short_description": null,
+  "upc_code": null,
+  "model_number": null,
+  "commodity_code": null,
+  "item_line": 0,
+  "item_group": 0,
+  "item_type": 0,
+  "unit_purchase_quantity": 0,
+  "unit_order_quantity": 0,
+  "pack_order_quantity": 0,
+  "supplier_id": 0,
+  "supplier_code": null,
+  "supplier_part_number": null
+}
+
+### Delete Item
+DELETE http://localhost:5001/api/v1/items/P000006
+Content-Type: application/json
+
+### get item Line:
+GET http://localhost:5001/api/v1/items/line/0
+Content-Type: application/json
+
+### get Item Groups
+GET http://localhost:5001/api/v1/items/group/0
+Content-Type: application/json
+
+### get Item supplier
+GET http://localhost:5001/api/v1/items/supplier/0
+Content-Type: application/json

@@ -17,52 +17,50 @@ namespace CSharpAPI.Controller
         }
 
         [HttpGet("all")]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var warehouses = _warehouseService.GetAllWarehouses();
+            var warehouses = await _warehouseService.GetAllWarehouses();
             return Ok(warehouses);
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            var warehouse = _warehouseService.GetWarehouseById(id);
-            if (warehouse == null)
-                return NotFound($"Warehouse with id {id} not found.");
+            var warehouse = await _warehouseService.GetWarehouseById(id);
+            if (warehouse == null) return NotFound($"Warehouse with id {id} not found.");
             return Ok(warehouse);
         }
 
-        [HttpPost]
-        public IActionResult Post([FromBody] WarehouseModel warehouse)
+        [HttpGet("{id}/location")]
+        public async Task<IActionResult> LocationFromWarehouseID(int id)
         {
-            if (warehouse == null)
-                return BadRequest("Warehouse is null.");
+            var location = await _warehouseService.GetLocationFromWarehouseID(id);
+            if (location == null) return NotFound($"Location with id {id} not found.");
+            return Ok(location);
+        }
 
-            _warehouseService.AddWarehouse(warehouse);
+
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] WarehouseModel warehouse)
+        {
+            if (warehouse == null) return BadRequest("Warehouse is null.");
+            await _warehouseService.AddWarehouse(warehouse);
             return CreatedAtAction(nameof(Get), new { id = warehouse.id }, warehouse);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] WarehouseModel warehouse)
+        public async Task<IActionResult> Put(int id, [FromBody] WarehouseModel warehouse)
         {
-            if (warehouse == null)
-                return BadRequest("Warehouse is null.");
-
-            var updated = _warehouseService.UpdateWarehouse(id, warehouse);
-            if (!updated)
-                return NotFound($"Warehouse with id {id} not found.");
-
-            return Ok("Warehouse has been updated"); // 204 No Content
+            if (warehouse == null) return BadRequest(new { message = "Invalid warehouse data." });
+            await _warehouseService.UpdateWarehouse(id, warehouse);
+            return Ok("Warehouse has been updated");
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var deleted = _warehouseService.DeleteWarehouse(id);
-            if (!deleted)
-                return NotFound($"Warehouse with id {id} not found.");
-
-            return Ok("Warehouse has been deleted"); // 204 No Content
+            await _warehouseService.DeleteWarehouse(id);
+            return Ok("Warehouse has been deleted");
         }
     }
 }

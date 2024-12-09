@@ -1,67 +1,55 @@
+using CSharpAPI.Data;
 using CSharpAPI.Models;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace CSharpAPI.Service
 {
     public interface IItemTypeService
     {
-        List<ItemTypeModel> GetAll();
-        ItemTypeModel GetById(int id);
-        void Add(ItemTypeModel itemType);
-        bool Update(int id, ItemTypeModel itemType);
-        bool Delete(int id);
+        Task<List<ItemTypeModel>> GetAll();
+        Task<ItemTypeModel> GetById(int id);
+        Task Add(ItemTypeModel itemType);
+        Task Update(int id, ItemTypeModel itemType);
+        Task Delete(int id);
     }
 
     public class ItemTypeService : IItemTypeService
     {
-        private readonly string dataPath = "data/itemtypes.json";
-
-        public List<ItemTypeModel> GetAll()
+        private readonly SQLiteDatabase _Db;
+        public ItemTypeService(SQLiteDatabase sQLite)
         {
-            if (!File.Exists(dataPath)) return new List<ItemTypeModel>();
-            return JsonConvert.DeserializeObject<List<ItemTypeModel>>(File.ReadAllText(dataPath)) ?? new List<ItemTypeModel>();
+            _Db = sQLite; 
         }
-
-        public ItemTypeModel GetById(int id)
+        public async Task<List<ItemTypeModel>> GetAll() => await _Db.ItemType.AsQueryable().ToListAsync();
+        public async Task<ItemTypeModel> GetById(int id)
         {
-            var itemType = GetAll().FirstOrDefault(x => x.id == id);
-            if (itemType == null) throw new Exception($"ItemType {id} not found");
-            return itemType;
+            var _itemtype = await _Db.ItemType.FirstOrDefaultAsync(x => x.id == id);
+            if (_itemtype == null) throw new Exception($"ItemType not found!");
+            return _itemtype;
         }
-
-        public void Add(ItemTypeModel itemType)
+        public async Task Add(ItemTypeModel itemType)
         {
-            var items = GetAll();
-            itemType.id = items.Count > 0 ? items.Max(x => x.id) + 1 : 1;
-            itemType.created_at = DateTime.UtcNow;
-            itemType.updated_at = DateTime.UtcNow;
-            items.Add(itemType);
-            File.WriteAllText(dataPath, JsonConvert.SerializeObject(items, Formatting.Indented));
+            if (itemType == null) throw new ArgumentNullException(nameof(itemType));
+            await _Db.ItemType.AddAsync(itemType);
+            await _Db.SaveChangesAsync();
         }
-
-        public bool Update(int id, ItemTypeModel itemType)
+        public async Task Update(int id, ItemTypeModel itemType)
         {
-            var items = GetAll();
-            var existing = items.FirstOrDefault(x => x.id == id);
-            if (existing == null) return false;
+            var _itemtype = await GetById(id);
 
-            existing.name = itemType.name;
-            existing.description = itemType.description;
-            existing.updated_at = DateTime.UtcNow;
+            _itemtype.name = itemType.name;
+            _itemtype.description = itemType.description;
+            _itemtype.updated_at = DateTime.Now;
 
-            File.WriteAllText(dataPath, JsonConvert.SerializeObject(items, Formatting.Indented));
-            return true;
+            _Db.ItemType.Update(itemType);
+            await _Db.SaveChangesAsync();
         }
-
-        public bool Delete(int id)
+        public async Task Delete(int id)
         {
-            var items = GetAll();
-            var item = items.FirstOrDefault(x => x.id == id);
-            if (item == null) return false;
-
-            items.Remove(item);
-            File.WriteAllText(dataPath, JsonConvert.SerializeObject(items, Formatting.Indented));
-            return true;
+            var _itemtype = await GetById(id);
+            _Db.ItemType.Remove(_itemtype);
+            await _Db.SaveChangesAsync();
         }
     }
 }

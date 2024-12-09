@@ -3,16 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\controllers\\locationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:controllers\\locationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\restfiles\\shipments.rest||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}",
+      "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:restfiles\\shipments.rest||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\controllers\\orderscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:controllers\\orderscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\controllers\\transferscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:controllers\\transferscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\services\\shipmentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:services\\shipmentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,49 +26,32 @@
             },
             {
               "$type": "Bookmark",
-              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
-            },
-            {
-              "$type": "Bookmark",
               "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "LocationsController.cs",
-              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Controllers\\LocationsController.cs",
-              "RelativeDocumentMoniker": "Controllers\\LocationsController.cs",
-              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Controllers\\LocationsController.cs",
-              "RelativeToolTip": "Controllers\\LocationsController.cs",
-              "ViewState": "AQIAACMAAAAAAAAAAAAwwDoAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-03T18:28:18.328Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "OrdersController.cs",
-              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Controllers\\OrdersController.cs",
-              "RelativeDocumentMoniker": "Controllers\\OrdersController.cs",
-              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Controllers\\OrdersController.cs",
-              "RelativeToolTip": "Controllers\\OrdersController.cs",
-              "ViewState": "AQIAACMAAAAAAAAAAAAIwBEAAAAVAAAA",
+              "Title": "ShipmentService.cs",
+              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Services\\ShipmentService.cs",
+              "RelativeDocumentMoniker": "Services\\ShipmentService.cs",
+              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Services\\ShipmentService.cs",
+              "RelativeToolTip": "Services\\ShipmentService.cs",
+              "ViewState": "AQIAAB0AAAAAAAAAAAAswDMAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-03T18:14:06.905Z",
+              "WhenOpened": "2024-12-05T18:34:56.866Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "TransfersController.cs",
-              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Controllers\\TransfersController.cs",
-              "RelativeDocumentMoniker": "Controllers\\TransfersController.cs",
-              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Controllers\\TransfersController.cs",
-              "RelativeToolTip": "Controllers\\TransfersController.cs",
-              "ViewState": "AQIAABcAAAAAAAAAAAAwwCsAAABEAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-03T17:36:19.12Z",
+              "DocumentIndex": 0,
+              "Title": "Shipments.rest",
+              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\RestFiles\\Shipments.rest",
+              "RelativeDocumentMoniker": "RestFiles\\Shipments.rest",
+              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\RestFiles\\Shipments.rest",
+              "RelativeToolTip": "RestFiles\\Shipments.rest",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAFYAAAAeAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003502|",
+              "WhenOpened": "2024-12-05T18:29:57.052Z",
               "EditorCaption": ""
             }
           ]

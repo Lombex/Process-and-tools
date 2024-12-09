@@ -1,67 +1,72 @@
 using CSharpAPI.Models;
-using Newtonsoft.Json;
+using CSharpAPI.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace CSharpAPI.Service
 {
     public interface IItemGroupService
     {
-        List<ItemGroupModel> GetAll();
-        ItemGroupModel GetById(int id);
-        void Add(ItemGroupModel ItemGroupModel);
-        bool Update(int id, ItemGroupModel ItemGroupModel);
-        bool Delete(int id);
+        Task<List<ItemGroupModel>> GetAll();
+        Task<ItemGroupModel> GetById(int id);
+        Task Add(ItemGroupModel itemGroupModel);
+        Task<bool> Update(int id, ItemGroupModel itemGroupModel);
+        Task<bool> Delete(int id);
     }
 
     public class ItemGroupService : IItemGroupService
     {
-        private readonly string dataPath = "data/ItemGroupModels.json";
+        private readonly SQLiteDatabase _Db;
 
-        public List<ItemGroupModel> GetAll()
+        public ItemGroupService(SQLiteDatabase context)
         {
-            if (!File.Exists(dataPath)) return new List<ItemGroupModel>();
-            return JsonConvert.DeserializeObject<List<ItemGroupModel>>(File.ReadAllText(dataPath)) ?? new List<ItemGroupModel>();
+            _Db = context;
         }
 
-        public ItemGroupModel GetById(int id)
+        public async Task<List<ItemGroupModel>> GetAll()
         {
-            var itemgroup = GetAll().FirstOrDefault(x => x.id == id);
-            if (itemgroup == null) throw new Exception($"ItemGroup {id} not found");
-            return itemgroup;
+            return await _Db.ItemGroups.ToListAsync();
         }
 
-        public void Add(ItemGroupModel itemGroup)
+        public async Task<ItemGroupModel> GetById(int id)
         {
-            var items = GetAll();
-            itemGroup.id = items.Count > 0 ? items.Max(x => x.id) + 1 : 1;
-            itemGroup.created_at = DateTime.UtcNow;
-            itemGroup.updated_at = DateTime.UtcNow;
-            items.Add(itemGroup);
-            File.WriteAllText(dataPath, JsonConvert.SerializeObject(items, Formatting.Indented));
+            var itemGroup = await _Db.ItemGroups.FirstOrDefaultAsync(x => x.id == id);
+            if (itemGroup == null)
+            {
+                throw new Exception($"ItemGroup {id} not found");
+            }
+            return itemGroup;
         }
 
-        public bool Update(int id, ItemGroupModel itemGroup)
+        public async Task Add(ItemGroupModel itemGroupModel)
         {
-            var items = GetAll();
-            var existing = items.FirstOrDefault(x => x.id == id);
-            if (existing == null) return false;
+            itemGroupModel.created_at = DateTime.UtcNow;
+            itemGroupModel.updated_at = DateTime.UtcNow;
+            await _Db.ItemGroups.AddAsync(itemGroupModel);
+            await _Db.SaveChangesAsync();
+        }
 
-            existing.name = itemGroup.name;
-            existing.description = itemGroup.description;
-            existing.itemtype_id = itemGroup.itemtype_id;
-            existing.updated_at = DateTime.UtcNow;
+        public async Task<bool> Update(int id, ItemGroupModel itemGroupModel)
+        {
+            var existingItemGroup = await _Db.ItemGroups.FirstOrDefaultAsync(x => x.id == id);
+            if (existingItemGroup == null) return false;
 
-            File.WriteAllText(dataPath, JsonConvert.SerializeObject(items, Formatting.Indented));
+            existingItemGroup.name = itemGroupModel.name;
+            existingItemGroup.description = itemGroupModel.description;
+            existingItemGroup.itemtype_id = itemGroupModel.itemtype_id;
+            existingItemGroup.updated_at = DateTime.UtcNow;
+
+            _Db.ItemGroups.Update(existingItemGroup);
+            await _Db.SaveChangesAsync();
             return true;
         }
 
-        public bool Delete(int id)
+        public async Task<bool> Delete(int id)
         {
-            var items = GetAll();
-            var item = items.FirstOrDefault(x => x.id == id);
-            if (item == null) return false;
+            var itemGroup = await _Db.ItemGroups.FirstOrDefaultAsync(x => x.id == id);
+            if (itemGroup == null) return false;
 
-            items.Remove(item);
-            File.WriteAllText(dataPath, JsonConvert.SerializeObject(items, Formatting.Indented));
+            _Db.ItemGroups.Remove(itemGroup);
+            await _Db.SaveChangesAsync();
             return true;
         }
     }

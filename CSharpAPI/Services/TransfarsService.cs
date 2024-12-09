@@ -1,76 +1,77 @@
+using CSharpAPI.Data;
 using CSharpAPI.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace CSharpAPI.Service {
     public class TransferSerivce : ITransfersService {
-        private readonly string dummydata = "data/transfer.json";
-
-        public List<TransferModel> GetAllTransfers() {
-            if (!File.Exists(dummydata)) return new List<TransferModel>();
-            return JsonConvert.DeserializeObject<List<TransferModel>>(File.ReadAllText(dummydata)) ?? new List<TransferModel>();
-
-            // still returns our dummy data
+        private readonly SQLiteDatabase _Db;
+        public TransferSerivce(SQLiteDatabase sQLite) 
+        {
+            _Db = sQLite;
         }
 
-        public TransferModel GetTransferById(int id) {
-            var _transfer = GetAllTransfers().FirstOrDefault(x => x.id == id);
-            if (_transfer == null) throw new Exception("This Transfer does not exits!");
+        public async Task<List<TransferModel>> GetAllTransfers() => await _Db.Transfer.AsQueryable().ToListAsync();
+
+        public async Task<TransferModel> GetTransferById(int id)
+        {
+            var _transfer = await _Db.Transfer.FirstOrDefaultAsync(x => x.id == id);
+            if (_transfer == null) throw new Exception("Transfer not found!");
             return _transfer;
         }
 
-        public List<Items> GetItemFromTransferId(int id) {
-            var _transfer = GetAllTransfers().FirstOrDefault(x => x.id == id);
-            if (_transfer == null) throw new Exception("This Transfer does not exits!");
-            if (_transfer.items == null) throw new Exception("This Transfer does not contain any items!");
+        // Has to be implemented
+        public async Task<List<Items>> GetItemFromTransferId(int id)
+        {
+            var _transfer = await GetTransferById(id);
             return _transfer.items;
         }
 
-        public bool UpdateTransfer(int id, TransferModel updateTransfer) {
-            var _transfer = GetAllTransfers().FirstOrDefault(x => x.id == id);
-            if (_transfer == null) return false;
-
-            updateTransfer.id = _transfer.id;
-            updateTransfer.reference = _transfer.reference;
-            updateTransfer.transfer_from = _transfer.transfer_from;
-            updateTransfer.transfer_to = _transfer.transfer_to;
-            updateTransfer.transfer_status = _transfer.transfer_status;
-            updateTransfer.created_at = _transfer.created_at;
-            updateTransfer.updated_at = _transfer.updated_at;
-            updateTransfer.items = _transfer.items;
-
-            // Update Database here.
-
-            return true;
+        public async Task CreateTransfer(TransferModel model)
+        {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+            await _Db.Transfer.AddAsync(model);
+            await _Db.SaveChangesAsync();
         }
 
-        public void CreateTransfer(TransferModel transfer) {
-            var AllTransfers = GetAllTransfers();
-            transfer.id = AllTransfers.Count > 0 ? AllTransfers.Max(x => x.id) + 1 : 1;
-            AllTransfers.Add(transfer);
+        public async Task UpdateTransfer(int id, TransferModel model)
+        {
+            var _transfer = await GetTransferById(id);
 
-            // Update Database here.
+            _transfer.reference = model.reference;
+            _transfer.transfer_from = model.transfer_from;
+            _transfer.transfer_to = model.transfer_to;
+            _transfer.transfer_status = model.transfer_status;
+            _transfer.updated_at = DateTime.Now;
+            _transfer.items = model.items;
+
+            _Db.Transfer.Update(_transfer);
+            await _Db.SaveChangesAsync();
         }
 
-        public bool DeleteTransfer(int id) {      
-            var _transfer = GetAllTransfers().FirstOrDefault(x => x.id == id);
-            if (_transfer == null) return false;
-            
-            // Update Database here.
-
-            return true;
+        // Has to be implemented 
+        public async Task CommitTransfer()
+        {
+            throw new NotImplementedException();
         }
 
+        public async Task DeleteTransfer(int id)
+        {
+            var _transfer = await GetTransferById(id);
+            _Db.Transfer.Remove(_transfer);
+            await _Db.SaveChangesAsync();
+        }
     }
 
     public interface ITransfersService {
-        List<TransferModel> GetAllTransfers();
-        TransferModel GetTransferById(int id);
-        List<Items> GetItemFromTransferId(int id);
-        bool UpdateTransfer(int id, TransferModel updateTransfer);
+        Task<List<TransferModel>> GetAllTransfers();
+        Task<TransferModel> GetTransferById(int id);
+        Task<List<Items>> GetItemFromTransferId(int id);
+        Task CreateTransfer(TransferModel transfer);
+        Task UpdateTransfer(int id, TransferModel updateTransfer);
 
-        // commit => CommitTransfer();
-        void CreateTransfer(TransferModel transfer);
-        bool DeleteTransfer(int id);
+        // commit => CommitTransfer(); 
+        Task DeleteTransfer(int id);
     }
 }

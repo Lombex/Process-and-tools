@@ -29,12 +29,12 @@ Content-Type: application/json
 }
 
 ### Update a supplier
-POST http://localhost:5001/api/v1/suppliers/1
+PUT http://localhost:5001/api/v1/suppliers/1
 Content-Type: application/json
 
 {
     "code": "SUP0001",
-    "name": "Updated Supplier!!",
+    "name": "Oempaloempa",
     "address": "5989 Sullivan Drives",
     "address_extra": "Apt. 996",
     "city": "Port Anitaburgh",

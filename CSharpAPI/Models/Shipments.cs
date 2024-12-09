@@ -19,43 +19,6 @@ namespace CSharpAPI.Models {
         public float total_package_weight { get; set; }
         public DateTime created_at { get; set; }
         public DateTime updated_at { get; set; }
-        public List<Items>? items { get; set; }
-    }
-
-    public class ShipmentTable
-    {
-        public readonly Dictionary<string, string> shipmentQuery = new Dictionary<string, string>()
-        {
-            {
-                "Shipment",
-                @"CREATE TABLE IF NOT EXISTS Shipments (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    order_id INTEGER,
-                    source_id INTEGER,
-                    order_date TEXT,
-                    request_date TEXT,
-                    shipment_date TEXT,
-                    shipment_type TEXT,
-                    shipment_status TEXT,
-                    notes TEXT,
-                    carrier_code TEXT,
-                    carrier_description TEXT,
-                    service_code TEXT,
-                    payment_type TEXT,
-                    transfer_mode TEXT,
-                    total_package_count INTEGER,
-                    total_package_weight REAL,
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                )"
-            },
-            {
-                "ShipmentItem",
-                @"CREATE TABLE IF NOT EXISTS OrderItems (
-                    item_id TEXT PRIMARY KEY,
-                    amount INTEGER
-                )"
-            }
-        };
+        public List<Items>? items { get; set; } = new List<Items>();
     }
 }

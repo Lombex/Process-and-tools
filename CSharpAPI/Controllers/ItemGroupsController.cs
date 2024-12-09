@@ -15,18 +15,20 @@ namespace CSharpAPI.Controllers
             _service = service;
         }
 
-        [HttpGet]
-        public IActionResult GetAll()
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(_service.GetAll());
+            var itemGroups = await _service.GetAll();
+            return Ok(itemGroups);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
             try
             {
-                return Ok(_service.GetById(id));
+                var itemGroup = await _service.GetById(id);
+                return Ok(itemGroup);
             }
             catch (Exception ex)
             {
@@ -35,28 +37,36 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] ItemGroupModel item)
+        public async Task<IActionResult> Create([FromBody] ItemGroupModel itemGroup)
         {
-            if (item == null) return BadRequest();
-            _service.Add(item);
-            return Ok(item);
+            if (itemGroup == null)
+                return BadRequest("Request body is empty!");
+
+            await _service.Add(itemGroup);
+            return CreatedAtAction(nameof(GetById), new { id = itemGroup.id }, itemGroup);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] ItemGroupModel item)
+        public async Task<IActionResult> Update(int id, [FromBody] ItemGroupModel itemGroup)
         {
-            if (item == null) return BadRequest();
-            var result = _service.Update(id, item);
-            if (!result) return NotFound($"ItemGroup {id} not found");
-            return Ok();
+            if (itemGroup == null)
+                return BadRequest("Request body is empty!");
+
+            var updated = await _service.Update(id, itemGroup);
+            if (!updated)
+                return NotFound($"ItemGroup {id} not found");
+
+            return Ok($"ItemGroup {id} has been updated!");
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var result = _service.Delete(id);
-            if (!result) return NotFound($"ItemGroup {id} not found");
-            return Ok();
+            var deleted = await _service.Delete(id);
+            if (!deleted)
+                return NotFound($"ItemGroup {id} not found");
+
+            return Ok("ItemGroup has been deleted.");
         }
     }
 }

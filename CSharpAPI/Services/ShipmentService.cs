@@ -1,93 +1,100 @@
+using CSharpAPI.Data;
 using CSharpAPI.Models;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace CSharpAPI.Service
 {
-   public interface IShipmentService
-{
-    List<ShipmentModel> GetAll();
-    ShipmentModel GetById(int id);
-    void Add(ShipmentModel shipment);
-    bool Update(int id, ShipmentModel shipment);
-    bool Delete(int id);
-}
-
-public class ShipmentService : IShipmentService
-{
-    private readonly string dataPath = "data/shipments.json";
-
-    public List<ShipmentModel> GetAll()
+    public interface IShipmentService
     {
-        if (!File.Exists(dataPath))
-            return new List<ShipmentModel>();
-
-        var jsonContent = File.ReadAllText(dataPath);
-        return JsonConvert.DeserializeObject<List<ShipmentModel>>(jsonContent) ?? new List<ShipmentModel>();
+        Task<List<ShipmentModel>> GetAll();
+        Task<ShipmentModel> GetById(int id);
+        Task<List<Items>> GetItems(int id);
+        Task UpdateItems(int id, ShipmentModel model);
+        Task<OrderModel> GetOrderByshipmentId(int id);
+        Task Add(ShipmentModel shipment);
+        Task Update(int id, ShipmentModel shipment);
+        Task Delete(int id);
     }
 
-    public ShipmentModel GetById(int id)
+    public class ShipmentService : IShipmentService
     {
-        var shipment = GetAll().FirstOrDefault(x => x.id == id);
-        if (shipment == null)
-            throw new Exception($"Shipment {id} not found");
-        return shipment;
+        private readonly SQLiteDatabase _Db;
+
+        public ShipmentService(SQLiteDatabase sQLite)
+        {
+            _Db = sQLite;
+        }
+
+        public async Task<List<ShipmentModel>> GetAll() => await _Db.Shipment.AsQueryable().ToListAsync();
+
+        public async Task<ShipmentModel> GetById(int id)
+        {
+            var _shipment = await _Db.Shipment.FirstOrDefaultAsync(x => x.id == id);
+            if (_shipment == null) throw new Exception("Shipment not found!");
+            return _shipment;
+        }
+
+        public async Task<List<Items>> GetItems(int id)
+        {
+            var _shipment = await GetById(id);
+            return _shipment.items;
+        }
+
+        public async Task UpdateItems(int id, ShipmentModel model)
+        {
+            var _shipment = await GetById(id);
+            _shipment.items = model.items;
+
+            _Db.Shipment.Update(_shipment);
+            await _Db.SaveChangesAsync();
+        } 
+
+        public async Task<OrderModel> GetOrderByshipmentId(int id)
+        {
+            var _order = await _Db.Order.FirstOrDefaultAsync(x => x.shipment_id == id);
+            if (_order == null) throw new Exception("Order not found!");
+            return _order;
+        }
+
+        public async Task Add(ShipmentModel shipment)
+        {
+            if (shipment == null) throw new ArgumentNullException(nameof(shipment));
+            await _Db.Shipment.AddAsync(shipment);
+            await _Db.SaveChangesAsync();
+        }
+
+        public async Task Update(int id, ShipmentModel shipment)
+        {
+            var _shipment = await GetById(id);
+
+            _shipment.order_id = shipment.order_id;
+            _shipment.source_id = shipment.source_id;
+            _shipment.order_date = shipment.order_date;
+            _shipment.request_date = shipment.request_date;
+            _shipment.shipment_date = shipment.shipment_date;
+            _shipment.shipment_type = shipment.shipment_type;
+            _shipment.shipment_status = shipment.shipment_status;
+            _shipment.notes = shipment.notes;
+            _shipment.carrier_code = shipment.carrier_code;
+            _shipment.carrier_description = shipment.carrier_description;
+            _shipment.service_code = shipment.service_code;
+            _shipment.payment_type = shipment.payment_type;
+            _shipment.transfer_mode = shipment.transfer_mode;
+            _shipment.total_package_count = shipment.total_package_count;
+            _shipment.total_package_weight = shipment.total_package_weight;
+            _shipment.items = shipment.items;
+            _shipment.updated_at = DateTime.Now;
+
+            _Db.Shipment.Update(_shipment);
+            await _Db.SaveChangesAsync();
+        }
+
+        public async Task Delete(int id)
+        {
+            var _shipment = await GetById(id);
+            _Db.Shipment.Remove(_shipment);
+            await _Db.SaveChangesAsync();
+        }
     }
-
-    public void Add(ShipmentModel shipment)
-    {
-        var items = GetAll();
-        shipment.id = items.Count > 0 ? items.Max(x => x.id) + 1 : 1;
-        shipment.created_at = DateTime.UtcNow;
-        shipment.updated_at = DateTime.UtcNow;
-        items.Add(shipment);
-        SaveToFile(items);
-    }
-
-    public bool Update(int id, ShipmentModel shipment)
-    {
-        var items = GetAll();
-        var existing = items.FirstOrDefault(x => x.id == id);
-        if (existing == null)
-            return false;
-
-        existing.order_id = shipment.order_id;
-        existing.source_id = shipment.source_id;
-        existing.order_date = shipment.order_date;
-        existing.request_date = shipment.request_date;
-        existing.shipment_date = shipment.shipment_date;
-        existing.shipment_type = shipment.shipment_type;
-        existing.shipment_status = shipment.shipment_status;
-        existing.notes = shipment.notes;
-        existing.carrier_code = shipment.carrier_code;
-        existing.carrier_description = shipment.carrier_description;
-        existing.service_code = shipment.service_code;
-        existing.payment_type = shipment.payment_type;
-        existing.transfer_mode = shipment.transfer_mode;
-        existing.total_package_count = shipment.total_package_count;
-        existing.total_package_weight = shipment.total_package_weight;
-        existing.items = shipment.items;
-        existing.updated_at = DateTime.UtcNow;
-
-        SaveToFile(items);
-        return true;
-    }
-
-    public bool Delete(int id)
-    {
-        var items = GetAll();
-        var item = items.FirstOrDefault(x => x.id == id);
-        if (item == null)
-            return false;
-
-        items.Remove(item);
-        SaveToFile(items);
-        return true;
-    }
-
-    private void SaveToFile(List<ShipmentModel> items)
-    {
-        var jsonContent = JsonConvert.SerializeObject(items, Formatting.Indented);
-        File.WriteAllText(dataPath, jsonContent);
-    }
-}
 }

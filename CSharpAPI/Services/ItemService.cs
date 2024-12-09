@@ -1,113 +1,91 @@
+using CSharpAPI.Data;
 using CSharpAPI.Models;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace CSharpAPI.Service
 {
     public interface IItemsService
     {
-        IEnumerable<ItemModel> GetAllItems();
-        ItemModel GetItemById(string uid);
-        void CreateItem(ItemModel item);
-        bool UpdateItem(string uid, ItemModel item);
-        bool DeleteItem(string uid);
-        IEnumerable<ItemModel> GetItemsByLineId(int lineId);
-        IEnumerable<ItemModel> GetItemsByGroupId(int groupId);
-        IEnumerable<ItemModel> GetItemsBySupplierId(int supplierId);
+        Task<List<ItemModel>> GetAllItems();
+        Task<ItemModel> GetItemById(string uid);
+        Task CreateItem(ItemModel item);
+        Task UpdateItem(string uid, ItemModel item);
+        Task DeleteItem(string uid);
+        Task<IEnumerable<ItemModel>> GetItemsByLineId(int lineId);
+        Task<IEnumerable<ItemModel>> GetItemsByGroupId(int groupId);
+        Task<IEnumerable<ItemModel>> GetItemsBySupplierId(int supplierId);
     }
 
     public class ItemsService : IItemsService
     {
-        private List<ItemModel> _items;
 
-        public ItemsService()
+        private readonly SQLiteDatabase _Db;
+        public ItemsService(SQLiteDatabase sQLite)
         {
-            _items = new List<ItemModel>
-            {
-                new ItemModel
-                {
-                    uid = "ITEM001",
-                    code = "DEFAULT001",
-                    description = "Default Item",
-                    item_line = 0,
-                    item_group = 0,
-                    created_at = DateTime.UtcNow,
-                    updated_at = DateTime.UtcNow
-                }
-            };
+            _Db = sQLite;
         }
-
-        public IEnumerable<ItemModel> GetAllItems() => _items;
-
-        public ItemModel GetItemById(string uid)
+        public async Task<List<ItemModel>> GetAllItems() => await _Db.itemModels.AsQueryable().ToListAsync();
+        public async Task<ItemModel> GetItemById(string uid)
         {
-            var item = _items.FirstOrDefault(x => x.uid == uid);
-            if (item == null)
-            {
-                throw new Exception($"Item with uid {uid} not found");
-            }
-            return item;
+            var _item = await _Db.itemModels.FirstOrDefaultAsync(x => x.uid == uid);
+            if (_item == null) throw new Exception("Item not found!");
+            return _item;
         }
-
-        public void CreateItem(ItemModel item)
+        public async Task CreateItem(ItemModel item)
         {
-            item.uid = GenerateUniqueId(); 
-            item.created_at = DateTime.UtcNow;
-            item.updated_at = DateTime.UtcNow;
-            _items.Add(item);
+            if (item == null) throw new ArgumentNullException(nameof(item));
+
+            var amount = await GetAllItems();
+            item.uid = $"P{(amount.Count + 1).ToString("D6")}";
+
+            await _Db.itemModels.AddAsync(item);
+            await _Db.SaveChangesAsync();
         }
-
-        public bool UpdateItem(string uid, ItemModel item)
+        public async Task UpdateItem(string uid, ItemModel item)
         {
-            var existingItem = _items.FirstOrDefault(x => x.uid == uid);
-            if (existingItem == null) return false;
+            var _item = await GetItemById(uid);
 
-            existingItem.code = item.code;
-            existingItem.description = item.description;
-            existingItem.short_description = item.short_description;
-            existingItem.upc_code = item.upc_code;
-            existingItem.model_number = item.model_number;
-            existingItem.commodity_code = item.commodity_code;
-            existingItem.item_line = item.item_line;
-            existingItem.item_group = item.item_group;
-            existingItem.item_type = item.item_type;
-            existingItem.unit_purchase_quantity = item.unit_purchase_quantity;
-            existingItem.unit_order_quantity = item.unit_order_quantity;
-            existingItem.pack_order_quantity = item.pack_order_quantity;
-            existingItem.supplier_id = item.supplier_id;
-            existingItem.supplier_code = item.supplier_code;
-            existingItem.supplier_part_number = item.supplier_part_number;
-            existingItem.updated_at = DateTime.UtcNow;
+            _item.code = item.code;
+            _item.description = item.description;
+            _item.short_description = item.short_description;
+            _item.upc_code = item.upc_code;
+            _item.model_number = item.model_number;
+            _item.commodity_code = item.commodity_code;
+            _item.item_line = item.item_line;
+            _item.item_group = item.item_group;
+            _item.item_type = item.item_type;
+            _item.unit_purchase_quantity = item.unit_purchase_quantity;
+            _item.unit_order_quantity = item.unit_order_quantity;
+            _item.pack_order_quantity = item.pack_order_quantity;
+            _item.supplier_id = item.supplier_id;
+            _item.supplier_code = item.supplier_code;
+            _item.supplier_part_number = item.supplier_part_number;
+            _item.updated_at = DateTime.UtcNow;
 
-            return true;
+            _Db.itemModels.Update(_item);
+            await _Db.SaveChangesAsync();
         }
-
-        public bool DeleteItem(string uid)
+        public async Task DeleteItem(string uid)
         {
-            var item = _items.FirstOrDefault(x => x.uid == uid);
-            if (item == null) return false;
-
-            _items.Remove(item);
-            return true;
+            var _item = await GetItemById(uid);
+            _Db.itemModels.Remove(_item);
+            await _Db.SaveChangesAsync();
         }
-
-        public IEnumerable<ItemModel> GetItemsByLineId(int lineId)
+        public async Task<IEnumerable<ItemModel>> GetItemsByLineId(int lineId)
         {
-            return _items.Where(i => i.item_line == lineId);
+            var _items = await GetAllItems();
+            return _items.Where(x => x.item_line == lineId);
         }
-
-        public IEnumerable<ItemModel> GetItemsByGroupId(int groupId)
+        public async Task<IEnumerable<ItemModel>> GetItemsByGroupId(int groupId)
         {
-            return _items.Where(i => i.item_group == groupId);
+            var _items = await GetAllItems();
+            return _items.Where(x => x.item_group == groupId);
         }
-
-        public IEnumerable<ItemModel> GetItemsBySupplierId(int supplierId)
+        public async Task<IEnumerable<ItemModel>> GetItemsBySupplierId(int supplierId)
         {
-            return _items.Where(i => i.supplier_id == supplierId);
-        }
-
-        private string GenerateUniqueId()
-        {
-            return "ITEM" + DateTime.UtcNow.Ticks.ToString();
+            var _items = await GetAllItems();
+            return _items.Where(x => x.supplier_id == supplierId);
         }
     }
 }
