@@ -8,7 +8,7 @@ API_KEY: warehouse_key_2024
 ### Get client by id (Admin)
 GET http://localhost:5001/api/v1/clients/9821
 Content-Type: application/json
-API_KEY: warehouse_key_2024
+API_KEY: floor_key_2024_wh1
 
 ### Get order by client id (Admin)
 GET http://localhost:5001/api/v1/clients/3/orders
