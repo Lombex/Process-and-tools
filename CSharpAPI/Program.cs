@@ -111,21 +111,16 @@ app.Urls.Add("http://localhost:5001");
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<SQLiteDatabase>();
-    dbContext.Database.Migrate();
-
-    // Only seed admin user if no users exist
-    if (!dbContext.ApiUsers.Any())
+    try
     {
-        dbContext.ApiUsers.Add(new CSharpAPI.Models.Auth.ApiUser
-        { 
-            api_key = "a1b2c3d4e5",
-            app = "Admin App",
-            role = "Admin",
-            created_at = DateTime.UtcNow,
-            updated_at = DateTime.UtcNow
-        });
-
-        dbContext.SaveChanges();
+        await dbContext.Database.MigrateAsync();
+        await DatabaseSeeding.SeedDatabase(dbContext);
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+        throw;
     }
 }
 
