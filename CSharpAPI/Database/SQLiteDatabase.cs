@@ -1,4 +1,5 @@
 using CSharpAPI.Models;
+using CSharpAPI.Models.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
@@ -22,6 +23,8 @@ namespace CSharpAPI.Data
         public DbSet<InventorieModel> Inventors { get; set; }
         public DbSet<ClientModel> ClientModels { get; set; }
         public DbSet<Contact> contacts { get; set; }
+        public DbSet<ApiUser> ApiUsers { get; set; }
+        public DbSet<RolePermission> RolePermissions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -42,6 +45,25 @@ namespace CSharpAPI.Data
 
             modelBuilder.Entity<OrderModel>().Property(x => x.items).HasConversion(new ValueConverter<List<Items>, string>(
                 i => JsonConvert.SerializeObject(i), i => JsonConvert.DeserializeObject<List<Items>>(i)));
+
+            // Configure ApiUser entity
+            modelBuilder.Entity<ApiUser>(entity =>
+            {
+                entity.HasKey(e => e.id);
+                entity.Property(e => e.api_key).IsRequired();
+                entity.Property(e => e.role).IsRequired();
+                entity.HasIndex(e => e.api_key).IsUnique();
+            });
+
+            // Configure RolePermission entity
+            modelBuilder.Entity<RolePermission>(entity =>
+            {
+                entity.HasKey(e => e.id);
+                entity.Property(e => e.role).IsRequired();
+                entity.Property(e => e.resource).IsRequired();
+                entity.HasIndex(e => new { e.role, e.resource }).IsUnique();
+            });
+
             #pragma warning restore
 
             base.OnModelCreating(modelBuilder);
