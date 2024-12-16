@@ -27,13 +27,22 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0.x'
-      
-      - name: Run tests
-        run: dotnet test . --no-build --configuration Release
+        - name: Checkout repository
+          uses: actions/checkout@v4
+
+        - name: Set up .NET
+          uses: actions/setup-dotnet@v3
+          with:
+            dotnet-version: '8.0.x'
+
+        - name: Restore dependencies
+          run: dotnet restore ./Testing/Testing.csproj
+
+        - name: Run tests
+          run: dotnet test ./Testing/Testing.csproj --no-build --configuration Release --collect "XPlat Code Coverage"
+
+        - name: Upload coverage report
+          uses: actions/upload-artifact@v4
+          with:
+            name: coverage-report
+            path: '**/coverage.cobertura.xml'   
