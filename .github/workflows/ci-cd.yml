@@ -18,10 +18,22 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore ./CSharpAPI/CSharpAPI.csproj
+        run: dotnet restore ./CSharpAPI/NaamVanJeProject.csproj
 
       - name: Build solution
-        run: dotnet build ./CSharpAPI/CSharpAPI.csproj --no-restore --configuration Release
+        run: dotnet build ./CSharpAPI/NaamVanJeProject.csproj --no-restore --configuration Release
 
-
-
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+      
+      - name: Run tests
+        run: dotnet test . --no-build --configuration Release
