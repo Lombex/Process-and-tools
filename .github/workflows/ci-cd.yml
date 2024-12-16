@@ -18,11 +18,10 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore ./CSharpAPI
+        run: dotnet restore ./CSharpAPI/CSharpAPI.csproj
 
       - name: Build solution
-        run: dotnet build ./ --no-restore --configuration Release
+        run: dotnet build ./CSharpAPI/CSharpAPI.csproj --no-restore --configuration Release
 
-      - name: List csharpapi dir
-        run: ls ./csharpapi
+
 
