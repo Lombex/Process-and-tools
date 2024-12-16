@@ -54,10 +54,3 @@ jobs:
         with:
           name: test-results
           path: TestResults/test-results.trx
-
-      - name: Generate test summary
-        uses: dorny/test-reporter@v1
-        with:
-          name: .NET Test Results
-          path: TestResults/test-results.trx
-          reporter: dotnet-trx
