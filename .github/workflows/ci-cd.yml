@@ -2,7 +2,7 @@ name: CI Workflow
 
 on:
   push:
-    branches: [ "CICDTestingBranch" ]
+    branches: [ "CI/CD_c#" ]
   pull_request:
 
 jobs:
