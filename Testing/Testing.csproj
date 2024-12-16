@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <IsTestProject>true</IsTestProject>
-    <TargetFramework>net9.0</TargetFramework> <!-- Change to net8.0 as net9.0 might not be stable yet -->
+    <TargetFramework>net8.0</TargetFramework> 
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
