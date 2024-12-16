@@ -40,8 +40,9 @@ jobs:
 
       - name: Run tests
         run: |
-          dotnet test ./Testing/Testing.csproj --configuration Release --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=coverage/
-        
+          mkdir -p TestResults
+          dotnet test ./Testing/Testing.csproj --configuration Release --logger "trx;LogFileName=TestResults/test-results.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=coverage/
+
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
@@ -52,11 +53,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: test-results.trx
+          path: TestResults/test-results.trx
 
       - name: Generate test summary
         uses: dorny/test-reporter@v1
         with:
           name: .NET Test Results
-          path: test-results.trx
+          path: TestResults/test-results.trx
           reporter: dotnet-trx
