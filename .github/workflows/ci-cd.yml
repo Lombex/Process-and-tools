@@ -1,29 +1,28 @@
-name: CI Workflow
+name: CI Build
 
 on:
   push:
-    branches: [ "main", "CI/CD_c#" ]
+    branches: [ "CI/CD_c#" ]
+  pull_request:
 
 jobs:
-  # Job 1: Build
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: Set up .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x' # Pas aan op basis van je .NET-versie
+          dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore ./CSharpAPI/CSharpAPI.csproj
 
       - name: Build solution
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build ./CSharpAPI/CSharpAPI.csproj --no-restore --configuration Release
 
-  # Job 2: Test
   test:
     needs: build
     runs-on: ubuntu-latest
@@ -31,15 +30,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: Set up .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
 
-      - name: Run unit tests
+      - name: Restore dependencies
+        run: dotnet restore ./Testing/Testing.csproj
+
+      - name: Run tests
         run: |
-          dotnet test --no-build --logger "trx;LogFileName=test-results.trx" --configuration Release /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=coverage/
-        continue-on-error: true
+          dotnet test ./Testing/Testing.csproj --configuration Release --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=coverage/
+        
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: '**/coverage.cobertura.xml'
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -47,29 +54,9 @@ jobs:
           name: test-results
           path: test-results.trx
 
-      - name: Upload code coverage
-        uses: actions/upload-artifact@v4
-        with:
-          name: code-coverage
-          path: coverage/
-
       - name: Generate test summary
         uses: dorny/test-reporter@v1
         with:
           name: .NET Test Results
           path: test-results.trx
           reporter: dotnet-trx
-
-  # Job 3: Deployment
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Deploy to production
-        run: |
-          echo "Deploying application to production environment..."
-          # Voeg hier de deployment-stappen toe, zoals een SSH-opdracht of een cloud deployment script.
