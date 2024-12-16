@@ -1,8 +1,8 @@
-name: CI Build
+name: CI Workflow
 
 on:
   push:
-    branches: [ "CI/CD_c#" ]
+    branches: [ "CICDTestingBranch" ]
   pull_request:
 
 jobs:
@@ -38,6 +38,12 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore ./Testing/Testing.csproj
 
+      # Start the API server in the background
+      - name: Start API server
+        run: |
+          dotnet run --project ./CSharpAPI/CSharpAPI.csproj &
+        continue-on-error: true
+
       - name: Run tests
         run: |
           mkdir -p TestResults
@@ -54,3 +60,23 @@ jobs:
         with:
           name: test-results
           path: TestResults/test-results.trx
+
+      - name: Generate test summary
+        uses: dorny/test-reporter@v1
+        with:
+          name: .NET Test Results
+          path: TestResults/test-results.trx
+          reporter: dotnet-trx
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to production
+        run: |
+          echo "Deploying application to production environment..."
+          # Voeg hier de deployment-stappen toe, zoals een SSH-opdracht of een cloud deployment script.
