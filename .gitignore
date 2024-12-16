@@ -35,11 +35,22 @@
 /PythonAPI/api/providers/__pycache__/data_provider.cpython-313.pyc
 /PythonAPI/api/processors/__pycache__/notification_processor.cpython-313.pyc
 /PythonAPI/start-system.sh
-Testing/bin/Debug/net9.0/xunit.abstractions.dll
-Testing/bin/Debug/net9.0/Testing.runtimeconfig.json
-Testing/bin/Debug/net9.0/tr/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
-Testing/bin/Debug/net9.0/tr/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
-Testing/bin/Debug/net9.0/tr/Microsoft.TestPlatform.CoreUtilities.resources.dll
-Testing/bin/Debug/net9.0/tr/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
-Testing/bin/Debug/net9.0/tr/Microsoft.VisualStudio.TestPlatform.TestFramework.resources.dll
-Testing/bin/Debug/net9.0/tr/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+
+# Build outputs
+CSharpAPI/bin/
+CSharpAPI/obj/
+*.dll
+*.pdb
+*.cache
+*.json
+*.props
+*.targets
+
+# Build directories
+CSharpAPI/bin/
+CSharpAPI/obj/
+
+# Build artifacts
+*.cache
+*.editorconfig
+project.assets.json
