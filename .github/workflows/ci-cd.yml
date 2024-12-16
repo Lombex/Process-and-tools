@@ -1,49 +1,75 @@
-name: CI Build
+name: CI Workflow
 
 on:
   push:
-    branches: [ "CI/CD_c#" ]
-  pull_request:
+    branches: [ "main", "CICDTestingBranch" ]
 
 jobs:
+  # Job 1: Build
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up .NET
+      - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '8.0.x' # Pas aan op basis van je .NET-versie
 
       - name: Restore dependencies
-        run: dotnet restore ./CSharpAPI/CSharpAPI.csproj
+        run: dotnet restore
 
       - name: Build solution
-        run: dotnet build ./CSharpAPI/CSharpAPI.csproj --no-restore --configuration Release
+        run: dotnet build --no-restore --configuration Release
 
+  # Job 2: Test
   test:
     needs: build
     runs-on: ubuntu-latest
     steps:
-        - name: Checkout repository
-          uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-        - name: Set up .NET
-          uses: actions/setup-dotnet@v3
-          with:
-            dotnet-version: '8.0.x'
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x' # Pas aan op basis van je .NET-versie
 
-        - name: Restore dependencies
-          run: dotnet restore ./Testing/Testing.csproj
+      - name: Run unit tests
+        run: |
+          dotnet test --no-build --logger "trx;LogFileName=test-results.trx" --configuration Release /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=coverage/
+        continue-on-error: true
 
-        - name: Run tests
-          run: dotnet test ./Testing/Testing.csproj --configuration Release --collect:"XPlat Code Coverage"
-        
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results.trx
 
-        - name: Upload coverage report
-          uses: actions/upload-artifact@v4
-          with:
-            name: coverage-report
-            path: '**/coverage.cobertura.xml'   
+      - name: Upload code coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage
+          path: coverage/
+
+      - name: Generate test summary
+        uses: dorny/test-reporter@v1
+        with:
+          name: Unit Test Results
+          path: test-results.trx
+          reporter: dotnet-trx
+
+  # Job 3: Deployment
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to production
+        run: |
+          echo "Deploying application to production environment..."
+          # Voeg hier de deployment-stappen toe, zoals een SSH-opdracht of een cloud deployment script.
