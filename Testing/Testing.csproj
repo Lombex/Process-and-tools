@@ -10,14 +10,14 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
-    <!-- Gebruik een versie van AspNetCore.Mvc.Testing die compatibel is met .NET 8 -->
+    <!-- Houd Mvc.Testing op 8.x, deze is geschikt voor ASP.NET Core 8.0 -->
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />
 
-    <!-- Gebruik Entity Framework Core 8.0.x of lager om compatibiliteit met net8.0 te garanderen -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
+    <!-- Match de versies met CSharpAPI (9.0.0) om downgrades te voorkomen -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />
 
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="MSTest.TestFramework" Version="3.6.3" />
