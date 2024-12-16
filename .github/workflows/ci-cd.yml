@@ -36,7 +36,7 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore ./Testing/Testing.csproj
+        run: dotnet restore ./Test/Test.csproj
 
       # Start the API server in the background
       - name: Start API server
@@ -47,7 +47,7 @@ jobs:
       - name: Run tests
         run: |
           mkdir -p TestResults
-          dotnet test ./Testing/Testing.csproj --configuration Release --logger "trx;LogFileName=TestResults/test-results.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/coverage.cobertura.xml
+          dotnet test ./Test/Test.csproj --configuration Release --logger "trx;LogFileName=TestResults/test-results.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/coverage.cobertura.xml
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
