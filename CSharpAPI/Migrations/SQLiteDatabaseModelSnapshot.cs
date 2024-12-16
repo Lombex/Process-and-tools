@@ -17,6 +17,81 @@ namespace CSharpAPI.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
 
+            modelBuilder.Entity("CSharpAPI.Models.Auth.ApiUser", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("api_key")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("app")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("created_at")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("role")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("updated_at")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("warehouse_id")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("api_key")
+                        .IsUnique();
+
+                    b.ToTable("ApiUsers");
+                });
+
+            modelBuilder.Entity("CSharpAPI.Models.Auth.RolePermission", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("can_create")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("can_delete")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("can_update")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("can_view")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("created_at")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("resource")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("role")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("updated_at")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("role", "resource")
+                        .IsUnique();
+
+                    b.ToTable("RolePermissions");
+                });
+
             modelBuilder.Entity("CSharpAPI.Models.ClientModel", b =>
                 {
                     b.Property<int>("id")

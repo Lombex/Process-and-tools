@@ -1,10 +1,12 @@
 ### Get all Items
 GET http://localhost:5001/api/v1/items/all
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Get Item by uid
-GET http://localhost:5001/api/v1/items/P000001
+GET http://localhost:5001/api/v1/items/P011720
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Create Item
 POST http://localhost:5001/api/v1/items

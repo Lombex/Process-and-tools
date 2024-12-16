@@ -1,6 +1,7 @@
 ### Get All Locations
 GET http://localhost:5001/api/v1/locations/all
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Get Location by Id
 GET http://localhost:5001/api/v1/locations/34534

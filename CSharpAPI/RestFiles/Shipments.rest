@@ -1,10 +1,12 @@
 ### Get all shipments
 GET http://localhost:5001/api/v1/shipments/all
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Get shipment by id
-GET http://localhost:5001/api/v1/shipments/1
+GET http://localhost:5001/api/v1/shipments/10102
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Get shipment items by id
 GET http://localhost:5001/api/v1/shipments/1/items
