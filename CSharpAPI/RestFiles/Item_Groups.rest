@@ -1,6 +1,7 @@
 ### Get all ItemTypes
 GET http://localhost:5001/api/v1/itemgroup/all
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Get ItemType by ID
 GET http://localhost:5001/api/v1/itemgroup/1

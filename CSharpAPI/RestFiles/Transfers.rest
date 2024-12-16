@@ -2,10 +2,12 @@
 
 GET http://localhost:5001/api/v1/transfers/all
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Get transfer by ID
-GET http://localhost:5001/api/v1/transfers/1
+GET http://localhost:5001/api/v1/transfers/119240
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Get transfer item
 GET http://localhost:5001/api/v1/transfers/1/items

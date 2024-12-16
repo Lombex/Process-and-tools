@@ -1,6 +1,7 @@
 ### Get All Suppliers
 GET http://localhost:5001/api/v1/suppliers/all
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Get Supplier By ID
 GET http://localhost:5001/api/v1/suppliers/1

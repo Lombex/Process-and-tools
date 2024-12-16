@@ -1,6 +1,7 @@
 ### Get all inventories
 GET http://localhost:5001/api/v1/inventories/all
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Get inventorie id
 GET http://localhost:5001/api/v1/inventories/0

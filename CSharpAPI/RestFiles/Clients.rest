@@ -3,7 +3,7 @@
 ### Get all clients (Admin)
 GET http://localhost:5001/api/v1/clients/all
 Content-Type: application/json
-API_KEY: warehouse_key_2024
+API_KEY: admin_key_2024
 
 ### Get client by id (Admin)
 GET http://localhost:5001/api/v1/clients/9821

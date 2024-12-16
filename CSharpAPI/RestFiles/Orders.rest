@@ -1,6 +1,7 @@
 ### Get all orders
 GET http://localhost:5001/api/v1/orders/all
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Get order by id
 GET http://localhost:5001/api/v1/orders/1
