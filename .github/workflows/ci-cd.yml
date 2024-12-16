@@ -2,7 +2,7 @@ name: CI Workflow
 
 on:
   push:
-    branches: [ "main", "CICDTestingBranch" ]
+    branches: [ "main", "CI/CD_c#" ]
 
 jobs:
   # Job 1: Build
@@ -34,7 +34,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x' # Pas aan op basis van je .NET-versie
+          dotnet-version: '8.0.x'
 
       - name: Run unit tests
         run: |
@@ -56,7 +56,7 @@ jobs:
       - name: Generate test summary
         uses: dorny/test-reporter@v1
         with:
-          name: Unit Test Results
+          name: .NET Test Results
           path: test-results.trx
           reporter: dotnet-trx
 
