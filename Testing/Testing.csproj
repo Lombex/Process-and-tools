@@ -10,14 +10,16 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />
+    <!-- Gebruik een versie van AspNetCore.Mvc.Testing die compatibel is met .NET 8 -->
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />
+
+    <!-- Gebruik Entity Framework Core 8.0.x of lager om compatibiliteit met net8.0 te garanderen -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
+
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-    
-    <!-- Updated MSTest to version 3.6.3 to avoid the downgrade issue (>= 3.6.3 as required by CSharpAPI) -->
     <PackageReference Include="MSTest.TestFramework" Version="3.6.3" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.2.8" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
