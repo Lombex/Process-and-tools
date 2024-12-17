@@ -2,7 +2,7 @@ name: CI Workflow
 
 on:
   push:
-    branches: [ "CI/CD_C#2.0" ]
+    branches: [ "main" ]
   pull_request:
 
 jobs:
@@ -56,13 +56,14 @@ jobs:
       - name: Install ReportGenerator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
-      - name: Generate Markdown Summary
+      - name: Generate Filtered Markdown Summary
         run: |
           reportgenerator \
             -reports:"**/coverage.opencover.xml" \
             -targetdir:"coverage-report" \
-            -reporttypes:MarkdownSummary
-          echo "## Test Summary" >> $GITHUB_STEP_SUMMARY
+            -reporttypes:MarkdownSummary \
+            -classfilters:"+CSharpAPI.*"
+          echo "## Code Coverage Report" >> $GITHUB_STEP_SUMMARY
           cat coverage-report/Summary.md >> $GITHUB_STEP_SUMMARY
 
       - name: Upload coverage report
