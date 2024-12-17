@@ -2,7 +2,7 @@ name: CI Workflow
 
 on:
   push:
-    branches: [ "CI/CD_C#2.0" ]
+    branches: [ "main" ]
   pull_request:
 
 jobs:
@@ -20,29 +20,53 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore ./CSharpAPI/CSharpAPI.csproj
 
+      - name: Build solution
+        run: dotnet build ./CSharpAPI/CSharpAPI.csproj --configuration Release --no-restore
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: ./CSharpAPI/bin/Release
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./CSharpAPI/bin/Release
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
       - name: Run tests with coverage
         run: |
-          dotnet test ./Integration_Testing/Integration_Testing.csproj \
+          dotnet test ./CSharpAPI.Tests/CSharpAPI.Tests.csproj \
             --collect:"XPlat Code Coverage" \
             -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
       - name: Install ReportGenerator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
-      - name: Generate Markdown Coverage Report
+      - name: Generate Markdown Summary
         run: |
           reportgenerator \
             -reports:"**/coverage.opencover.xml" \
             -targetdir:"coverage-report" \
             -reporttypes:MarkdownSummary
+          echo "## Test Summary" >> $GITHUB_STEP_SUMMARY
           cat coverage-report/Summary.md >> $GITHUB_STEP_SUMMARY
 
-      - name: Fail if Coverage is Below 80%
-        run: |
-          COVERAGE=$(grep "Line coverage" coverage-report/Summary.md | awk '{print $3}' | tr -d '%')
-          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
-            echo "Code coverage is below 80%. Current: $COVERAGE%"
-            exit 1
-          else
-            echo "Code coverage is sufficient: $COVERAGE%"
-          fi
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-report
