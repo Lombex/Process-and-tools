@@ -10,7 +10,7 @@ namespace CSharpAPI.Tests
     {
         private string DatabasePath => Path.GetFullPath(Path.Combine(
     AppContext.BaseDirectory, 
-    "../../../../CSharpAPI/Database/Data.db"));
+        "../../../../CSharpAPI/Database/Data.db"));
 
         [TestInitialize]
         public void SetupDatabase()

@@ -50,7 +50,7 @@ jobs:
         run: dotnet restore ./Test/Test.csproj
 
       - name: Run tests
-        run: dotnet test ./Test/Test.csproj --configuration Release --logger "trx"
+        run: dotnet test ./Integration_Testing/Integration_Testing.csproj --configuration Release --logger "trx"
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
