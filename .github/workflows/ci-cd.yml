@@ -28,7 +28,7 @@ jobs:
         with:
           name: build
           path: ./CSharpAPI/bin/Release
-          
+
   test:
     needs: build 
     runs-on: ubuntu-latest
@@ -50,7 +50,7 @@ jobs:
         run: dotnet restore ./Test/Test.csproj
 
       - name: Run tests
-        run: dotnet test ./Test/Test.csproj --no-build --configuration Release --logger "trx;LogFileName=test-results.trx"
+        run: dotnet test ./Test/Test.csproj --configuration Release --logger "trx"
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
