@@ -22,3 +22,38 @@ jobs:
 
       - name: Build solution
         run: dotnet build ./CSharpAPI/CSharpAPI.csproj --no-restore --configuration Release
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: ./CSharpAPI/bin/Release
+          
+  test:
+    needs: build 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies for tests
+        run: dotnet restore ./Test/Test.csproj
+
+      - name: Run tests
+        run: dotnet test ./Test/Test.csproj --no-build --configuration Release --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults/test-results.trx
