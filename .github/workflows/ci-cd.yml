@@ -30,30 +30,35 @@ jobs:
           path: ./CSharpAPI/bin/Release
 
   test:
-    needs: build 
+    needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
 
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0.x'
+    - name: Restore dependencies
+      run: dotnet restore ./CSharpAPI/CSharpAPI.csproj
 
-      - name: Restore dependencies for tests
-        run: dotnet restore ./Test/Test.csproj
+    - name: Run tests with coverage
+      run: |
+        dotnet test ./Integration_Testing/Integration_Testing.csproj \
+          --collect:"XPlat Code Coverage" \
+          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
-      - name: Run tests
-        run: dotnet test ./Integration_Testing/Integration_Testing.csproj --configuration Release --logger "trx"
+    - name: Generate coverage report
+      run: |
+        reportgenerator \
+          -reports:"**/coverage.opencover.xml" \
+          -targetdir:"coverage-report" \
+          -reporttypes:HtmlSummaryMarkdown
 
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: TestResults/test-results.trx
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coverage-report
