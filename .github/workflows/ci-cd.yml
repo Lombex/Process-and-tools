@@ -51,23 +51,23 @@ jobs:
         run: |
           dotnet test ./Integrationtest/Integrationtest.csproj \
             --collect:"XPlat Code Coverage" \
-            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
 
       - name: Install ReportGenerator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
-      - name: Generate HTML and Markdown Coverage Report
+      - name: Generate Detailed Coverage Report
         run: |
           reportgenerator \
-            -reports:"**/coverage.opencover.xml" \
+            -reports:"**/coverage.cobertura.xml" \
             -targetdir:"coverage-report" \
-            -reporttypes:"Html;MarkdownSummary" \
-            -classfilters:"+*Tests*" \
+            -reporttypes:"HtmlInline_AzurePipelines;MarkdownSummary" \
+            -classfilters:"+CSharpAPI.*" \
             -historydir:"coverage-history"
 
       - name: Add Coverage Summary to GitHub Actions
         run: |
-          echo "## Integration Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## Coverage Summary" >> $GITHUB_STEP_SUMMARY
           cat coverage-report/Summary.md >> $GITHUB_STEP_SUMMARY
 
       - name: Upload HTML Coverage Report
