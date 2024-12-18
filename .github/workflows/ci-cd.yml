@@ -2,7 +2,7 @@ name: CI Workflow
 
 on:
   push:
-    branches: [ "CI/CD_C#2.0" ]
+    branches: [ "CI/CD_C#2.0", "master" ]
   pull_request:
 
 jobs:
@@ -42,10 +42,10 @@ jobs:
           name: build
           path: ./CSharpAPI/bin/Release
 
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0.x'
+      # - name: Set up .NET
+      #   uses: actions/setup-dotnet@v3
+      #   with:
+      #     dotnet-version: '8.0.x'
 
       - name: Run integration tests with coverage
         run: |
