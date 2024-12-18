@@ -1,0 +1,20 @@
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="Code Coverage">
+        <Configuration>
+          <!-- Alleen controllers en services -->
+          <Include>
+            <ClassName>.*Controller.*</ClassName>
+            <ClassName>.*Service.*</ClassName>
+          </Include>
+          <!-- Sluit models en migrations uit -->
+          <Exclude>
+            <ClassName>.*Model.*</ClassName>
+            <ClassName>.*Migration.*</ClassName>
+          </Exclude>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
