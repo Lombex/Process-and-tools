@@ -50,10 +50,35 @@ namespace CSharpAPI.Service {
             await _Db.SaveChangesAsync();
         }
 
-        // Has to be implemented 
-        public async Task CommitTransfer()
+        // This has to be confirmed...
+        public async Task CommitTransfer(int id)
         {
-            throw new NotImplementedException();
+            var _transfer = await GetTransferById(id);
+            foreach (Items? _item in _transfer.items)
+            {
+                var _inventory = _Db.Inventors.Where(x => x.item_id == _item.item_id);
+                foreach (var y in _inventory)
+                {
+                    if (y.locations.Any(x => x == _transfer.transfer_from)) 
+                    {
+                        y.total_on_hand -= _item.amount;
+                        y.total_expected = y.total_on_hand + y.total_ordered;
+                        y.total_available = y.total_on_hand - y.total_allocated;
+                        _Db.Inventors.Update(y);
+                        await _Db.SaveChangesAsync();
+                    } else if (y.locations.Any(x => x == _transfer.transfer_to))
+                    {
+                        y.total_on_hand += _item.amount;
+                        y.total_expected = y.total_on_hand + y.total_ordered;
+                        y.total_available = y.total_on_hand - y.total_allocated;
+                        _Db.Inventors.Update(y);
+                        await _Db.SaveChangesAsync();
+                    }
+                }
+            } 
+            _transfer.transfer_status = "Processed";
+            await UpdateTransfer(id, _transfer);
+            await _Db.SaveChangesAsync();
         }
 
         public async Task DeleteTransfer(int id)
