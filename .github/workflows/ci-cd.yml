@@ -47,25 +47,28 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Run tests with coverage
+      - name: Run integration tests with coverage
         run: |
-          dotnet test ./CSharpAPI.Tests/CSharpAPI.Tests.csproj \
+          dotnet test ./Integrationtest/Integrationtest.csproj \
             --collect:"XPlat Code Coverage" \
             -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
       - name: Install ReportGenerator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
-      - name: Generate Filtered Markdown Summary
+      - name: Generate Detailed Coverage Report
         run: |
           reportgenerator \
             -reports:"**/coverage.opencover.xml" \
             -targetdir:"coverage-report" \
             -reporttypes:MarkdownSummary \
-            -classfilters:"+CSharpAPI.Tests.*"
-          echo "## Code Coverage Report" >> $GITHUB_STEP_SUMMARY
+            -classfilters:"+*Tests*" \
+            -historydir:"coverage-history"
+
+      - name: Add Coverage Summary to GitHub Actions
+        run: |
+          echo "## Integration Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
           cat coverage-report/Summary.md >> $GITHUB_STEP_SUMMARY
-      
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
