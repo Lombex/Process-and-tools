@@ -56,13 +56,13 @@ jobs:
       - name: Install ReportGenerator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
-      - name: Generate Detailed Coverage Report
+       - name: Generate Detailed Coverage Report
         run: |
           reportgenerator \
             -reports:"**/coverage.cobertura.xml" \
             -targetdir:"coverage-report" \
             -reporttypes:"HtmlInline_AzurePipelines;MarkdownSummary" \
-            -classfilters:"+CSharpAPI.*" \
+            -classfilters:"+*Controller*;+*Service*;*" \
             -historydir:"coverage-history"
 
       - name: Add Coverage Summary to GitHub Actions
