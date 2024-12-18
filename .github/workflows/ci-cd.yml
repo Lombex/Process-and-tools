@@ -56,7 +56,7 @@ jobs:
       - name: Install ReportGenerator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
-       - name: Generate Detailed Coverage Report
+      - name: Generate Detailed Coverage Report
         run: |
           reportgenerator \
             -reports:"**/coverage.cobertura.xml" \
