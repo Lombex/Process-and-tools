@@ -51,7 +51,7 @@ jobs:
         run: |
           dotnet test ./Integrationtest/Integrationtest.csproj \
             --collect:"XPlat Code Coverage" \
-            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
+            --settings ./coverage.runsettings
 
       - name: Install ReportGenerator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
@@ -62,7 +62,7 @@ jobs:
             -reports:"**/coverage.cobertura.xml" \
             -targetdir:"coverage-report" \
             -reporttypes:"HtmlInline_AzurePipelines;MarkdownSummary" \
-            -classfilters:"+*Controller*;+*Service*;*" \
+            -classfilters:"+*Controller*;+*Service*;-*Model*;-*Migration*" \
             -historydir:"coverage-history"
 
       - name: Add Coverage Summary to GitHub Actions
