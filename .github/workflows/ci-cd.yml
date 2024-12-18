@@ -56,12 +56,12 @@ jobs:
       - name: Install ReportGenerator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
-      - name: Generate Detailed Coverage Report
+      - name: Generate HTML and Markdown Coverage Report
         run: |
           reportgenerator \
             -reports:"**/coverage.opencover.xml" \
             -targetdir:"coverage-report" \
-            -reporttypes:MarkdownSummary \
+            -reporttypes:"Html;MarkdownSummary" \
             -classfilters:"+*Tests*" \
             -historydir:"coverage-history"
 
@@ -70,8 +70,8 @@ jobs:
           echo "## Integration Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
           cat coverage-report/Summary.md >> $GITHUB_STEP_SUMMARY
 
-      - name: Upload coverage report
+      - name: Upload HTML Coverage Report
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
+          name: coverage-html-report
           path: coverage-report
