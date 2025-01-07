@@ -23,6 +23,9 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.0.0" />
     <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="NuGet.Frameworks" Version="6.5.0" />
+
+
   </ItemGroup>
 
   <ItemGroup>
