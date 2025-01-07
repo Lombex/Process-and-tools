@@ -16,14 +16,14 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<ActionResult<IEnumerable<InventorieModel>>> GetAllInventories()
+        public async Task<IActionResult> GetAllInventories()
         {
             var inventories = await _inventoriesService.GetAllInventories();
             return Ok(inventories);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<InventorieModel>> GetInventoryById(int id)
+        public async Task<IActionResult> GetInventoryById(int id)
         {
             try
             {
@@ -37,7 +37,7 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<InventorieModel>> CreateInventory([FromBody] InventorieModel inventory)
+        public async Task<IActionResult> CreateInventory([FromBody] InventorieModel inventory)
         {
             if (inventory == null)
             {
@@ -74,14 +74,14 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet("item/{itemId}")]
-        public async Task<ActionResult<IEnumerable<InventorieModel>>> GetInventoriesByItemId(string itemId)
+        public async Task<IActionResult> GetInventoriesByItemId(string itemId)
         {
             var inventories = await _inventoriesService.GetInventoriesByItemId(itemId);
             return Ok(inventories);
         }
 
         [HttpGet("location/{locationId}")]
-        public async Task<ActionResult<IEnumerable<InventorieModel>>> GetInventoriesByLocation(int locationId)
+        public async Task<IActionResult> GetInventoriesByLocation(int locationId)
         {
             var inventories = await _inventoriesService.GetInventoriesByLocation(locationId);
             return Ok(inventories);

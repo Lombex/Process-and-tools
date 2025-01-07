@@ -27,7 +27,7 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<ActionResult<IEnumerable<ClientModel>>> GetAllClients()
+        public async Task<IActionResult> GetAllClients()
         {
             if (!await CheckAccess("GET"))
                 return Forbid();
@@ -37,7 +37,7 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ClientModel>> GetClientById(int id)
+        public async Task<IActionResult> GetClientById(int id)
         {
             if (!await CheckAccess("GET"))
                 return Forbid();
@@ -62,7 +62,7 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ClientModel>> CreateClient([FromBody] ClientModel client)
+        public async Task<IActionResult> CreateClient([FromBody] ClientModel client)
         {
             if (!await CheckAccess("POST"))
                 return Forbid();
