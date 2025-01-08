@@ -52,3 +52,8 @@ Content-Type: application/json
 ### Delete transfer
 DELETE http://localhost:5001/api/v1/transfers/1
 Content-Type: application/json
+
+### Transfer commit
+POST http://localhost:5001/api/v1/transfers/119242/commit
+Content-Type: application/json
+API_KEY: admin_key_2024
