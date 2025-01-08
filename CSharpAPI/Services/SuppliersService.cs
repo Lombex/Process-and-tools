@@ -52,7 +52,7 @@ namespace CSharpAPI.Service
             _supplier.city = updateSupplier.city;
             _supplier.zip_code = updateSupplier.zip_code;
             _supplier.province = updateSupplier.province;
-            _supplier.contact_name = updateSupplier.contact_name;
+            _supplier.contact = updateSupplier.contact;
             _supplier.phonenumber = updateSupplier.phonenumber;
             _supplier.reference = updateSupplier.reference;
             _supplier.updated_at = DateTime.Now;

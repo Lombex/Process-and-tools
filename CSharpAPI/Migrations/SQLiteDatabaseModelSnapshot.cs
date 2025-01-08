@@ -104,15 +104,6 @@ namespace CSharpAPI.Migrations
                     b.Property<string>("city")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("contact_email")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("contact_name")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("contact_phone")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("country")
                         .HasColumnType("TEXT");
 
@@ -506,7 +497,7 @@ namespace CSharpAPI.Migrations
                     b.Property<string>("code")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("contact_name")
+                    b.Property<string>("country")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("created_at")
@@ -605,6 +596,60 @@ namespace CSharpAPI.Migrations
                     b.ToTable("Warehouse");
                 });
 
+            modelBuilder.Entity("CSharpAPI.Models.ClientModel", b =>
+                {
+                    b.OwnsOne("CSharpAPI.Models.Contact", "contact", b1 =>
+                        {
+                            b1.Property<int>("ClientModelid")
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<string>("email")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("name")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("phone")
+                                .HasColumnType("TEXT");
+
+                            b1.HasKey("ClientModelid");
+
+                            b1.ToTable("ClientModels");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ClientModelid");
+                        });
+
+                    b.Navigation("contact");
+                });
+
+            modelBuilder.Entity("CSharpAPI.Models.SupplierModel", b =>
+                {
+                    b.OwnsOne("CSharpAPI.Models.Contact", "contact", b1 =>
+                        {
+                            b1.Property<int>("SupplierModelid")
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<string>("email")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("name")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("phone")
+                                .HasColumnType("TEXT");
+
+                            b1.HasKey("SupplierModelid");
+
+                            b1.ToTable("Suppliers");
+
+                            b1.WithOwner()
+                                .HasForeignKey("SupplierModelid");
+                        });
+
+                    b.Navigation("contact");
+                });
+
             modelBuilder.Entity("CSharpAPI.Models.WarehouseModel", b =>
                 {
                     b.OwnsOne("CSharpAPI.Models.Contact", "contact", b1 =>
@@ -623,7 +668,7 @@ namespace CSharpAPI.Migrations
 
                             b1.HasKey("WarehouseModelid");
 
-                            b1.ToTable("contacts");
+                            b1.ToTable("Warehouse");
 
                             b1.WithOwner()
                                 .HasForeignKey("WarehouseModelid");
