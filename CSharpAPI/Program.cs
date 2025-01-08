@@ -112,14 +112,23 @@ app.Urls.Add("http://localhost:5001");
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<SQLiteDatabase>();
+    var authService = scope.ServiceProvider.GetRequiredService<IAuthService>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
     try
     {
         await dbContext.Database.MigrateAsync();
-        await DatabaseSeeding.SeedDatabase(dbContext);
+        await DatabaseSeeding.SeedDatabase(dbContext, authService);
+        
+        // Ensure permissions for all existing API keys
+        var existingUsers = await dbContext.ApiUsers.ToListAsync();
+        foreach (var user in existingUsers)
+        {
+            await authService.EnsureRolePermissions(user.role);
+        }
     }
     catch (Exception ex)
     {
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occurred while migrating or seeding the database.");
         throw;
     }

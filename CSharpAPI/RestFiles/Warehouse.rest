@@ -1,12 +1,12 @@
 ### Get All warehouses
 GET http://localhost:5001/api/v1/warehouses/all
 Content-Type: application/json
-API_KEY: admin_key_2024
+API_KEY: SEjDY2hB63IuwzdVNy/nzcMJaoX5kVTsxbQ5VkT0zzE=
 
 ### Get Warehouse By ID
-GET http://localhost:5001/api/v1/warehouses/2
+GET http://localhost:5001/api/v1/warehouses/1
 Content-Type: application/json
-
+API_KEY: VkWlxnR5uDmReqaSwVda5mywa/8LZuESJSACVRbRA5w=
 ### Get Location from warehouse
 GET http://localhost:5001/api/v1/warehouses/1/location
 Content-Type: application/json
