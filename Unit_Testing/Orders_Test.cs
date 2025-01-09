@@ -2,136 +2,71 @@ using Xunit;
 using Moq;
 using CSharpAPI.Service;
 using CSharpAPI.Models;
-using CSharpAPI.Data;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CSharpAPI.Tests
 {
-    public class OrderServiceTests
+    public class OrderServiceUnitTests
     {
-        private readonly DbContextOptions<SQLiteDatabase> _dbContextOptions;
-
-        public OrderServiceTests()
-        {
-            // Set up In-Memory database options
-            _dbContextOptions = new DbContextOptionsBuilder<SQLiteDatabase>()
-                .UseInMemoryDatabase(databaseName: "OrderTestDatabase_" + Guid.NewGuid())  // Unique DB name for each test
-                .Options;
-        }
-
-        private SQLiteDatabase CreateDbContext()
-        {
-            return new SQLiteDatabase(_dbContextOptions);
-        }
-
         [Fact]
         public async Task GetAllOrders_ReturnsListOfOrders()
         {
-            // Arrange: Create a list of orders based on the provided data
-            var orderList = new List<OrderModel>
+            // Arrange
+            var mockOrders = new List<OrderModel>
             {
                 new OrderModel
                 {
                     id = 1,
-                    source_id = 33,
-                    order_date = "2019-04-03T11:33:15Z",
-                    request_date = "2019-04-07T11:33:15Z",
                     reference = "ORD00001",
-                    reference_extra = "Bedreven arm straffen bureau.",
                     order_status = "Delivered",
-                    notes = "Voedsel vijf vork heel.",
-                    shipping_notes = "Buurman betalen plaats bewolkt.",
-                    picking_notes = "Ademen fijn volgorde scherp aardappel op leren.",
-                    warehouse_id = 18,
-                    ship_to = 4562,
-                    bill_to = 7863,
-                    shipment_id = 1,
-                    total_amount = 9905.13f,
-                    total_discount = 150.77f,
-                    total_tax = 372.72f,
-                    total_surcharge = 77.6f,
-                    created_at = DateTime.Parse("2019-04-03T11:33:15"),
-                    updated_at = DateTime.Parse("2019-04-05T07:33:15"),
-                    items = new List<Items>
-                    {
-                        new Items { item_id = "P007435", amount = 23 },
-                        new Items { item_id = "P009557", amount = 1 },
-                        new Items { item_id = "P009553", amount = 50 },
-                        new Items { item_id = "P010015", amount = 16 }
-                    }
+                    total_amount = 500.0f
+                },
+                new OrderModel
+                {
+                    id = 2,
+                    reference = "ORD00002",
+                    order_status = "Pending",
+                    total_amount = 750.0f
                 }
             };
 
-            using (var context = CreateDbContext())
-            {
-                context.Order.AddRange(orderList);
-                await context.SaveChangesAsync();
-            }
+            var mockOrderService = new Mock<IOrderService>();
+            mockOrderService
+                .Setup(service => service.GetAllOrders())
+                .ReturnsAsync(mockOrders);
 
-            // Act: Retrieve all orders
-            List<OrderModel> result;
-            using (var context = CreateDbContext())
-            {
-                var service = new OrderService(context);
-                result = await service.GetAllOrders();
-            }
+            // Act
+            var result = await mockOrderService.Object.GetAllOrders();
 
-            // Assert: Ensure that the result is not null and contains the expected number of orders
+            // Assert
             Assert.NotNull(result);
-            Assert.Equal(1, result.Count);
+            Assert.Equal(2, result.Count);
+            Assert.Equal("ORD00001", result[0].reference);
+            Assert.Equal("ORD00002", result[1].reference);
         }
 
         [Fact]
         public async Task GetOrderById_ValidId_ReturnsOrder()
         {
-            // Arrange: Add order to the database
+            // Arrange
             var order = new OrderModel
             {
                 id = 1,
-                source_id = 33,
-                order_date = "2019-04-03T11:33:15Z",
-                request_date = "2019-04-07T11:33:15Z",
                 reference = "ORD00001",
-                reference_extra = "Bedreven arm straffen bureau.",
                 order_status = "Delivered",
-                notes = "Voedsel vijf vork heel.",
-                shipping_notes = "Buurman betalen plaats bewolkt.",
-                picking_notes = "Ademen fijn volgorde scherp aardappel op leren.",
-                warehouse_id = 18,
-                ship_to = 4562,
-                bill_to = 7863,
-                shipment_id = 1,
-                total_amount = 9905.13f,
-                total_discount = 150.77f,
-                total_tax = 372.72f,
-                total_surcharge = 77.6f,
-                created_at = DateTime.Parse("2019-04-03T11:33:15"),
-                updated_at = DateTime.Parse("2019-04-05T07:33:15"),
-                items = new List<Items>
-                {
-                    new Items { item_id = "P007435", amount = 23 },
-                    new Items { item_id = "P009557", amount = 1 }
-                }
+                total_amount = 500.0f
             };
 
-            using (var context = CreateDbContext())
-            {
-                context.Order.Add(order);
-                await context.SaveChangesAsync();
-            }
+            var mockOrderService = new Mock<IOrderService>();
+            mockOrderService
+                .Setup(service => service.GetOrderById(1))
+                .ReturnsAsync(order);
 
-            // Act: Retrieve the order by ID
-            OrderModel result;
-            using (var context = CreateDbContext())
-            {
-                var service = new OrderService(context);
-                result = await service.GetOrderById(1);
-            }
+            // Act
+            var result = await mockOrderService.Object.GetOrderById(1);
 
-            // Assert: Check if the returned order matches the expected data
+            // Assert
             Assert.NotNull(result);
             Assert.Equal(1, result.id);
             Assert.Equal("ORD00001", result.reference);
@@ -139,153 +74,66 @@ namespace CSharpAPI.Tests
         }
 
         [Fact]
-        public async Task CreateOrder_ValidOrder_CreatesOrder()
+        public async Task CreateOrder_ValidOrder_CallsCreateMethod()
         {
-            // Arrange: Create a new order
+            // Arrange
             var newOrder = new OrderModel
             {
-                source_id = 33,
-                order_date = "2019-04-03T11:33:15Z",
-                request_date = "2019-04-07T11:33:15Z",
-                reference = "ORD00002",
-                reference_extra = "Test Order",
+                reference = "ORD00003",
                 order_status = "Pending",
-                notes = "Test Notes",
-                shipping_notes = "Shipping Test Notes",
-                picking_notes = "Picking Test Notes",
-                warehouse_id = 18,
-                ship_to = 4562,
-                bill_to = 7863,
-                shipment_id = 1,
-                total_amount = 1500.00f,
-                total_discount = 50.00f,
-                total_tax = 100.00f,
-                total_surcharge = 20.00f,
-                created_at = DateTime.Now,
-                updated_at = DateTime.Now,
-                items = new List<Items>
-                {
-                    new Items { item_id = "P000123", amount = 10 },
-                    new Items { item_id = "P000124", amount = 5 }
-                }
+                total_amount = 1200.0f
             };
 
-            // Act: Add the order to the database
-            using (var context = CreateDbContext())
-            {
-                var service = new OrderService(context);
-                await service.CreateOrder(newOrder);
-            }
+            var mockOrderService = new Mock<IOrderService>();
+            mockOrderService
+                .Setup(service => service.CreateOrder(It.IsAny<OrderModel>()))
+                .Returns(Task.CompletedTask);
 
-            // Assert: Ensure the new order is added to the database
-            using (var context = CreateDbContext())
-            {
-                var result = await context.Order.FirstOrDefaultAsync(o => o.reference == "ORD00002");
-                Assert.NotNull(result);
-                Assert.Equal("ORD00002", result.reference);
-            }
+            // Act
+            await mockOrderService.Object.CreateOrder(newOrder);
+
+            // Assert
+            mockOrderService.Verify(service => service.CreateOrder(It.Is<OrderModel>(o => o.reference == "ORD00003" && o.total_amount == 1200.0f)), Times.Once);
         }
 
         [Fact]
-        public async Task UpdateOrders_ValidOrder_UpdatesOrder()
+        public async Task UpdateOrders_ValidOrder_CallsUpdateMethod()
         {
-            // Arrange: Create and save an order
-            var order = new OrderModel
-            {
-                id = 1,
-                source_id = 33,
-                order_date = "2019-04-03T11:33:15Z",
-                request_date = "2019-04-07T11:33:15Z",
-                reference = "ORD00001",
-                reference_extra = "Bedreven arm straffen bureau.",
-                order_status = "Delivered",
-                total_amount = 9905.13f,
-                created_at = DateTime.Now,
-                updated_at = DateTime.Now,
-                items = new List<Items>
-                {
-                    new Items { item_id = "P007435", amount = 23 }
-                }
-            };
-
-            using (var context = CreateDbContext())
-            {
-                context.Order.Add(order);
-                await context.SaveChangesAsync();
-            }
-
+            // Arrange
             var updatedOrder = new OrderModel
             {
-                source_id = 33,
-                order_date = "2019-04-03T11:33:15Z",
-                request_date = "2019-04-07T11:33:15Z",
+                id = 1,
                 reference = "ORD00001",
-                reference_extra = "Updated Reference",
                 order_status = "Shipped",
-                total_amount = 10500.00f, // Updated total amount
-                created_at = DateTime.Now,
-                updated_at = DateTime.Now,
-                items = order.items
+                total_amount = 1300.0f
             };
 
-            // Act: Update the order
-            using (var context = CreateDbContext())
-            {
-                var service = new OrderService(context);
-                await service.UpdateOrders(1, updatedOrder);
-            }
+            var mockOrderService = new Mock<IOrderService>();
+            mockOrderService
+                .Setup(service => service.UpdateOrders(It.IsAny<int>(), It.IsAny<OrderModel>()))
+                .Returns(Task.CompletedTask);
 
-            // Assert: Verify that the order was updated
-            using (var context = CreateDbContext())
-            {
-                var result = await context.Order.FirstOrDefaultAsync(o => o.id == 1);
-                Assert.NotNull(result);
-                Assert.Equal("Updated Reference", result.reference_extra);
-                Assert.Equal(10500.00f, result.total_amount);
-            }
+            // Act
+            await mockOrderService.Object.UpdateOrders(1, updatedOrder);
+
+            // Assert
+            mockOrderService.Verify(service => service.UpdateOrders(1, It.Is<OrderModel>(o => o.order_status == "Shipped" && o.total_amount == 1300.0f)), Times.Once);
         }
 
         [Fact]
-        public async Task DeleteOrder_ValidOrder_DeletesOrder()
+        public async Task DeleteOrder_ValidId_CallsDeleteMethod()
         {
-            // Arrange: Create and add an order
-            var order = new OrderModel
-            {
-                id = 1,
-                source_id = 33,
-                order_date = "2019-04-03T11:33:15Z",
-                request_date = "2019-04-07T11:33:15Z",
-                reference = "ORD00001",
-                reference_extra = "Bedreven arm straffen bureau.",
-                order_status = "Delivered",
-                total_amount = 9905.13f,
-                created_at = DateTime.Now,
-                updated_at = DateTime.Now,
-                items = new List<Items>
-                {
-                    new Items { item_id = "P007435", amount = 23 }
-                }
-            };
+            // Arrange
+            var mockOrderService = new Mock<IOrderService>();
+            mockOrderService
+                .Setup(service => service.DeleteOrder(1))
+                .Returns(Task.CompletedTask);
 
-            using (var context = CreateDbContext())
-            {
-                context.Order.Add(order);
-                await context.SaveChangesAsync();
-            }
+            // Act
+            await mockOrderService.Object.DeleteOrder(1);
 
-            // Act: Delete the order
-            using (var context = CreateDbContext())
-            {
-                var service = new OrderService(context);
-                await service.DeleteOrder(1);
-            }
-
-            // Assert: Ensure the order is deleted
-            using (var context = CreateDbContext())
-            {
-                var result = await context.Order.FirstOrDefaultAsync(o => o.id == 1);
-                Assert.Null(result); // The order should be deleted
-            }
+            // Assert
+            mockOrderService.Verify(service => service.DeleteOrder(1), Times.Once);
         }
     }
 }

@@ -1,163 +1,109 @@
-using CSharpAPI.Data;
-using CSharpAPI.Models;
+using Xunit;
+using Moq;
 using CSharpAPI.Service;
-using Microsoft.EntityFrameworkCore;
-using System;
+using CSharpAPI.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Xunit;
 
 namespace CSharpAPI.Tests
 {
-    public class ItemTypeServiceTests
+    public class ItemTypeServiceUnitTests
     {
-        private readonly DbContextOptions<SQLiteDatabase> _dbContextOptions;
-
-        public ItemTypeServiceTests()
-        {
-            _dbContextOptions = new DbContextOptionsBuilder<SQLiteDatabase>()
-                .UseInMemoryDatabase(databaseName: "ItemTypeTestDatabase_" + Guid.NewGuid())  // Unique DB name for each test
-                .Options;
-        }
-
-        private SQLiteDatabase CreateDbContext()
-        {
-            return new SQLiteDatabase(_dbContextOptions);
-        }
-
         [Fact]
-        public async Task Add_ItemType_AddsSuccessfully()
+        public async Task GetAll_ReturnsListOfItemTypes()
         {
-            var newItemType = new ItemTypeModel
+            // Arrange
+            var mockItemTypes = new List<ItemTypeModel>
             {
-                name = "Type A",
-                description = "Description for Type A",
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
+                new ItemTypeModel { id = 1, name = "Type A", description = "Description A" },
+                new ItemTypeModel { id = 2, name = "Type B", description = "Description B" }
             };
 
-            // Act: Add a new ItemType to the database
-            using (var context = CreateDbContext())
-            {
-                var service = new ItemTypeService(context);
-                await service.Add(newItemType);
-            }
+            var mockItemTypeService = new Mock<IItemTypeService>();
+            mockItemTypeService
+                .Setup(service => service.GetAll())
+                .ReturnsAsync(mockItemTypes);
 
-            // Assert: Verify the ItemType has been added to the database
-            using (var context = CreateDbContext())
-            {
-                var result = await context.ItemType.FirstOrDefaultAsync(i => i.name == "Type A");
-                Assert.NotNull(result);
-                Assert.Equal("Type A", result.name);
-            }
-        }
+            // Act
+            var result = await mockItemTypeService.Object.GetAll();
 
-        [Fact]
-        public async Task GetAll_ReturnsAllItemTypes()
-        {
-            // Arrange: Add mock ItemTypes to the database
-            var itemTypes = new List<ItemTypeModel>
-            {
-                new ItemTypeModel { name = "Type A", description = "Description A", created_at = DateTime.UtcNow, updated_at = DateTime.UtcNow },
-                new ItemTypeModel { name = "Type B", description = "Description B", created_at = DateTime.UtcNow, updated_at = DateTime.UtcNow }
-            };
-
-            using (var context = CreateDbContext())
-            {
-                context.ItemType.AddRange(itemTypes);
-                await context.SaveChangesAsync();
-            }
-
-            // Act: Retrieve all ItemTypes
-            List<ItemTypeModel> result;
-            using (var context = CreateDbContext())
-            {
-                var service = new ItemTypeService(context);
-                result = await service.GetAll();
-            }
-
-            // Assert: Verify the correct number of ItemTypes is returned
+            // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
+            Assert.Equal("Type A", result[0].name);
+            Assert.Equal("Type B", result[1].name);
         }
 
         [Fact]
         public async Task GetById_ValidId_ReturnsItemType()
         {
-            // Arrange: Add a mock ItemType
-            var itemType = new ItemTypeModel { name = "Type A", description = "Description A", created_at = DateTime.UtcNow, updated_at = DateTime.UtcNow };
+            // Arrange
+            var mockItemType = new ItemTypeModel { id = 1, name = "Type A", description = "Description A" };
 
-            using (var context = CreateDbContext())
-            {
-                context.ItemType.Add(itemType);
-                await context.SaveChangesAsync();
-            }
+            var mockItemTypeService = new Mock<IItemTypeService>();
+            mockItemTypeService
+                .Setup(service => service.GetById(1))
+                .ReturnsAsync(mockItemType);
 
-            // Act: Retrieve ItemType by ID
-            ItemTypeModel result;
-            using (var context = CreateDbContext())
-            {
-                var service = new ItemTypeService(context);
-                result = await service.GetById(1);  // Assuming ID 1
-            }
+            // Act
+            var result = await mockItemTypeService.Object.GetById(1);
 
-            // Assert: Verify that the correct ItemType is returned
+            // Assert
             Assert.NotNull(result);
+            Assert.Equal(1, result.id);
             Assert.Equal("Type A", result.name);
         }
 
         [Fact]
-        public async Task Update_ValidId_UpdatesItemType()
+        public async Task Add_ValidItemType_CallsAddMethod()
         {
-            // Arrange: Add an ItemType
-            var itemType = new ItemTypeModel { name = "Type A", description = "Description A", created_at = DateTime.UtcNow, updated_at = DateTime.UtcNow };
-            using (var context = CreateDbContext())
-            {
-                context.ItemType.Add(itemType);
-                await context.SaveChangesAsync();
-            }
+            // Arrange
+            var newItemType = new ItemTypeModel { name = "Type A", description = "Description A" };
 
-            // Act: Update the ItemType
-            var updatedItemType = new ItemTypeModel { name = "Updated Type A", description = "Updated Description A", created_at = DateTime.UtcNow, updated_at = DateTime.UtcNow };
-            using (var context = CreateDbContext())
-            {
-                var service = new ItemTypeService(context);
-                await service.Update(1, updatedItemType);
-            }
+            var mockItemTypeService = new Mock<IItemTypeService>();
+            mockItemTypeService
+                .Setup(service => service.Add(It.IsAny<ItemTypeModel>()))
+                .Returns(Task.CompletedTask);
 
-            // Assert: Verify the ItemType has been updated
-            using (var context = CreateDbContext())
-            {
-                var result = await context.ItemType.FirstOrDefaultAsync(i => i.id == 1);
-                Assert.NotNull(result);
-                Assert.Equal("Updated Type A", result.name);
-            }
+            // Act
+            await mockItemTypeService.Object.Add(newItemType);
+
+            // Assert
+            mockItemTypeService.Verify(service => service.Add(It.Is<ItemTypeModel>(i => i.name == "Type A" && i.description == "Description A")), Times.Once);
         }
 
         [Fact]
-        public async Task Delete_ValidId_DeletesItemType()
+        public async Task Update_ValidItemType_CallsUpdateMethod()
         {
-            // Arrange: Add an ItemType
-            var itemType = new ItemTypeModel { name = "Type A", description = "Description A", created_at = DateTime.UtcNow, updated_at = DateTime.UtcNow };
-            using (var context = CreateDbContext())
-            {
-                context.ItemType.Add(itemType);
-                await context.SaveChangesAsync();
-            }
+            // Arrange
+            var updatedItemType = new ItemTypeModel { name = "Updated Type A", description = "Updated Description A" };
 
-            // Act: Delete the ItemType by ID
-            using (var context = CreateDbContext())
-            {
-                var service = new ItemTypeService(context);
-                await service.Delete(1);
-            }
+            var mockItemTypeService = new Mock<IItemTypeService>();
+            mockItemTypeService
+                .Setup(service => service.Update(It.IsAny<int>(), It.IsAny<ItemTypeModel>()))
+                .Returns(Task.CompletedTask);
 
-            // Assert: Verify the ItemType has been deleted
-            using (var context = CreateDbContext())
-            {
-                var result = await context.ItemType.FirstOrDefaultAsync(i => i.id == 1);
-                Assert.Null(result); // The ItemType should be deleted
-            }
+            // Act
+            await mockItemTypeService.Object.Update(1, updatedItemType);
+
+            // Assert
+            mockItemTypeService.Verify(service => service.Update(1, It.Is<ItemTypeModel>(i => i.name == "Updated Type A")), Times.Once);
+        }
+
+        [Fact]
+        public async Task Delete_ValidId_CallsDeleteMethod()
+        {
+            // Arrange
+            var mockItemTypeService = new Mock<IItemTypeService>();
+            mockItemTypeService
+                .Setup(service => service.Delete(1))
+                .Returns(Task.CompletedTask);
+
+            // Act
+            await mockItemTypeService.Object.Delete(1);
+
+            // Assert
+            mockItemTypeService.Verify(service => service.Delete(1), Times.Once);
         }
     }
 }

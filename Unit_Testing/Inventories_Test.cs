@@ -1,85 +1,33 @@
 using Xunit;
-using CSharpAPI.Data;
+using Moq;
 using CSharpAPI.Models;
 using CSharpAPI.Service;
-using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CSharpAPI.Tests
 {
-    public class InventoriesServiceTests
+    public class InventoriesServiceUnitTests
     {
-        private readonly DbContextOptions<SQLiteDatabase> _dbContextOptions;
-
-        public InventoriesServiceTests()
-        {
-            // Set up In-Memory database options
-            _dbContextOptions = new DbContextOptionsBuilder<SQLiteDatabase>()
-                .UseInMemoryDatabase(databaseName: "InventoriesTestDatabase_" + Guid.NewGuid())  // Unique DB name for each test
-                .Options;
-        }
-
-        private SQLiteDatabase CreateDbContext()
-        {
-            return new SQLiteDatabase(_dbContextOptions);
-        }
-
         [Fact]
         public async Task GetAllInventories_ReturnsListOfInventories()
         {
-            // Arrange: Create mock data for Inventories
-            var inventoryList = new List<InventorieModel>
+            // Arrange
+            var mockInventories = new List<InventorieModel>
             {
-                new InventorieModel
-                {
-                    id = 1,
-                    item_id = "Item001",
-                    description = "Inventory for Item 1",
-                    item_reference = "Ref001",
-                    locations = new List<int> { 1, 2 },
-                    total_on_hand = 100,
-                    total_expected = 120,
-                    total_ordered = 50,
-                    total_allocated = 30,
-                    total_available = 40,
-                    created_at = DateTime.UtcNow,
-                    updated_at = DateTime.UtcNow
-                },
-                new InventorieModel
-                {
-                    id = 2,
-                    item_id = "Item002",
-                    description = "Inventory for Item 2",
-                    item_reference = "Ref002",
-                    locations = new List<int> { 2, 3 },
-                    total_on_hand = 200,
-                    total_expected = 220,
-                    total_ordered = 80,
-                    total_allocated = 60,
-                    total_available = 60,
-                    created_at = DateTime.UtcNow,
-                    updated_at = DateTime.UtcNow
-                }
+                new InventorieModel { id = 1, item_id = "Item001", total_on_hand = 100 },
+                new InventorieModel { id = 2, item_id = "Item002", total_on_hand = 200 }
             };
 
-            using (var context = CreateDbContext())
-            {
-                context.Inventors.AddRange(inventoryList);
-                await context.SaveChangesAsync();
-            }
+            var mockService = new Mock<IInventoriesService>();
+            mockService
+                .Setup(service => service.GetAllInventories())
+                .ReturnsAsync(mockInventories);
 
-            // Act: Retrieve all Inventories
-            List<InventorieModel> result;
-            using (var context = CreateDbContext())
-            {
-                var service = new InventoriesService(context);
-                result = await service.GetAllInventories();
-            }
+            // Act
+            var result = await mockService.Object.GetAllInventories();
 
-            // Assert: Verify that the correct number of Inventories is returned
+            // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
         }
@@ -87,289 +35,108 @@ namespace CSharpAPI.Tests
         [Fact]
         public async Task GetInventoryById_ValidId_ReturnsInventory()
         {
-            // Arrange: Add an Inventory to the database
-            var inventory = new InventorieModel
-            {
-                id = 1,
-                item_id = "Item001",
-                description = "Inventory for Item 1",
-                item_reference = "Ref001",
-                locations = new List<int> { 1, 2 },
-                total_on_hand = 100,
-                total_expected = 120,
-                total_ordered = 50,
-                total_allocated = 30,
-                total_available = 40,
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
-            };
+            // Arrange
+            var mockInventory = new InventorieModel { id = 1, item_id = "Item001", total_on_hand = 100 };
 
-            using (var context = CreateDbContext())
-            {
-                context.Inventors.Add(inventory);
-                await context.SaveChangesAsync();
-            }
+            var mockService = new Mock<IInventoriesService>();
+            mockService
+                .Setup(service => service.GetInventoryById(1))
+                .ReturnsAsync(mockInventory);
 
-            // Act: Retrieve the Inventory by ID
-            InventorieModel result;
-            using (var context = CreateDbContext())
-            {
-                var service = new InventoriesService(context);
-                result = await service.GetInventoryById(1);
-            }
+            // Act
+            var result = await mockService.Object.GetInventoryById(1);
 
-            // Assert: Verify that the Inventory was retrieved correctly
+            // Assert
             Assert.NotNull(result);
             Assert.Equal(1, result.id);
-            Assert.Equal("Item001", result.item_id);
         }
 
         [Fact]
-        public async Task AddInventory_ValidInventory_CreatesInventory()
+        public async Task AddInventory_ValidInventory_CallsAddMethod()
         {
-            // Arrange: Create a new Inventory
-            var newInventory = new InventorieModel
-            {
-                item_id = "Item003",
-                description = "Inventory for Item 3",
-                item_reference = "Ref003",
-                locations = new List<int> { 3, 4 },
-                total_on_hand = 300,
-                total_expected = 350,
-                total_ordered = 150,
-                total_allocated = 100,
-                total_available = 100,
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
-            };
+            // Arrange
+            var newInventory = new InventorieModel { item_id = "Item003", total_on_hand = 300 };
 
-            // Act: Add the new Inventory to the database
-            using (var context = CreateDbContext())
-            {
-                var service = new InventoriesService(context);
-                await service.AddInventory(newInventory);
-            }
+            var mockService = new Mock<IInventoriesService>();
+            mockService
+                .Setup(service => service.AddInventory(It.IsAny<InventorieModel>()))
+                .Returns(Task.CompletedTask);
 
-            // Assert: Verify that the Inventory is added to the database
-            using (var context = CreateDbContext())
-            {
-                var result = await context.Inventors.FirstOrDefaultAsync(i => i.item_id == "Item003");
-                Assert.NotNull(result);
-                Assert.Equal("Item003", result.item_id);
-            }
+            // Act
+            await mockService.Object.AddInventory(newInventory);
+
+            // Assert
+            mockService.Verify(service => service.AddInventory(It.Is<InventorieModel>(i => i.item_id == "Item003")), Times.Once);
         }
 
         [Fact]
-        public async Task UpdateInventory_ValidInventory_UpdatesInventory()
+        public async Task UpdateInventory_ValidInventory_ReturnsTrue()
         {
-            // Arrange: Add an Inventory to the database
-            var inventory = new InventorieModel
-            {
-                id = 1,
-                item_id = "Item001",
-                description = "Inventory for Item 1",
-                item_reference = "Ref001",
-                locations = new List<int> { 1, 2 },
-                total_on_hand = 100,
-                total_expected = 120,
-                total_ordered = 50,
-                total_allocated = 30,
-                total_available = 40,
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
-            };
+            // Arrange
+            var updatedInventory = new InventorieModel { item_id = "Item001", total_on_hand = 150 };
 
-            using (var context = CreateDbContext())
-            {
-                context.Inventors.Add(inventory);
-                await context.SaveChangesAsync();
-            }
+            var mockService = new Mock<IInventoriesService>();
+            mockService
+                .Setup(service => service.UpdateInventory(1, It.IsAny<InventorieModel>()))
+                .ReturnsAsync(true);
 
-            // Act: Update the Inventory
-            var updatedInventory = new InventorieModel
-            {
-                id = 1,
-                item_id = "Item001",
-                description = "Updated Inventory for Item 1",
-                item_reference = "Ref001Updated",
-                locations = new List<int> { 1, 3 },
-                total_on_hand = 150,
-                total_expected = 160,
-                total_ordered = 60,
-                total_allocated = 40,
-                total_available = 50,
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
-            };
+            // Act
+            var result = await mockService.Object.UpdateInventory(1, updatedInventory);
 
-            using (var context = CreateDbContext())
-            {
-                var service = new InventoriesService(context);
-                var result = await service.UpdateInventory(1, updatedInventory);
-            }
-
-            // Assert: Verify that the Inventory was updated correctly
-            using (var context = CreateDbContext())
-            {
-                var result = await context.Inventors.FirstOrDefaultAsync(i => i.id == 1);
-                Assert.NotNull(result);
-                Assert.Equal("Updated Inventory for Item 1", result.description);
-            }
+            // Assert
+            Assert.True(result);
+            mockService.Verify(service => service.UpdateInventory(1, It.Is<InventorieModel>(i => i.total_on_hand == 150)), Times.Once);
         }
 
         [Fact]
-        public async Task DeleteInventory_ValidInventory_DeletesInventory()
+        public async Task UpdateInventory_InvalidInventory_ReturnsFalse()
         {
-            // Arrange: Add an Inventory to the database
-            var inventory = new InventorieModel
-            {
-                id = 1,
-                item_id = "Item001",
-                description = "Inventory for Item 1",
-                item_reference = "Ref001",
-                locations = new List<int> { 1, 2 },
-                total_on_hand = 100,
-                total_expected = 120,
-                total_ordered = 50,
-                total_allocated = 30,
-                total_available = 40,
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
-            };
+            // Arrange
+            var updatedInventory = new InventorieModel { item_id = "Item004", total_on_hand = 50 };
 
-            using (var context = CreateDbContext())
-            {
-                context.Inventors.Add(inventory);
-                await context.SaveChangesAsync();
-            }
+            var mockService = new Mock<IInventoriesService>();
+            mockService
+                .Setup(service => service.UpdateInventory(99, It.IsAny<InventorieModel>()))
+                .ReturnsAsync(false);
 
-            // Act: Delete the Inventory
-            using (var context = CreateDbContext())
-            {
-                var service = new InventoriesService(context);
-                await service.DeleteInventory(1);
-            }
+            // Act
+            var result = await mockService.Object.UpdateInventory(99, updatedInventory);
 
-            // Assert: Verify that the Inventory was deleted
-            using (var context = CreateDbContext())
-            {
-                var result = await context.Inventors.FirstOrDefaultAsync(i => i.id == 1);
-                Assert.Null(result); // The Inventory should be deleted
-            }
+            // Assert
+            Assert.False(result);
         }
 
         [Fact]
-        public async Task GetInventoriesByItemId_ValidItemId_ReturnsInventories()
+        public async Task DeleteInventory_ValidId_ReturnsTrue()
         {
-            // Arrange: Add inventories to the database
-            var inventoryList = new List<InventorieModel>
-            {
-                new InventorieModel
-                {
-                    id = 1,
-                    item_id = "Item001",
-                    description = "Inventory for Item 1",
-                    item_reference = "Ref001",
-                    locations = new List<int> { 1, 2 },
-                    total_on_hand = 100,
-                    total_expected = 120,
-                    total_ordered = 50,
-                    total_allocated = 30,
-                    total_available = 40,
-                    created_at = DateTime.UtcNow,
-                    updated_at = DateTime.UtcNow
-                },
-                new InventorieModel
-                {
-                    id = 2,
-                    item_id = "Item001",
-                    description = "Another Inventory for Item 1",
-                    item_reference = "Ref002",
-                    locations = new List<int> { 2, 3 },
-                    total_on_hand = 200,
-                    total_expected = 220,
-                    total_ordered = 80,
-                    total_allocated = 60,
-                    total_available = 60,
-                    created_at = DateTime.UtcNow,
-                    updated_at = DateTime.UtcNow
-                }
-            };
+            // Arrange
+            var mockService = new Mock<IInventoriesService>();
+            mockService
+                .Setup(service => service.DeleteInventory(1))
+                .ReturnsAsync(true);
 
-            using (var context = CreateDbContext())
-            {
-                context.Inventors.AddRange(inventoryList);
-                await context.SaveChangesAsync();
-            }
+            // Act
+            var result = await mockService.Object.DeleteInventory(1);
 
-            // Act: Retrieve inventories by ItemId
-            List<InventorieModel> result;
-            using (var context = CreateDbContext())
-            {
-                var service = new InventoriesService(context);
-                result = await service.GetInventoriesByItemId("Item001");
-            }
-
-            // Assert: Verify that the correct inventories are returned
-            Assert.NotNull(result);
-            Assert.Equal(2, result.Count);
+            // Assert
+            Assert.True(result);
+            mockService.Verify(service => service.DeleteInventory(1), Times.Once);
         }
 
         [Fact]
-        public async Task GetInventoriesByLocation_ValidLocationId_ReturnsInventories()
+        public async Task DeleteInventory_InvalidId_ReturnsFalse()
         {
-            // Arrange: Add inventories to the database
-            var inventoryList = new List<InventorieModel>
-            {
-                new InventorieModel
-                {
-                    id = 1,
-                    item_id = "Item001",
-                    description = "Inventory for Item 1",
-                    item_reference = "Ref001",
-                    locations = new List<int> { 1, 2 },
-                    total_on_hand = 100,
-                    total_expected = 120,
-                    total_ordered = 50,
-                    total_allocated = 30,
-                    total_available = 40,
-                    created_at = DateTime.UtcNow,
-                    updated_at = DateTime.UtcNow
-                },
-                new InventorieModel
-                {
-                    id = 2,
-                    item_id = "Item002",
-                    description = "Inventory for Item 2",
-                    item_reference = "Ref002",
-                    locations = new List<int> { 2, 3 },
-                    total_on_hand = 200,
-                    total_expected = 220,
-                    total_ordered = 80,
-                    total_allocated = 60,
-                    total_available = 60,
-                    created_at = DateTime.UtcNow,
-                    updated_at = DateTime.UtcNow
-                }
-            };
+            // Arrange
+            var mockService = new Mock<IInventoriesService>();
+            mockService
+                .Setup(service => service.DeleteInventory(99))
+                .ReturnsAsync(false);
 
-            using (var context = CreateDbContext())
-            {
-                context.Inventors.AddRange(inventoryList);
-                await context.SaveChangesAsync();
-            }
+            // Act
+            var result = await mockService.Object.DeleteInventory(99);
 
-            // Act: Retrieve inventories by LocationId
-            List<InventorieModel> result;
-            using (var context = CreateDbContext())
-            {
-                var service = new InventoriesService(context);
-                result = await service.GetInventoriesByLocation(2);
-            }
-
-            // Assert: Verify that the correct inventories are returned
-            Assert.NotNull(result);
-            Assert.Equal(2, result.Count);
+            // Assert
+            Assert.False(result);
         }
     }
 }

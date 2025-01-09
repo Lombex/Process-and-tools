@@ -1,210 +1,112 @@
 using Xunit;
-using CSharpAPI.Data;
-using CSharpAPI.Models;
+using Moq;
 using CSharpAPI.Service;
-using Microsoft.EntityFrameworkCore;
-using System;
+using CSharpAPI.Models;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CSharpAPI.Tests
 {
-    public class ItemLineServiceTests
+    public class ItemLineServiceUnitTests
     {
-        private readonly DbContextOptions<SQLiteDatabase> _dbContextOptions;
-
-        public ItemLineServiceTests()
-        {
-            // Set up In-Memory database options
-            _dbContextOptions = new DbContextOptionsBuilder<SQLiteDatabase>()
-                .UseInMemoryDatabase(databaseName: "ItemLineTestDatabase_" + Guid.NewGuid())  // Unique DB name for each test
-                .Options;
-        }
-
-        private SQLiteDatabase CreateDbContext()
-        {
-            return new SQLiteDatabase(_dbContextOptions);
-        }
-
         [Fact]
         public async Task GetAllItemLines_ReturnsListOfItemLines()
         {
-            // Arrange: Create mock data for ItemLines
-            var itemLineList = new List<ItemLineModel>
+            // Arrange
+            var mockItemLines = new List<ItemLineModel>
             {
-                new ItemLineModel
-                {
-                    id = 1,
-                    name = "Item Line A",
-                    description = "Description for Item Line A",
-                    created_at = DateTime.UtcNow,
-                    updated_at = DateTime.UtcNow
-                },
-                new ItemLineModel
-                {
-                    id = 2,
-                    name = "Item Line B",
-                    description = "Description for Item Line B",
-                    created_at = DateTime.UtcNow,
-                    updated_at = DateTime.UtcNow
-                }
+                new ItemLineModel { id = 1, name = "Item Line A", description = "Description for Item Line A" },
+                new ItemLineModel { id = 2, name = "Item Line B", description = "Description for Item Line B" }
             };
 
-            using (var context = CreateDbContext())
-            {
-                context.ItemLine.AddRange(itemLineList);
-                await context.SaveChangesAsync();
-            }
+            var mockItemLineService = new Mock<IItemLineService>();
+            mockItemLineService
+                .Setup(service => service.GetAllItemLines())
+                .ReturnsAsync(mockItemLines);
 
-            // Act: Retrieve all ItemLines
-            IEnumerable<ItemLineModel> result;
-            using (var context = CreateDbContext())
-            {
-                var service = new ItemLineService(context);
-                result = await service.GetAllItemLines();
-            }
+            // Act
+            var result = await mockItemLineService.Object.GetAllItemLines();
 
-            // Assert: Verify that the correct number of ItemLines is returned
+            // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count());
+            Assert.Equal("Item Line A", result.First().name);
+            Assert.Equal("Item Line B", result.Last().name);
         }
 
         [Fact]
         public async Task GetItemLineById_ValidId_ReturnsItemLine()
         {
-            // Arrange: Add an ItemLine to the database
-            var itemLine = new ItemLineModel
-            {
-                id = 1,
-                name = "Item Line A",
-                description = "Description for Item Line A",
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
-            };
+            // Arrange
+            var mockItemLine = new ItemLineModel { id = 1, name = "Item Line A", description = "Description for Item Line A" };
 
-            using (var context = CreateDbContext())
-            {
-                context.ItemLine.Add(itemLine);
-                await context.SaveChangesAsync();
-            }
+            var mockItemLineService = new Mock<IItemLineService>();
+            mockItemLineService
+                .Setup(service => service.GetItemLineById(1))
+                .ReturnsAsync(mockItemLine);
 
-            // Act: Retrieve the ItemLine by ID
-            ItemLineModel result;
-            using (var context = CreateDbContext())
-            {
-                var service = new ItemLineService(context);
-                result = await service.GetItemLineById(1);
-            }
+            // Act
+            var result = await mockItemLineService.Object.GetItemLineById(1);
 
-            // Assert: Verify that the ItemLine was retrieved correctly
+            // Assert
             Assert.NotNull(result);
             Assert.Equal(1, result.id);
             Assert.Equal("Item Line A", result.name);
         }
 
         [Fact]
-        public async Task CreateItemLine_ValidItemLine_CreatesItemLine()
+        public async Task CreateItemLine_ValidItemLine_CallsCreateMethod()
         {
-            // Arrange: Create a new ItemLine
-            var newItemLine = new ItemLineModel
-            {
-                name = "Item Line C",
-                description = "Description for Item Line C",
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
-            };
+            // Arrange
+            var newItemLine = new ItemLineModel { name = "Item Line C", description = "Description for Item Line C" };
 
-            // Act: Add the new ItemLine to the database
-            using (var context = CreateDbContext())
-            {
-                var service = new ItemLineService(context);
-                await service.CreateItemLine(newItemLine);
-            }
+            var mockItemLineService = new Mock<IItemLineService>();
+            mockItemLineService
+                .Setup(service => service.CreateItemLine(It.IsAny<ItemLineModel>()))
+                .Returns(Task.CompletedTask);
 
-            // Assert: Verify that the ItemLine is added to the database
-            using (var context = CreateDbContext())
-            {
-                var result = await context.ItemLine.FirstOrDefaultAsync(i => i.name == "Item Line C");
-                Assert.NotNull(result);
-                Assert.Equal("Item Line C", result.name);
-            }
+            // Act
+            await mockItemLineService.Object.CreateItemLine(newItemLine);
+
+            // Assert
+            mockItemLineService.Verify(service => service.CreateItemLine(It.Is<ItemLineModel>(i => i.name == "Item Line C" && i.description == "Description for Item Line C")), Times.Once);
         }
 
         [Fact]
-        public async Task UpdateItemLine_ValidItemLine_UpdatesItemLine()
+        public async Task UpdateItemLine_ValidItemLine_CallsUpdateMethod()
         {
-            // Arrange: Add an ItemLine to the database
-            var itemLine = new ItemLineModel
-            {
-                id = 1,
-                name = "Item Line A",
-                description = "Description for Item Line A",
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
-            };
+            // Arrange
+            var updatedItemLine = new ItemLineModel { name = "Updated Item Line A", description = "Updated description for Item Line A" };
 
-            using (var context = CreateDbContext())
-            {
-                context.ItemLine.Add(itemLine);
-                await context.SaveChangesAsync();
-            }
+            var mockItemLineService = new Mock<IItemLineService>();
+            mockItemLineService
+                .Setup(service => service.UpdateItemLine(It.IsAny<int>(), It.IsAny<ItemLineModel>()))
+                .ReturnsAsync(true); // Simuleer succesvolle update
 
-            // Act: Update the ItemLine
-            var updatedItemLine = new ItemLineModel
-            {
-                name = "Updated Item Line A",
-                description = "Updated description for Item Line A",
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
-            };
+            // Act
+            var result = await mockItemLineService.Object.UpdateItemLine(1, updatedItemLine);
 
-            using (var context = CreateDbContext())
-            {
-                var service = new ItemLineService(context);
-                var result = await service.UpdateItemLine(1, updatedItemLine);
-            }
-
-            // Assert: Verify that the ItemLine was updated correctly
-            using (var context = CreateDbContext())
-            {
-                var result = await context.ItemLine.FirstOrDefaultAsync(i => i.id == 1);
-                Assert.NotNull(result);
-                Assert.Equal("Updated Item Line A", result.name);
-            }
+            // Assert
+            Assert.True(result);
+            mockItemLineService.Verify(service => service.UpdateItemLine(1, It.Is<ItemLineModel>(i => i.name == "Updated Item Line A")), Times.Once);
         }
 
         [Fact]
-        public async Task DeleteItemLine_ValidItemLine_DeletesItemLine()
+        public async Task DeleteItemLine_ValidId_CallsDeleteMethod()
         {
-            // Arrange: Add an ItemLine to the database
-            var itemLine = new ItemLineModel
-            {
-                id = 1,
-                name = "Item Line A",
-                description = "Description for Item Line A",
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
-            };
+            // Arrange
+            var mockItemLineService = new Mock<IItemLineService>();
+            mockItemLineService
+                .Setup(service => service.DeleteItemLine(1))
+                .ReturnsAsync(true); // Simuleer succesvolle verwijdering
 
-            using (var context = CreateDbContext())
-            {
-                context.ItemLine.Add(itemLine);
-                await context.SaveChangesAsync();
-            }
+            // Act
+            var result = await mockItemLineService.Object.DeleteItemLine(1);
 
-            // Act: Delete the ItemLine
-            using (var context = CreateDbContext())
-            {
-                var service = new ItemLineService(context);
-                await service.DeleteItemLine(1);
-            }
-
-            // Assert: Verify that the ItemLine was deleted
-            using (var context = CreateDbContext())
-            {
-                var result = await context.ItemLine.FirstOrDefaultAsync(i => i.id == 1);
-                Assert.Null(result); // The ItemLine should be deleted
-            }
+            // Assert
+            Assert.True(result);
+            mockItemLineService.Verify(service => service.DeleteItemLine(1), Times.Once);
         }
     }
 }

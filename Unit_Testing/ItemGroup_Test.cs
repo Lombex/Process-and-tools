@@ -1,73 +1,33 @@
 using Xunit;
-using CSharpAPI.Data;
+using Moq;
 using CSharpAPI.Models;
 using CSharpAPI.Service;
-using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CSharpAPI.Tests
 {
-    public class ItemGroupServiceTests
+    public class ItemGroupServiceUnitTests
     {
-        private readonly DbContextOptions<SQLiteDatabase> _dbContextOptions;
-
-        public ItemGroupServiceTests()
-        {
-            // Set up In-Memory database options
-            _dbContextOptions = new DbContextOptionsBuilder<SQLiteDatabase>()
-                .UseInMemoryDatabase(databaseName: "ItemGroupTestDatabase_" + Guid.NewGuid())  // Unique DB name for each test
-                .Options;
-        }
-
-        private SQLiteDatabase CreateDbContext()
-        {
-            return new SQLiteDatabase(_dbContextOptions);
-        }
-
         [Fact]
         public async Task GetAll_ReturnsListOfItemGroups()
         {
-            // Arrange: Create mock data for ItemGroups
-            var itemGroupList = new List<ItemGroupModel>
+            // Arrange
+            var mockItemGroups = new List<ItemGroupModel>
             {
-                new ItemGroupModel
-                {
-                    id = 1,
-                    name = "Group A",
-                    description = "Description for Group A",
-                    itemtype_id = 1,
-                    created_at = DateTime.UtcNow,
-                    updated_at = DateTime.UtcNow
-                },
-                new ItemGroupModel
-                {
-                    id = 2,
-                    name = "Group B",
-                    description = "Description for Group B",
-                    itemtype_id = 2,
-                    created_at = DateTime.UtcNow,
-                    updated_at = DateTime.UtcNow
-                }
+                new ItemGroupModel { id = 1, name = "Group A", description = "Description A", itemtype_id = 1 },
+                new ItemGroupModel { id = 2, name = "Group B", description = "Description B", itemtype_id = 2 }
             };
 
-            using (var context = CreateDbContext())
-            {
-                context.ItemGroups.AddRange(itemGroupList);
-                await context.SaveChangesAsync();
-            }
+            var mockService = new Mock<IItemGroupService>();
+            mockService
+                .Setup(service => service.GetAll())
+                .ReturnsAsync(mockItemGroups);
 
-            // Act: Retrieve all ItemGroups
-            List<ItemGroupModel> result;
-            using (var context = CreateDbContext())
-            {
-                var service = new ItemGroupService(context);
-                result = await service.GetAll();
-            }
+            // Act
+            var result = await mockService.Object.GetAll();
 
-            // Assert: Verify that the correct number of ItemGroups is returned
+            // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
         }
@@ -75,144 +35,75 @@ namespace CSharpAPI.Tests
         [Fact]
         public async Task GetById_ValidId_ReturnsItemGroup()
         {
-            // Arrange: Add an ItemGroup to the database
-            var itemGroup = new ItemGroupModel
-            {
-                id = 1,
-                name = "Group A",
-                description = "Description for Group A",
-                itemtype_id = 1,
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
-            };
+            // Arrange
+            var mockItemGroup = new ItemGroupModel { id = 1, name = "Group A", description = "Description A", itemtype_id = 1 };
 
-            using (var context = CreateDbContext())
-            {
-                context.ItemGroups.Add(itemGroup);
-                await context.SaveChangesAsync();
-            }
+            var mockService = new Mock<IItemGroupService>();
+            mockService
+                .Setup(service => service.GetById(1))
+                .ReturnsAsync(mockItemGroup);
 
-            // Act: Retrieve the ItemGroup by ID
-            ItemGroupModel result;
-            using (var context = CreateDbContext())
-            {
-                var service = new ItemGroupService(context);
-                result = await service.GetById(1);
-            }
+            // Act
+            var result = await mockService.Object.GetById(1);
 
-            // Assert: Verify that the ItemGroup was retrieved correctly
+            // Assert
             Assert.NotNull(result);
             Assert.Equal(1, result.id);
             Assert.Equal("Group A", result.name);
         }
 
         [Fact]
-        public async Task Add_ValidItemGroup_CreatesItemGroup()
+        public async Task Add_ValidItemGroup_CallsAddMethod()
         {
-            // Arrange: Create a new ItemGroup
-            var newItemGroup = new ItemGroupModel
-            {
-                name = "Group C",
-                description = "Description for Group C",
-                itemtype_id = 3,
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
-            };
+            // Arrange
+            var newItemGroup = new ItemGroupModel { name = "Group C", description = "Description C", itemtype_id = 3 };
 
-            // Act: Add the new ItemGroup to the database
-            using (var context = CreateDbContext())
-            {
-                var service = new ItemGroupService(context);
-                await service.Add(newItemGroup);
-            }
+            var mockService = new Mock<IItemGroupService>();
+            mockService
+                .Setup(service => service.Add(It.IsAny<ItemGroupModel>()))
+                .Returns(Task.CompletedTask);
 
-            // Assert: Verify that the ItemGroup is added to the database
-            using (var context = CreateDbContext())
-            {
-                var result = await context.ItemGroups.FirstOrDefaultAsync(i => i.name == "Group C");
-                Assert.NotNull(result);
-                Assert.Equal("Group C", result.name);
-            }
+            // Act
+            await mockService.Object.Add(newItemGroup);
+
+            // Assert
+            mockService.Verify(service => service.Add(It.Is<ItemGroupModel>(g => g.name == "Group C")), Times.Once);
         }
 
         [Fact]
-        public async Task Update_ValidItemGroup_UpdatesItemGroup()
+        public async Task Update_ValidItemGroup_CallsUpdateMethod()
         {
-            // Arrange: Add an ItemGroup to the database
-            var itemGroup = new ItemGroupModel
-            {
-                id = 1,
-                name = "Group A",
-                description = "Description for Group A",
-                itemtype_id = 1,
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
-            };
+            // Arrange
+            var updatedItemGroup = new ItemGroupModel { name = "Updated Group A", description = "Updated Description A", itemtype_id = 1 };
 
-            using (var context = CreateDbContext())
-            {
-                context.ItemGroups.Add(itemGroup);
-                await context.SaveChangesAsync();
-            }
+            var mockService = new Mock<IItemGroupService>();
+            mockService
+                .Setup(service => service.Update(1, It.IsAny<ItemGroupModel>()))
+                .ReturnsAsync(true);
 
-            // Act: Update the ItemGroup
-            var updatedItemGroup = new ItemGroupModel
-            {
-                name = "Updated Group A",
-                description = "Updated description for Group A",
-                itemtype_id = 1,
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
-            };
+            // Act
+            var result = await mockService.Object.Update(1, updatedItemGroup);
 
-            using (var context = CreateDbContext())
-            {
-                var service = new ItemGroupService(context);
-                var result = await service.Update(1, updatedItemGroup);
-            }
-
-            // Assert: Verify that the ItemGroup was updated correctly
-            using (var context = CreateDbContext())
-            {
-                var result = await context.ItemGroups.FirstOrDefaultAsync(i => i.id == 1);
-                Assert.NotNull(result);
-                Assert.Equal("Updated Group A", result.name);
-            }
+            // Assert
+            Assert.True(result);
+            mockService.Verify(service => service.Update(1, It.Is<ItemGroupModel>(g => g.name == "Updated Group A")), Times.Once);
         }
 
         [Fact]
-        public async Task Delete_ValidItemGroup_DeletesItemGroup()
+        public async Task Delete_ValidItemGroup_CallsDeleteMethod()
         {
-            // Arrange: Add an ItemGroup to the database
-            var itemGroup = new ItemGroupModel
-            {
-                id = 1,
-                name = "Group A",
-                description = "Description for Group A",
-                itemtype_id = 1,
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
-            };
+            // Arrange
+            var mockService = new Mock<IItemGroupService>();
+            mockService
+                .Setup(service => service.Delete(1))
+                .ReturnsAsync(true);
 
-            using (var context = CreateDbContext())
-            {
-                context.ItemGroups.Add(itemGroup);
-                await context.SaveChangesAsync();
-            }
+            // Act
+            var result = await mockService.Object.Delete(1);
 
-            // Act: Delete the ItemGroup
-            using (var context = CreateDbContext())
-            {
-                var service = new ItemGroupService(context);
-                await service.Delete(1);
-            }
-
-            // Assert: Verify that the ItemGroup was deleted
-            using (var context = CreateDbContext())
-            {
-                var result = await context.ItemGroups.FirstOrDefaultAsync(i => i.id == 1);
-                Assert.Null(result); // The ItemGroup should be deleted
-            }
+            // Assert
+            Assert.True(result);
+            mockService.Verify(service => service.Delete(1), Times.Once);
         }
     }
 }

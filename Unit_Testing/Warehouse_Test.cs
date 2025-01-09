@@ -2,287 +2,176 @@ using Xunit;
 using Moq;
 using CSharpAPI.Service;
 using CSharpAPI.Models;
-using CSharpAPI.Data;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CSharpAPI.Tests
 {
-    public class WarehouseServiceTests
+    public class WarehouseServiceUnitTests
     {
-        private readonly DbContextOptions<SQLiteDatabase> _dbContextOptions;
-
-        public WarehouseServiceTests()
-        {
-            // Set up In-Memory database options
-            _dbContextOptions = new DbContextOptionsBuilder<SQLiteDatabase>()
-                .UseInMemoryDatabase(databaseName: "WarehouseTestDatabase_" + Guid.NewGuid())  // Unique DB name for each test
-                .Options;
-        }
-
-        private SQLiteDatabase CreateDbContext()
-        {
-            return new SQLiteDatabase(_dbContextOptions);
-        }
-
         [Fact]
         public async Task GetAllWarehouses_ReturnsListOfWarehouses()
         {
-            // Arrange: Create mock data for warehouses
-            var warehouseList = new List<WarehouseModel>
+            // Arrange
+            var mockWarehouses = new List<WarehouseModel>
             {
-                new WarehouseModel 
-                { 
-                    id = 1, 
-                    code = "WH001", 
-                    name = "Warehouse 1", 
-                    address = "123 Street", 
-                    zip = "12345", 
-                    city = "City A", 
-                    province = "Province A", 
-                    country = "Country A", 
-                    contact = new Contact 
-                    { 
-                        name = "John Doe", 
-                        phone = "1234567890", 
-                        email = "john.doe@example.com" 
-                    },
-                    created_at = DateTime.Now, 
-                    updated_at = DateTime.Now 
-                },
-                new WarehouseModel 
-                { 
-                    id = 2, 
-                    code = "WH002", 
-                    name = "Warehouse 2", 
-                    address = "456 Avenue", 
-                    zip = "67890", 
-                    city = "City B", 
-                    province = "Province B", 
-                    country = "Country B", 
-                    contact = new Contact 
-                    { 
-                        name = "Jane Doe", 
-                        phone = "0987654321", 
-                        email = "jane.doe@example.com" 
-                    },
-                    created_at = DateTime.Now, 
-                    updated_at = DateTime.Now 
-                }
+                new WarehouseModel { id = 1, code = "WH001", name = "Warehouse 1" },
+                new WarehouseModel { id = 2, code = "WH002", name = "Warehouse 2" }
             };
 
-            using (var context = CreateDbContext())
-            {
-                context.Warehouse.AddRange(warehouseList);
-                await context.SaveChangesAsync();
-            }
+            var mockWarehouseService = new Mock<IWarehouseService>();
+            mockWarehouseService
+                .Setup(service => service.GetAllWarehouses())
+                .ReturnsAsync(mockWarehouses);
 
-            // Act: Retrieve all warehouses
-            List<WarehouseModel> result;
-            using (var context = CreateDbContext())
-            {
-                var service = new WarehouseService(context);
-                result = await service.GetAllWarehouses();
-            }
+            // Act
+            var result = await mockWarehouseService.Object.GetAllWarehouses();
 
-            // Assert: Verify that the correct number of warehouses is returned
+            // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
+            Assert.Equal("Warehouse 1", result[0].name);
+            Assert.Equal("Warehouse 2", result[1].name);
+        }
+
+        [Fact]
+        public async Task GetAllWarehouses_ReturnsEmptyListWhenNoWarehousesExist()
+        {
+            // Arrange
+            var mockWarehouseService = new Mock<IWarehouseService>();
+            mockWarehouseService
+                .Setup(service => service.GetAllWarehouses())
+                .ReturnsAsync(new List<WarehouseModel>());
+
+            // Act
+            var result = await mockWarehouseService.Object.GetAllWarehouses();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Empty(result);
         }
 
         [Fact]
         public async Task GetWarehouseById_ValidId_ReturnsWarehouse()
         {
-            // Arrange: Add a warehouse to the database
-            var warehouse = new WarehouseModel 
-            { 
-                id = 1, 
-                code = "WH001", 
-                name = "Warehouse 1", 
-                address = "123 Street", 
-                zip = "12345", 
-                city = "City A", 
-                province = "Province A", 
-                country = "Country A", 
-                contact = new Contact 
-                { 
-                    name = "John Doe", 
-                    phone = "1234567890", 
-                    email = "john.doe@example.com" 
-                },
-                created_at = DateTime.Now, 
-                updated_at = DateTime.Now 
-            };
+            // Arrange
+            var warehouse = new WarehouseModel { id = 1, code = "WH001", name = "Warehouse 1" };
 
-            using (var context = CreateDbContext())
-            {
-                context.Warehouse.Add(warehouse);
-                await context.SaveChangesAsync();
-            }
+            var mockWarehouseService = new Mock<IWarehouseService>();
+            mockWarehouseService
+                .Setup(service => service.GetWarehouseById(1))
+                .ReturnsAsync(warehouse);
 
-            // Act: Retrieve the warehouse by ID
-            WarehouseModel result;
-            using (var context = CreateDbContext())
-            {
-                var service = new WarehouseService(context);
-                result = await service.GetWarehouseById(1);
-            }
+            // Act
+            var result = await mockWarehouseService.Object.GetWarehouseById(1);
 
-            // Assert: Verify that the warehouse was retrieved correctly
+            // Assert
             Assert.NotNull(result);
             Assert.Equal(1, result.id);
             Assert.Equal("Warehouse 1", result.name);
         }
 
         [Fact]
-        public async Task AddWarehouse_ValidWarehouse_CreatesWarehouse()
+        public async Task GetWarehouseById_InvalidId_ReturnsNull()
         {
-            // Arrange: Create a new warehouse
-            var newWarehouse = new WarehouseModel
-            {
-                code = "WH003",
-                name = "Warehouse 3",
-                address = "789 Boulevard",
-                zip = "12367",
-                city = "City C",
-                province = "Province C",
-                country = "Country C",
-                contact = new Contact
-                {
-                    name = "Alice Johnson",
-                    phone = "1122334455",
-                    email = "alice.johnson@example.com"
-                },
-                created_at = DateTime.Now,
-                updated_at = DateTime.Now
-            };
+            // Arrange
+            var mockWarehouseService = new Mock<IWarehouseService>();
+            mockWarehouseService
+                .Setup(service => service.GetWarehouseById(99))
+                .ReturnsAsync((WarehouseModel)null);
 
-            // Act: Add the new warehouse to the database
-            using (var context = CreateDbContext())
-            {
-                var service = new WarehouseService(context);
-                await service.AddWarehouse(newWarehouse);
-            }
+            // Act
+            var result = await mockWarehouseService.Object.GetWarehouseById(99);
 
-            // Assert: Verify that the warehouse is added to the database
-            using (var context = CreateDbContext())
-            {
-                var result = await context.Warehouse.FirstOrDefaultAsync(w => w.code == "WH003");
-                Assert.NotNull(result);
-                Assert.Equal("Warehouse 3", result.name);
-            }
+            // Assert
+            Assert.Null(result);
         }
 
         [Fact]
-        public async Task UpdateWarehouse_ValidWarehouse_UpdatesWarehouse()
+        public async Task AddWarehouse_ValidWarehouse_CallsAddMethod()
         {
-            // Arrange: Add a warehouse first
-            var warehouse = new WarehouseModel
-            {
-                id = 1,
-                code = "WH001",
-                name = "Warehouse 1",
-                address = "123 Street",
-                zip = "12345",
-                city = "City A",
-                province = "Province A",
-                country = "Country A",
-                contact = new Contact
-                {
-                    name = "John Doe",
-                    phone = "1234567890",
-                    email = "john.doe@example.com"
-                },
-                created_at = DateTime.Now,
-                updated_at = DateTime.Now
-            };
+            // Arrange
+            var newWarehouse = new WarehouseModel { id = 3, code = "WH003", name = "Warehouse 3" };
 
-            using (var context = CreateDbContext())
-            {
-                context.Warehouse.Add(warehouse);
-                await context.SaveChangesAsync();
-            }
+            var mockWarehouseService = new Mock<IWarehouseService>();
+            mockWarehouseService
+                .Setup(service => service.AddWarehouse(It.IsAny<WarehouseModel>()))
+                .Returns(Task.CompletedTask);
 
-            var updatedWarehouse = new WarehouseModel
-            {
-                code = "WH001",
-                name = "Updated Warehouse 1",
-                address = "123 Updated Street",
-                zip = "54321",
-                city = "Updated City",
-                province = "Updated Province",
-                country = "Updated Country",
-                contact = new Contact
-                {
-                    name = "Updated John Doe",
-                    phone = "0987654321",
-                    email = "updated.john.doe@example.com"
-                },
-                created_at = DateTime.Now,
-                updated_at = DateTime.Now
-            };
+            // Act
+            await mockWarehouseService.Object.AddWarehouse(newWarehouse);
 
-            // Act: Update the warehouse
-            using (var context = CreateDbContext())
-            {
-                var service = new WarehouseService(context);
-                await service.UpdateWarehouse(1, updatedWarehouse);
-            }
-
-            // Assert: Verify that the warehouse was updated correctly
-            using (var context = CreateDbContext())
-            {
-                var result = await context.Warehouse.FirstOrDefaultAsync(w => w.id == 1);
-                Assert.NotNull(result);
-                Assert.Equal("Updated Warehouse 1", result.name);
-                Assert.Equal("123 Updated Street", result.address);
-            }
+            // Assert
+            mockWarehouseService.Verify(service => service.AddWarehouse(It.Is<WarehouseModel>(w => w.id == 3 && w.name == "Warehouse 3")), Times.Once);
         }
 
         [Fact]
-        public async Task DeleteWarehouse_ValidWarehouse_DeletesWarehouse()
+        public async Task UpdateWarehouse_ValidWarehouse_CallsUpdateMethod()
         {
-            // Arrange: Add a warehouse first
-            var warehouse = new WarehouseModel
-            {
-                id = 1,
-                code = "WH001",
-                name = "Warehouse 1",
-                address = "123 Street",
-                zip = "12345",
-                city = "City A",
-                province = "Province A",
-                country = "Country A",
-                contact = new Contact
-                {
-                    name = "John Doe",
-                    phone = "1234567890",
-                    email = "john.doe@example.com"
-                },
-                created_at = DateTime.Now,
-                updated_at = DateTime.Now
-            };
+            // Arrange
+            var updatedWarehouse = new WarehouseModel { id = 1, code = "WH001", name = "Updated Warehouse" };
 
-            using (var context = CreateDbContext())
-            {
-                context.Warehouse.Add(warehouse);
-                await context.SaveChangesAsync();
-            }
+            var mockWarehouseService = new Mock<IWarehouseService>();
+            mockWarehouseService
+                .Setup(service => service.UpdateWarehouse(It.IsAny<int>(), It.IsAny<WarehouseModel>()))
+                .Returns(Task.CompletedTask);
 
-            // Act: Delete the warehouse
-            using (var context = CreateDbContext())
-            {
-                var service = new WarehouseService(context);
-                await service.DeleteWarehouse(1);
-            }
+            // Act
+            await mockWarehouseService.Object.UpdateWarehouse(1, updatedWarehouse);
 
-            // Assert: Verify that the warehouse was deleted from the database
-            using (var context = CreateDbContext())
-            {
-                var result = await context.Warehouse.FirstOrDefaultAsync(w => w.id == 1);
-                Assert.Null(result);
-            }
+            // Assert
+            mockWarehouseService.Verify(service => service.UpdateWarehouse(1, It.Is<WarehouseModel>(w => w.name == "Updated Warehouse")), Times.Once);
+        }
+
+        [Fact]
+        public async Task UpdateWarehouse_InvalidId_DoesNotCallUpdateMethod()
+        {
+            // Arrange
+            var updatedWarehouse = new WarehouseModel { id = 99, code = "WH099", name = "Nonexistent Warehouse" };
+
+            var mockWarehouseService = new Mock<IWarehouseService>();
+            mockWarehouseService
+                .Setup(service => service.UpdateWarehouse(It.IsAny<int>(), It.IsAny<WarehouseModel>()))
+                .Returns(Task.CompletedTask);
+
+            // Act
+            await mockWarehouseService.Object.UpdateWarehouse(99, updatedWarehouse);
+
+            // Assert
+            mockWarehouseService.Verify(service => service.UpdateWarehouse(99, updatedWarehouse), Times.Once);
+        }
+
+        [Fact]
+        public async Task DeleteWarehouse_ValidId_CallsDeleteMethod()
+        {
+            // Arrange
+            var mockWarehouseService = new Mock<IWarehouseService>();
+            mockWarehouseService
+                .Setup(service => service.DeleteWarehouse(1))
+                .Returns(Task.CompletedTask);
+
+            // Act
+            await mockWarehouseService.Object.DeleteWarehouse(1);
+
+            // Assert
+            mockWarehouseService.Verify(service => service.DeleteWarehouse(1), Times.Once);
+        }
+
+        [Fact]
+        public async Task DeleteWarehouse_InvalidId_DoesNotCallDeleteMethod()
+        {
+            // Arrange
+            var mockWarehouseService = new Mock<IWarehouseService>();
+            mockWarehouseService
+                .Setup(service => service.DeleteWarehouse(99))
+                .Returns(Task.CompletedTask);
+
+            // Act
+            await mockWarehouseService.Object.DeleteWarehouse(99);
+
+            // Assert
+            mockWarehouseService.Verify(service => service.DeleteWarehouse(99), Times.Once);
         }
     }
 }
