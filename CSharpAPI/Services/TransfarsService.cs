@@ -1,5 +1,6 @@
 using CSharpAPI.Data;
 using CSharpAPI.Models;
+using CSharpAPI.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -7,9 +8,11 @@ using Newtonsoft.Json;
 namespace CSharpAPI.Service {
     public class TransferSerivce : ITransfersService {
         private readonly SQLiteDatabase _Db;
-        public TransferSerivce(SQLiteDatabase sQLite) 
+        private readonly HistoryService _historyService;
+        public TransferSerivce(SQLiteDatabase sQLite, HistoryService historyService) 
         {
             _Db = sQLite;
+            _historyService = historyService;
         }
 
         public async Task<List<TransferModel>> GetAllTransfers() => await _Db.Transfer.AsQueryable().ToListAsync();
@@ -109,7 +112,7 @@ namespace CSharpAPI.Service {
         Task CreateTransfer(TransferModel transfer);
         Task UpdateTransfer(int id, TransferModel updateTransfer);
 
-        // commit => CommitTransfer(); 
+        Task CommitTransfer(int id);
         Task DeleteTransfer(int id);
     }
 }

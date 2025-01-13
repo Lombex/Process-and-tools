@@ -37,6 +37,8 @@ builder.Services.AddScoped<IItemLineService, ItemLineService>();
 builder.Services.AddScoped<IItemGroupService, ItemGroupService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
+builder.Services.AddScoped<HistoryService>();
+
 
 // Add CORS
 builder.Services.AddCors(options =>

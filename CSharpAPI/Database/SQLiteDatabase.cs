@@ -24,6 +24,7 @@ namespace CSharpAPI.Data
         public DbSet<ClientModel> ClientModels { get; set; }
         public DbSet<Contact> contacts { get; set; }
         public DbSet<ApiUser> ApiUsers { get; set; }
+        public DbSet<History> History { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

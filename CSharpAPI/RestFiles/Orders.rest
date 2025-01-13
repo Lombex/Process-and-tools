@@ -1,7 +1,7 @@
 ### Get all orders
 GET http://localhost:5001/api/v1/orders/all
 Content-Type: application/json
-API_KEY: admin_key_2024
+API_KEY: /93HCQgUO64yDli09K0zRbAy4o7FoRfRS8SBqXYtCgg=
 
 ### Get order by id
 GET http://localhost:5001/api/v1/orders/1
@@ -10,13 +10,15 @@ Content-Type: application/json
 ### Get order item by id
 GET http://localhost:5001/api/v1/orders/1/items
 Content-Type: application/json
+API_KEY: /93HCQgUO64yDli09K0zRbAy4o7FoRfRS8SBqXYtCgg=
 
 ### Create new Order
 POST http://localhost:5001/api/v1/orders
 Content-Type: application/json
+API_KEY: /93HCQgUO64yDli09K0zRbAy4o7FoRfRS8SBqXYtCgg=
 
 {
-  "source_id": 33,
+  "source_id": 9000,
   "order_date": "2019-04-03T11:33:15Z",
   "request_date": "2019-04-07T11:33:15Z",
   "reference": "ORD00001",
@@ -48,6 +50,8 @@ Content-Type: application/json
 ### Update Order
 PUT http://localhost:5001/api/v1/orders/1
 Content-Type: application/json
+API_KEY: /93HCQgUO64yDli09K0zRbAy4o7FoRfRS8SBqXYtCgg=
+
 
 {
   "source_id": 33,
@@ -82,3 +86,4 @@ Content-Type: application/json
 ### Delete order
 DELETE http://localhost:5001/api/v1/orders/1
 Content-Type: application/json
+API_KEY: /93HCQgUO64yDli09K0zRbAy4o7FoRfRS8SBqXYtCgg=

@@ -11,6 +11,8 @@ API_KEY: admin_key_2024
 ### Create Item
 POST http://localhost:5001/api/v1/items
 Content-Type: application/json
+API_KEY: /93HCQgUO64yDli09K0zRbAy4o7FoRfRS8SBqXYtCgg=
+
 
 {
   "code": "DEFAULT001",

@@ -1,5 +1,6 @@
 using CSharpAPI.Data;
 using CSharpAPI.Models;
+using CSharpAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -21,9 +22,11 @@ namespace CSharpAPI.Service
     {
 
         private readonly SQLiteDatabase _Db;
-        public ItemsService(SQLiteDatabase sQLite)
+        private readonly HistoryService _historyService;
+        public ItemsService(SQLiteDatabase sQLite, HistoryService historyService)
         {
             _Db = sQLite;
+            _historyService = historyService;
         }
         public async Task<List<ItemModel>> GetAllItems() => await _Db.itemModels.AsQueryable().ToListAsync();
         public async Task<ItemModel> GetItemById(string uid)
@@ -41,10 +44,18 @@ namespace CSharpAPI.Service
 
             await _Db.itemModels.AddAsync(item);
             await _Db.SaveChangesAsync();
+            await _historyService.LogAsync(EntityType.Item, item.uid, "Created", $"Item {item.description} is aangemaakt met UID: {item.uid}");
+
         }
         public async Task UpdateItem(string uid, ItemModel item)
         {
             var _item = await GetItemById(uid);
+
+            string changes = $"";
+            if (_item.code != item.code) changes += $"Code: {_item.code} -> {item.code}; ";
+            if (_item.description != item.description) changes += $"Description: {_item.description} -> {item.description}; ";
+            if (_item.short_description != item.short_description) changes += $"Short Description: {_item.short_description} -> {item.short_description}; ";
+            if (_item.upc_code != item.upc_code) changes += $"UPC Code: {_item.upc_code} -> {item.upc_code}; ";
 
             _item.code = item.code;
             _item.description = item.description;
@@ -64,13 +75,19 @@ namespace CSharpAPI.Service
             _item.updated_at = DateTime.UtcNow;
 
             _Db.itemModels.Update(_item);
+            
+
             await _Db.SaveChangesAsync();
+            await _historyService.LogAsync(EntityType.Item, uid, "Updated", $"Wijzigingen: {changes}");
+
         }
         public async Task DeleteItem(string uid)
         {
             var _item = await GetItemById(uid);
             _Db.itemModels.Remove(_item);
             await _Db.SaveChangesAsync();
+            await _historyService.LogAsync(EntityType.Item, uid, "Deleted", $"Item {_item.description} met UID: {uid} is verwijderd");
+
         }
         public async Task<IEnumerable<ItemModel>> GetItemsByLineId(int lineId)
         {

@@ -136,6 +136,35 @@ namespace CSharpAPI.Migrations
                     b.ToTable("ClientModels");
                 });
 
+            modelBuilder.Entity("CSharpAPI.Models.History", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Changes")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EntityId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("EntityType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("History");
+                });
+
             modelBuilder.Entity("CSharpAPI.Models.InventorieModel", b =>
                 {
                     b.Property<int>("id")

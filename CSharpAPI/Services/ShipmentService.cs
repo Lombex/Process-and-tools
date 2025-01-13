@@ -1,5 +1,6 @@
 using CSharpAPI.Data;
 using CSharpAPI.Models;
+using CSharpAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -20,10 +21,11 @@ namespace CSharpAPI.Service
     public class ShipmentService : IShipmentService
     {
         private readonly SQLiteDatabase _Db;
-
-        public ShipmentService(SQLiteDatabase sQLite)
+        private readonly HistoryService _historyService;
+        public ShipmentService(SQLiteDatabase sQLite, HistoryService historyService)
         {
             _Db = sQLite;
+            _historyService = historyService;
         }
 
         public async Task<List<ShipmentModel>> GetAll() => await _Db.Shipment.AsQueryable().ToListAsync();
@@ -62,11 +64,17 @@ namespace CSharpAPI.Service
             if (shipment == null) throw new ArgumentNullException(nameof(shipment));
             await _Db.Shipment.AddAsync(shipment);
             await _Db.SaveChangesAsync();
+            await _historyService.LogAsync(EntityType.Shipment, shipment.id.ToString(),"Created", $"Shipment {shipment.id} is aangemaakt met status {shipment.shipment_status} en totaal gewicht {shipment.total_package_weight}"
+    );
         }
 
         public async Task Update(int id, ShipmentModel shipment)
         {
             var _shipment = await GetById(id);
+
+            string changes = $"";
+            if (_shipment.shipment_status != shipment.shipment_status) changes += $"Status: {_shipment.shipment_status} -> {shipment.shipment_status}; ";
+            if (_shipment.total_package_weight != shipment.total_package_weight) changes += $"Total Weight: {_shipment.total_package_weight} -> {shipment.total_package_weight}; ";
 
             _shipment.order_id = shipment.order_id;
             _shipment.source_id = shipment.source_id;
@@ -88,6 +96,7 @@ namespace CSharpAPI.Service
 
             _Db.Shipment.Update(_shipment);
             await _Db.SaveChangesAsync();
+            await _historyService.LogAsync(EntityType.Shipment, id.ToString(), "Updated", $"Wijzigingen: {changes}");
         }
 
         public async Task Delete(int id)
@@ -95,6 +104,7 @@ namespace CSharpAPI.Service
             var _shipment = await GetById(id);
             _Db.Shipment.Remove(_shipment);
             await _Db.SaveChangesAsync();
+            await _historyService.LogAsync(EntityType.Shipment, id.ToString(), "Deleted", $"Shipment {_shipment.id} met status {_shipment.shipment_status} is verwijderd");
         }
     }
 }
