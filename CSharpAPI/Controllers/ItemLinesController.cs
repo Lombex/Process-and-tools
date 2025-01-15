@@ -1,5 +1,7 @@
 using CSharpAPI.Models;
 using CSharpAPI.Service;
+using CSharpAPI.Models.Auth;
+using CSharpAPI.Services.Auth;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CSharpAPI.Controllers
@@ -9,15 +11,26 @@ namespace CSharpAPI.Controllers
     public class ItemLinesController : ControllerBase
     {
         private readonly IItemLineService _service;
+        private readonly IAuthService _authService;
 
-        public ItemLinesController(IItemLineService service)
+        public ItemLinesController(IItemLineService service, IAuthService authService)
         {
             _service = service;
+            _authService = authService;
+        }
+
+        private async Task<bool> CheckAccess(string method)
+        {
+            var user = HttpContext.Items["User"] as ApiUser;
+            return await _authService.HasAccess(user, "itemlines", method);
         }
 
         [HttpGet("all")]
         public async Task<IActionResult> GetAll()
         {
+            if (!await CheckAccess("GET"))
+                return Forbid();
+
             var itemLines = await _service.GetAllItemLines();
             return Ok(itemLines);
         }
@@ -25,6 +38,9 @@ namespace CSharpAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
+            if (!await CheckAccess("GET"))
+                return Forbid();
+
             try
             {
                 var itemLine = await _service.GetItemLineById(id);
@@ -39,6 +55,9 @@ namespace CSharpAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ItemLineModel itemLine)
         {
+            if (!await CheckAccess("POST"))
+                return Forbid();
+
             if (itemLine == null)
                 return BadRequest("Request is empty!");
 
@@ -49,6 +68,9 @@ namespace CSharpAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] ItemLineModel itemLine)
         {
+            if (!await CheckAccess("PUT"))
+                return Forbid();
+
             if (itemLine == null)
                 return BadRequest("Request is empty!");
 
@@ -59,10 +81,12 @@ namespace CSharpAPI.Controllers
             return Ok($"ItemLine {id} has been updated!");
         }
 
-
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
+            if (!await CheckAccess("DELETE"))
+                return Forbid();
+
             var deleted = await _service.DeleteItemLine(id);
             if (!deleted)
                 return NotFound($"ItemLine with id {id} not found!");
