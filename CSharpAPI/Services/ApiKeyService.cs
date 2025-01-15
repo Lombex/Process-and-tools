@@ -3,6 +3,7 @@ using CSharpAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using CSharpAPI.Controllers;
+using CSharpAPI.Services.Auth;
 
 namespace CSharpAPI.Services.Auth
 {
@@ -19,10 +20,12 @@ namespace CSharpAPI.Services.Auth
     public class ApiKeyService : IApiKeyService
     {
         private readonly SQLiteDatabase _db;
+        private readonly IAuthService _authService;
 
-        public ApiKeyService(SQLiteDatabase db)
+        public ApiKeyService(SQLiteDatabase db, IAuthService authService)
         {
             _db = db;
+            _authService = authService;
         }
 
         public async Task<List<ApiUser>> GetAllApiKeys(ApiUser currentUser)
@@ -74,6 +77,9 @@ namespace CSharpAPI.Services.Auth
             apiUser.created_at = DateTime.UtcNow;
             apiUser.updated_at = DateTime.UtcNow;
 
+            // Ensure role permissions are created
+            await _authService.EnsureRolePermissions(apiUser.role);
+
             await _db.ApiUsers.AddAsync(apiUser);
             await _db.SaveChangesAsync();
         }
@@ -83,6 +89,9 @@ namespace CSharpAPI.Services.Auth
             var existingKey = await _db.ApiUsers.FirstOrDefaultAsync(x => x.id == id);
             if (existingKey == null)
                 throw new Exception($"API key with id {id} not found");
+
+            // Ensure new role has permissions
+            await _authService.EnsureRolePermissions(apiUser.role);
 
             existingKey.app = apiUser.app;
             existingKey.role = apiUser.role;
@@ -121,20 +130,13 @@ namespace CSharpAPI.Services.Auth
                 updated_at = DateTime.UtcNow
             };
 
+            // Ensure role permissions are created before saving the key
+            await _authService.EnsureRolePermissions(request.role);
+
             await _db.ApiUsers.AddAsync(newKey);
             await _db.SaveChangesAsync();
 
             return newKey;
-        }
-
-        private string GenerateKey()
-        {
-            var bytes = new byte[32];
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(bytes);
-            }
-            return Convert.ToBase64String(bytes);
         }
     }
 }

@@ -11,7 +11,7 @@ API_KEY: admin_key_2024
 }
 
 ### Get all API Keys (Admin only)
-GET http://localhost:5001/api/v1/keys
+GET http://localhost:5001/api/v1/keys/all
 Content-Type: application/json
 API_KEY: admin_key_2024
 
