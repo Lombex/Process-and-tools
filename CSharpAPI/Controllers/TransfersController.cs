@@ -13,10 +13,38 @@ namespace CSharpAPI.Controller {
         }
 
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllTransfers() {
+        public async Task<IActionResult> GetAllTransfers([FromQuery] int page)
+        {
             var transfers = await _transferSerivces.GetAllTransfers();
-            return Ok(transfers);
+
+            int totalItem = transfers.Count;
+            int totalPages = (int)Math.Ceiling(totalItem / (double)10);
+            if (page > totalPages) return BadRequest("Page number exceeds total pages");
+
+            var Elements = transfers.Skip((page * 10)).Take(10).Select(x => new
+            {
+                ID = x.id,
+                Reference = x.reference,
+                Transfer_from = x.transfer_from,
+                Transfer_to = x.transfer_to,
+                Transer_Status = x.transfer_status,
+                Created_at = x.created_at,
+                Updated_at = x.updated_at,
+                Items = x.items
+            }).ToList().OrderBy(_ => _.ID);
+
+            var Response = new
+            {
+                Page = page,
+                PageSize = 10,
+                TotalItems = totalItem,
+                TotalPages = totalPages,
+                Transfers = Elements
+            };
+
+            return Ok(Response);
         }
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTransferById(int id) {

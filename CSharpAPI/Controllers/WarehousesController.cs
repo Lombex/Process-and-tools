@@ -17,10 +17,39 @@ namespace CSharpAPI.Controller
         }
 
         [HttpGet("all")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] int page)
         {
             var warehouses = await _warehouseService.GetAllWarehouses();
-            return Ok(warehouses);
+
+            int totalItem = warehouses.Count;
+            int totalPages = (int)Math.Ceiling(totalItem / (double)10);
+            if (page > totalPages) return BadRequest("Page number exceeds total pages");
+
+            var Elements = warehouses.Skip((page * 10)).Take(10).Select(x => new
+            {
+                ID = x.id,
+                Code = x.code,
+                Name = x.name,
+                Adress = x.address,
+                Zip = x.zip,
+                City = x.city,
+                Province = x.province,
+                Country = x.country,
+                Contact = x.contact,
+                Created_at = x.created_at,
+                Updated_at = x.updated_at
+            }).ToList().OrderBy(_ => _.ID);
+
+            var Response = new
+            {
+                Page = page,
+                PageSize = 10,
+                TotalItems = totalItem,
+                TotalPages = totalPages,
+                Warehouses = Elements
+            };
+
+            return Ok(Response);
         }
 
         [HttpGet("{id}")]

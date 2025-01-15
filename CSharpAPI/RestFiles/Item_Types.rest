@@ -10,6 +10,7 @@ Content-Type: application/json
 ### Create ItemType
 POST http://localhost:5001/api/v1/itemtypes
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 {
     "name": "New Testtype",

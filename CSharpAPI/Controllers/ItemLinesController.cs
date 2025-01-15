@@ -1,6 +1,7 @@
 using CSharpAPI.Models;
 using CSharpAPI.Service;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace CSharpAPI.Controllers
 {
@@ -16,10 +17,32 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] int page)
         {
             var itemLines = await _service.GetAllItemLines();
-            return Ok(itemLines);
+
+            int totalItem = itemLines.Count;
+            int totalPages = (int)Math.Ceiling(totalItem / (double)10);
+            if (page > totalPages) return BadRequest("Page number exceeds total pages");
+
+            var Elements = itemLines.Skip((page * 10)).Take(10).Select(x => new
+            {
+                ID = x.id,
+                Name = x.name,
+                Description = x.description,
+                Created_at = x.created_at,
+                Updated_at = x.updated_at
+            }).ToList().OrderBy(_ => _.ID);
+
+            var Response = new
+            {
+                Page = page,
+                PageSize = 10,
+                TotalItems = totalItem,
+                TotalPages = totalPages,
+                ItemLine = Elements
+            };
+            return Ok(Response);
         }
 
         [HttpGet("{id}")]

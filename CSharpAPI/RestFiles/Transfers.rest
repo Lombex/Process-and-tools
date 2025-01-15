@@ -16,9 +16,9 @@ Content-Type: application/json
 ### Create new Transfer
 POST http://localhost:5001/api/v1/transfers
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 {
-  "id": 1,
   "reference": "Test",
   "transfer_from": 1,
   "transfer_to": 1,

@@ -19,6 +19,7 @@ Content-Type: application/json
 ### Create shipment
 POST http://localhost:5001/api/v1/shipments
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 {
   "order_id": 1,

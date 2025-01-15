@@ -10,7 +10,6 @@ namespace CSharpAPI.Models {
         public string? province { get; set; }
         public string? country { get; set; }
         public Contact? contact { get; set; }
-        public string? phonenumber { get; set; }
         public string? reference { get; set; }
         public DateTime created_at { get; set; }
         public DateTime updated_at { get; set; }

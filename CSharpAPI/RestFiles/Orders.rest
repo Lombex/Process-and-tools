@@ -14,6 +14,7 @@ Content-Type: application/json
 ### Create new Order
 POST http://localhost:5001/api/v1/orders
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 {
   "source_id": 33,

@@ -15,10 +15,40 @@ namespace CSharpAPI.Controller
         }
 
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllSuppliers()
+        public async Task<IActionResult> GetAllSuppliers([FromQuery] int page)
         {
             var suppliers = await _supplierService.GetAllSuppliers();
-            return Ok(suppliers);
+
+            int totalItem = suppliers.Count;
+            int totalPages = (int)Math.Ceiling(totalItem / (double)10);
+            if (page > totalPages) return BadRequest("Page number exceeds total pages");
+
+            var Elements = suppliers.Skip((page * 10)).Take(10).Select(x => new
+            {
+                ID = x.id,
+                Code = x.code,
+                Name = x.name,
+                Address = x.address,
+                Address_Extra = x.address_extra,
+                City = x.city,
+                Zip_Code = x.zip_code,
+                Province = x.province,
+                Contact = x.contact,
+                Reference = x.reference,
+                Created_at = x.created_at,
+                Updated_at = x.updated_at
+            }).ToList().OrderBy(_ => _.ID);
+
+            var Response = new
+            {
+                Page = page,
+                PageSize = 10,
+                TotalItems = totalItem,
+                TotalPages = totalPages,
+                Suppliers = Elements
+            };
+
+            return Ok(Response);
         }
 
         [HttpGet("{id}")]

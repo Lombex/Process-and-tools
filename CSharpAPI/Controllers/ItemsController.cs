@@ -16,10 +16,45 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllItems()
+        public async Task<IActionResult> GetAllItems([FromQuery] int page)
         {
             var _items = await _itemsService.GetAllItems();
-            return Ok(_items);
+
+            int totalItem = _items.Count;
+            int totalPages = (int)Math.Ceiling(totalItem / (double)10);
+            if (page > totalPages) return BadRequest("Page number exceeds total pages");
+
+            var Elements = _items.Skip((page * 10)).Take(10).Select(x => new
+            {
+                Uid = x.uid,
+                Code = x.code,
+                Description = x.description,
+                Short_description = x.short_description,
+                Upc_code = x.upc_code,
+                Model_number = x.model_number,
+                Commodity_code = x.commodity_code,
+                Item_line = x.item_line,
+                Item_group = x.item_group,
+                Item_type = x.item_type,
+                Unit_purchase_quantity = x.unit_purchase_quantity,
+                Unit_order_quantity = x.unit_order_quantity,
+                Pack_order_quantity = x.pack_order_quantity,
+                Supplier_id = x.supplier_id,
+                Supplier_code = x.supplier_code,
+                Supplier_part_number = x.supplier_part_number,
+                Created_at = x.created_at,
+                Updated_at = x.updated_at
+            }).ToList().OrderBy(_ => _.Uid);
+
+            var Response = new
+            {
+                Page = page,
+                PageSize = 10,
+                TotalItems = totalItem,
+                TotalPages = totalPages,
+                Items = Elements
+            };
+            return Ok(Response);
         }
 
         [HttpGet("{uid}")]

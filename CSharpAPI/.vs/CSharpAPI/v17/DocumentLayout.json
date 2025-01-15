@@ -3,26 +3,6 @@
   "WorkspaceRootPath": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\database\\sqlitedatabase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:database\\sqlitedatabase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\services\\suppliersservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:services\\suppliersservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\services\\clientservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:services\\clientservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\models\\warehouse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:models\\warehouse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\models\\clients.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:models\\clients.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|c:\\users\\zdenn\\desktop\\software-construction\\csharpapi\\models\\suppliers.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{74849649-EEE9-4C3D-94C8-947652CEDE6C}|CSharpAPI.csproj|solutionrelative:models\\suppliers.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
@@ -34,73 +14,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 4,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "SQLiteDatabase.cs",
-              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Database\\SQLiteDatabase.cs",
-              "RelativeDocumentMoniker": "Database\\SQLiteDatabase.cs",
-              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Database\\SQLiteDatabase.cs",
-              "RelativeToolTip": "Database\\SQLiteDatabase.cs",
-              "ViewState": "AQIAABUAAAAAAAAAAAA4wCUAAABJAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-08T09:16:49.38Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "SuppliersService.cs",
-              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Services\\SuppliersService.cs",
-              "RelativeDocumentMoniker": "Services\\SuppliersService.cs",
-              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Services\\SuppliersService.cs",
-              "RelativeToolTip": "Services\\SuppliersService.cs",
-              "ViewState": "AQIAACAAAAAAAAAAAAAUwD4AAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-08T09:03:39.826Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "ClientService.cs",
-              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Services\\ClientService.cs",
-              "RelativeDocumentMoniker": "Services\\ClientService.cs",
-              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Services\\ClientService.cs",
-              "RelativeToolTip": "Services\\ClientService.cs",
-              "ViewState": "AQIAACgAAAAAAAAAAAAcwEIAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-08T09:02:06.802Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "Suppliers.cs",
-              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Models\\Suppliers.cs",
-              "RelativeDocumentMoniker": "Models\\Suppliers.cs",
-              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Models\\Suppliers.cs",
-              "RelativeToolTip": "Models\\Suppliers.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABEAAAABAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-08T09:01:30.786Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Clients.cs",
-              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Models\\Clients.cs",
-              "RelativeDocumentMoniker": "Models\\Clients.cs",
-              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Models\\Clients.cs",
-              "RelativeToolTip": "Models\\Clients.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAXAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-08T08:59:48.378Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
@@ -119,15 +34,15 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Warehouse.cs",
-              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Models\\Warehouse.cs",
-              "RelativeDocumentMoniker": "Models\\Warehouse.cs",
-              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Models\\Warehouse.cs",
-              "RelativeToolTip": "Models\\Warehouse.cs",
-              "ViewState": "AQIAAAwAAAAAAAAAAIA/wBYAAAARAAAA",
+              "DocumentIndex": 0,
+              "Title": "Suppliers.cs",
+              "DocumentMoniker": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Models\\Suppliers.cs",
+              "RelativeDocumentMoniker": "Models\\Suppliers.cs",
+              "ToolTip": "C:\\Users\\zdenn\\Desktop\\Software-Construction\\CSharpAPI\\Models\\Suppliers.cs",
+              "RelativeToolTip": "Models\\Suppliers.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAAtAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-08T08:59:58.739Z",
+              "WhenOpened": "2025-01-15T10:53:14.39Z",
               "EditorCaption": ""
             }
           ]
