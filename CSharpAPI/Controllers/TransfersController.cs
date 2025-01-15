@@ -4,11 +4,11 @@ using CSharpAPI.Models.Auth;
 using CSharpAPI.Services.Auth;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CSharpAPI.Controller 
+namespace CSharpAPI.Controller
 {
     [ApiController]
     [Route("api/v1/transfers")]
-    public class TransferController : ControllerBase 
+    public class TransferController : ControllerBase
     {
         private readonly ITransfersService _transferSerivces;
         private readonly IAuthService _authService;
@@ -26,17 +26,43 @@ namespace CSharpAPI.Controller
         }
 
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllTransfers() 
+        public async Task<IActionResult> GetAllTransfers([FromQuery] int page)
         {
             if (!await CheckAccess("GET"))
                 return Forbid();
 
             var transfers = await _transferSerivces.GetAllTransfers();
-            return Ok(transfers);
+
+            int totalItem = transfers.Count;
+            int totalPages = (int)Math.Ceiling(totalItem / (double)10);
+            if (page > totalPages) return BadRequest("Page number exceeds total pages");
+
+            var Elements = transfers.Skip((page - 1) * 10).Take(10).Select(x => new
+            {
+                ID = x.id,
+                Reference = x.reference,
+                Transfer_from = x.transfer_from,
+                Transfer_to = x.transfer_to,
+                Transfer_Status = x.transfer_status,
+                Created_at = x.created_at,
+                Updated_at = x.updated_at,
+                Items = x.items
+            }).ToList();
+
+            var Response = new
+            {
+                Page = page,
+                PageSize = 10,
+                TotalItems = totalItem,
+                TotalPages = totalPages,
+                Transfers = Elements
+            };
+
+            return Ok(Response);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetTransferById(int id) 
+        public async Task<IActionResult> GetTransferById(int id)
         {
             if (!await CheckAccess("GET"))
                 return Forbid();
@@ -47,7 +73,7 @@ namespace CSharpAPI.Controller
         }
 
         [HttpGet("{id}/items")]
-        public async Task<IActionResult> GetItemFromTransferId(int id) 
+        public async Task<IActionResult> GetItemFromTransferId(int id)
         {
             if (!await CheckAccess("GET"))
                 return Forbid();
@@ -58,7 +84,7 @@ namespace CSharpAPI.Controller
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTransfer(int id, [FromBody] TransferModel transfer) 
+        public async Task<IActionResult> UpdateTransfer(int id, [FromBody] TransferModel transfer)
         {
             if (!await CheckAccess("PUT"))
                 return Forbid();
@@ -69,18 +95,18 @@ namespace CSharpAPI.Controller
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTransfer([FromBody] TransferModel transfer) 
+        public async Task<IActionResult> CreateTransfer([FromBody] TransferModel transfer)
         {
             if (!await CheckAccess("POST"))
                 return Forbid();
 
             if (transfer == null) return BadRequest("Request is empty!");
             await _transferSerivces.CreateTransfer(transfer);
-            return CreatedAtAction(nameof(GetTransferById), new { id = transfer.id}, transfer);
+            return CreatedAtAction(nameof(GetTransferById), new { id = transfer.id }, transfer);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeteteTransfer(int id) 
+        public async Task<IActionResult> DeteteTransfer(int id)
         {
             if (!await CheckAccess("DELETE"))
                 return Forbid();
@@ -88,14 +114,14 @@ namespace CSharpAPI.Controller
             await _transferSerivces.DeleteTransfer(id);
             return Ok("Transfer has been deleted.");
         }
-        
+
         [HttpPost("{id}/commit")]
         public async Task<IActionResult> CommitTransfer(int id)
         {
             try
             {
                 await _transferSerivces.CommitTransfer(id);
-                return Ok($"Transfer {id} has been Completed and processed.");
+                return Ok($"Transfer {id} has been completed and processed.");
             }
             catch (Exception ex)
             {
