@@ -88,5 +88,19 @@ namespace CSharpAPI.Controller
             await _transferSerivces.DeleteTransfer(id);
             return Ok("Transfer has been deleted.");
         }
+        
+        [HttpPost("{id}/commit")]
+        public async Task<IActionResult> CommitTransfer(int id)
+        {
+            try
+            {
+                await _transferSerivces.CommitTransfer(id);
+                return Ok($"Transfer {id} has been Completed and processed.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error processing transfer {id}: {ex.Message}");
+            }
+        }
     }
 }

@@ -50,10 +50,48 @@ namespace CSharpAPI.Service {
             await _Db.SaveChangesAsync();
         }
 
-        // Has to be implemented 
-        public async Task CommitTransfer()
+        // Commit a transfer
+        public async Task CommitTransfer(int id)
         {
-            throw new NotImplementedException();
+            var transfer = await _Db.Transfer
+                                    .Where(x => x.id == id && x.transfer_status == "Pending")
+                                    .FirstOrDefaultAsync();
+
+            if (transfer == null) throw new Exception("No pending transfer found with the given ID!");
+
+            foreach (var item in transfer.items)
+            {
+                var inventories = await _Db.Inventors
+                                            .Where(y => y.item_id == item.item_id)
+                                            .ToListAsync();
+
+                foreach (var inventory in inventories)
+                {
+                    if (inventory.locations.Contains((int)transfer.transfer_from))
+                    {
+                        // verminder de aantalen op de locatie
+                        inventory.total_on_hand -= item.amount;
+                        inventory.total_expected = inventory.total_on_hand + inventory.total_ordered;
+                        inventory.total_available = inventory.total_on_hand - inventory.total_allocated;
+
+                        _Db.Inventors.Update(inventory);
+                    }
+                    else if (inventory.locations.Contains((int)transfer.transfer_to))
+                    {
+                        //optellen van de aantallen op de locatie
+                        inventory.total_on_hand += item.amount;
+                        inventory.total_expected = inventory.total_on_hand + inventory.total_ordered;
+                        inventory.total_available = inventory.total_on_hand - inventory.total_allocated;
+
+                        _Db.Inventors.Update(inventory);
+                    }
+                }
+            }
+            transfer.transfer_status = "Completed";
+            transfer.updated_at = DateTime.Now;
+
+            _Db.Transfer.Update(transfer);
+            await _Db.SaveChangesAsync();
         }
 
         public async Task DeleteTransfer(int id)
