@@ -506,9 +506,6 @@ namespace CSharpAPI.Migrations
                     b.Property<string>("name")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("phonenumber")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("province")
                         .HasColumnType("TEXT");
 
