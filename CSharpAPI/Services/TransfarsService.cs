@@ -108,8 +108,7 @@ namespace CSharpAPI.Service {
         Task<List<Items>> GetItemFromTransferId(int id);
         Task CreateTransfer(TransferModel transfer);
         Task UpdateTransfer(int id, TransferModel updateTransfer);
-
-        // commit => CommitTransfer(); 
+        Task CommitTransfer(int id);
         Task DeleteTransfer(int id);
     }
 }
