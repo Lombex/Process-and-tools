@@ -26,6 +26,9 @@ namespace CSharpAPI.Data
         public DbSet<ApiUser> ApiUsers { get; set; }
         public DbSet<History> History { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
+        public DbSet<ArchivedOrderModel> ArchivedOrders { get; set; }
+        public DbSet<ArchivedShipmentModel> ArchivedShipments { get; set; }
+        public DbSet<ArchivedItemModel> ArchivedItems { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
