@@ -26,13 +26,50 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] int page)
         {
             if (!await CheckAccess("GET"))
                 return Forbid();
 
             var shipments = await _service.GetAll();
-            return Ok(shipments);
+
+            int totalItem = shipments.Count;
+            int totalPages = (int)Math.Ceiling(totalItem / (double)10);
+            if (page > totalPages) return BadRequest("Page number exceeds total pages");
+
+            var Elements = shipments.Skip((page - 1) * 10).Take(10).Select(x => new
+            {
+                ID = x.id,
+                Order_id = x.order_id,
+                Source_id = x.source_id,
+                Order_date = x.order_date,
+                Request_date = x.request_date,
+                Shipment_date = x.shipment_date,
+                Shipment_type = x.shipment_type,
+                Shipment_Status = x.shipment_status,
+                Notes = x.notes,
+                Carrier_code = x.carrier_code,
+                Carrier_description = x.carrier_description,
+                Service_code = x.service_code,
+                Payment_type = x.payment_type,
+                Transfer_mode = x.transfer_mode,
+                Total_package_count = x.total_package_count,
+                Total_package_weight = x.total_package_weight,
+                Created_at = x.created_at,
+                Updated_at = x.updated_at,
+                Items = x.items
+            }).OrderBy(_ => _.ID).ToList();
+
+            var Response = new
+            {
+                Page = page,
+                PageSize = 10,
+                TotalItems = totalItem,
+                TotalPages = totalPages,
+                Shipments = Elements
+            };
+
+            return Ok(Response);
         }
 
         [HttpGet("{id}")]
@@ -43,7 +80,7 @@ namespace CSharpAPI.Controllers
 
             var shipment = await _service.GetById(id);
             if (shipment == null) return NotFound($"Shipment with id {id} not found.");
-            return Ok(shipment);    
+            return Ok(shipment);
         }
 
         [HttpGet("{id}/items")]
