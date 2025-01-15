@@ -26,7 +26,7 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<IActionResult> GetAll([FromQuery] int page)
+        public async Task<IActionResult> GetAll([FromQuery] int page = 1)
         {
             if (!await CheckAccess("GET"))
                 return Forbid();
@@ -35,7 +35,7 @@ namespace CSharpAPI.Controllers
 
             int totalItem = shipments.Count;
             int totalPages = (int)Math.Ceiling(totalItem / (double)10);
-            if (page > totalPages) return BadRequest("Page number exceeds total pages");
+            if (page < 1 || page > totalPages) return BadRequest("Page number exceeds total pages");
 
             var Elements = shipments.Skip((page - 1) * 10).Take(10).Select(x => new
             {
