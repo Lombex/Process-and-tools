@@ -6,10 +6,12 @@ API_KEY: admin_key_2024
 ### Get Supplier By ID
 GET http://localhost:5001/api/v1/suppliers/1
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Get Item from supplier
 GET http://localhost:5001/api/v1/suppliers/1/items
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Create a supplier
 POST http://localhost:5001/api/v1/suppliers
@@ -36,6 +38,7 @@ API_KEY: admin_key_2024
 ### Update a supplier
 PUT http://localhost:5001/api/v1/suppliers/1
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 {
     "code": "SUP0001",
@@ -54,3 +57,4 @@ Content-Type: application/json
 ### Delete supplier
 DELETE http://localhost:5001/api/v1/suppliers/1
 Content-Type: application/json
+API_KEY: admin_key_2024

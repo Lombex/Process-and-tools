@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using CSharpAPI.Models;
 using CSharpAPI.Service;
+using CSharpAPI.Models.Auth;
+using CSharpAPI.Services.Auth;
 
 namespace CSharpAPI.Controllers
 {
@@ -9,15 +11,26 @@ namespace CSharpAPI.Controllers
     public class InventoriesController : ControllerBase
     {
         private readonly IInventoriesService _inventoriesService;
+        private readonly IAuthService _authService;
 
-        public InventoriesController(IInventoriesService inventoriesService)
+        public InventoriesController(IInventoriesService inventoriesService, IAuthService authService)
         {
             _inventoriesService = inventoriesService;
+            _authService = authService;
+        }
+
+        private async Task<bool> CheckAccess(string method)
+        {
+            var user = HttpContext.Items["User"] as ApiUser;
+            return await _authService.HasAccess(user, "inventories", method);
         }
 
         [HttpGet("all")]
         public async Task<IActionResult> GetAllInventories([FromQuery] int page)
         {
+            if (!await CheckAccess("GET"))
+                return Forbid();
+
             var inventories = await _inventoriesService.GetAllInventories();
 
             int totalItem = inventories.Count;
@@ -55,6 +68,9 @@ namespace CSharpAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<InventorieModel>> GetInventoryById(int id)
         {
+            if (!await CheckAccess("GET"))
+                return Forbid();
+
             try
             {
                 var inventory = await _inventoriesService.GetInventoryById(id);
@@ -69,6 +85,9 @@ namespace CSharpAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<InventorieModel>> CreateInventory([FromBody] InventorieModel inventory)
         {
+            if (!await CheckAccess("POST"))
+                return Forbid();
+
             if (inventory == null)
             {
                 return BadRequest("Inventory data is null.");
@@ -81,6 +100,9 @@ namespace CSharpAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateInventory(int id, [FromBody] InventorieModel inventory)
         {
+            if (!await CheckAccess("PUT"))
+                return Forbid();
+
             if (inventory == null)
             {
                 return BadRequest("Invalid inventory data.");
@@ -96,6 +118,9 @@ namespace CSharpAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteInventory(int id)
         {
+            if (!await CheckAccess("DELETE"))
+                return Forbid();
+
             var result = await _inventoriesService.DeleteInventory(id);
             if (result)
                 return NoContent();
@@ -106,6 +131,9 @@ namespace CSharpAPI.Controllers
         [HttpGet("item/{itemId}")]
         public async Task<ActionResult<IEnumerable<InventorieModel>>> GetInventoriesByItemId(string itemId)
         {
+            if (!await CheckAccess("GET"))
+                return Forbid();
+
             var inventories = await _inventoriesService.GetInventoriesByItemId(itemId);
             return Ok(inventories);
         }
@@ -113,6 +141,9 @@ namespace CSharpAPI.Controllers
         [HttpGet("location/{locationId}")]
         public async Task<ActionResult<IEnumerable<InventorieModel>>> GetInventoriesByLocation(int locationId)
         {
+            if (!await CheckAccess("GET"))
+                return Forbid();
+
             var inventories = await _inventoriesService.GetInventoriesByLocation(locationId);
             return Ok(inventories);
         }

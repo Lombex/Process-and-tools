@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CSharpAPI.Migrations
 {
     [DbContext(typeof(SQLiteDatabase))]
-    [Migration("20250115132241_DataMigration")]
+    [Migration("20250115194309_DataMigration")]
     partial class DataMigration
     {
         /// <inheritdoc />
