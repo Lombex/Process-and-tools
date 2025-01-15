@@ -6,14 +6,17 @@ API_KEY: admin_key_2024
 ### Get Location by Id
 GET http://localhost:5001/api/v1/locations/34534
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Get warehouse from location
 GET http://localhost:5001/api/v1/locations/warehouse/1
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Create new Location
 POST http://localhost:5001/api/v1/locations
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 {
   "warehouse_id": 1,
@@ -24,6 +27,7 @@ Content-Type: application/json
 ### Update Location
 PUT http://localhost:5001/api/v1/locations/34534
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 {
   "warehouse_id": 1,
@@ -34,3 +38,4 @@ Content-Type: application/json
 ### Delete location
 DELETE http://localhost:5001/api/v1/locations/34534
 Content-Type: application/json
+API_KEY: admin_key_2024
