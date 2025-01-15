@@ -1,9 +1,15 @@
-name: CI Workflow
+name: CI/CD Workflow for CSharpAPI
 
 on:
   push:
     branches: [ "CI/CD_C#2.0", "master" ]
   pull_request:
+    branches: [ "CI/CD_C#2.0", "master" ]
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  PROJECT_PATH: './CSharpAPI/CSharpAPI.csproj'
+  TEST_PROJECT_PATH: './Integrationtest/Integrationtest.csproj'
 
 jobs:
   build:
@@ -11,23 +17,29 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensures full git history for versioning
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore dependencies
-        run: dotnet restore ./CSharpAPI/CSharpAPI.csproj
+        run: dotnet restore ${{ env.PROJECT_PATH }}
 
       - name: Build solution
-        run: dotnet build ./CSharpAPI/CSharpAPI.csproj --configuration Release --no-restore
+        run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
+
+      - name: Create publish output
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ./publish
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build
-          path: ./CSharpAPI/bin/Release
+          name: build-artifacts
+          path: ./publish
+          retention-days: 5
 
   test:
     needs: build
@@ -39,19 +51,13 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build
-          path: ./CSharpAPI/bin/Release
+          name: build-artifacts
+          path: ./publish
 
-      # - name: Set up .NET
-      #   uses: actions/setup-dotnet@v3
-      #   with:
-      #     dotnet-version: '8.0.x'
-
-      - name: Run integration tests with coverage
-        run: |
-          dotnet test ./Integrationtest/Integrationtest.csproj \
-            --collect:"XPlat Code Coverage" \
-            --settings ./coverage.runsettings
+      - name: Run unit and integration tests
+        run: dotnet test ${{ env.TEST_PROJECT_PATH }} \
+          --collect:"XPlat Code Coverage" \
+          --settings ./coverage.runsettings
 
       - name: Install ReportGenerator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
@@ -67,11 +73,77 @@ jobs:
 
       - name: Add Coverage Summary to GitHub Actions
         run: |
-          echo "## Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## Code Coverage Summary" >> $GITHUB_STEP_SUMMARY
           cat coverage-report/Summary.md >> $GITHUB_STEP_SUMMARY
 
-      - name: Upload HTML Coverage Report
+      - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-html-report
+          name: coverage-report
           path: coverage-report
+          retention-days: 5
+
+  security-scan:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Dependency Vulnerability Scan
+        run: dotnet list package --vulnerable
+
+      - name: Run Security Scan with Snyk
+        uses: snyk/actions/dotnet@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
+
+  deployment:
+    needs: [test, security-scan]
+    runs-on: self-hosted
+    environment: production
+    if: github.ref == 'refs/heads/master'  # Only deploy from master
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: ./publish
+
+      - name: Deploy to Production Server
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+        run: |
+          echo "Starting deployment to production server..."
+          
+          # Securely copy files
+          scp -i $SSH_KEY -o StrictHostKeyChecking=no -r ./publish/* $SSH_USER@$SERVER_IP:/path/to/deployment/directory/
+          
+          # Restart application service
+          ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$SERVER_IP << EOF
+            sudo systemctl stop my-application.service
+            sudo rm -rf /path/to/deployment/directory/*
+            sudo cp -r /tmp/publish/* /path/to/deployment/directory/
+            sudo systemctl start my-application.service
+          EOF
+
+  notification:
+    needs: [deployment]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Notify Slack on Workflow Status
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
