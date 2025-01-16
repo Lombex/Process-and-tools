@@ -145,5 +145,16 @@ namespace CSharpAPI.Controllers
             if (_supplierId == null) return NotFound("Supplier not found!");
             return Ok(_supplierId);
         }
+
+        [HttpGet("type/{typeId}")]
+        public async Task<IActionResult> GetItemsByTypeId(int typeId)
+        {
+            if (!await CheckAccess("GET"))
+                return Forbid();
+
+            var _itemtype = await _itemsService.GetItemsByTypeId(typeId);
+            if (_itemtype == null) return NotFound("Itemtype not found!");
+            return Ok(_itemtype);
+        }
     }
 }

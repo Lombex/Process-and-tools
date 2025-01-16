@@ -15,6 +15,7 @@ namespace CSharpAPI.Service
         Task<IEnumerable<ItemModel>> GetItemsByLineId(int lineId);
         Task<IEnumerable<ItemModel>> GetItemsByGroupId(int groupId);
         Task<IEnumerable<ItemModel>> GetItemsBySupplierId(int supplierId);
+        Task<IEnumerable<ItemModel>> GetItemsByTypeId(int item_type);
     }
 
     public class ItemsService : IItemsService
@@ -86,6 +87,12 @@ namespace CSharpAPI.Service
         {
             var _items = await GetAllItems();
             return _items.Where(x => x.supplier_id == supplierId);
+        }
+
+                public async Task<IEnumerable<ItemModel>> GetItemsByTypeId(int item_type)
+        {
+            var _items = await GetAllItems();
+            return _items.Where(x => x.item_type == item_type);
         }
     }
 }
