@@ -65,9 +65,21 @@ namespace CSharpAPI.Service
         public async Task CreateOrder(OrderModel orders)
         {
             if (orders == null) throw new ArgumentNullException(nameof(orders));
+
+            var shipToExists = await _Db.ClientModels.AnyAsync(client => client.id == orders.ship_to);
+            if (!shipToExists) throw new Exception($"Shipping address with Client ID {orders.ship_to} does not exist.");
+
+            var billToExists = await _Db.ClientModels.AnyAsync(client => client.id == orders.bill_to);
+            if (!billToExists) throw new Exception($"Billing address with Client ID {orders.bill_to} does not exist.");
+
+            orders.created_at = DateTime.UtcNow;
+            orders.updated_at = DateTime.UtcNow;
+
             await _Db.Order.AddAsync(orders);
             await _Db.SaveChangesAsync();
         }
+
+
         public async Task DeleteOrder(int id)
         {
             var _order = await GetOrderById(id);
