@@ -15,7 +15,8 @@ Content-Type: application/json
 ### Create new Warehouse
 POST http://localhost:5001/api/v1/warehouses
 Content-Type: application/json
-API_KEY: admin_key_2024
+API_KEY: admin_key_2024 
+
 {
   "code": "WH001",
   "name": "Updated Main Warehouse",

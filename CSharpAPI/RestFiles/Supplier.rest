@@ -27,8 +27,11 @@ API_KEY: admin_key_2024
     "zip_code": "91688",
     "province": "Illinois",
     "country": "Czech Republic",
-    "contact_name": "Toni Barnett",
-    "phonenumber": "363.541.7282x36825",
+    "contact": {
+        "name": "Toni Barnett",
+        "phone": "363.541.7282x36825",
+        "email": "lee@hotmail.com"
+    },
     "reference": "LPaJ-SUP0001"
 }
 

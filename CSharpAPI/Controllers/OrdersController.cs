@@ -26,13 +26,51 @@ namespace CShartpAPI.Controller
         }
 
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllOrders()
+        public async Task<IActionResult> GetAllOrders([FromQuery] int page)
         {
             if (!await CheckAccess("GET"))
                 return Forbid();
 
             var orders = await _orderService.GetAllOrders();
-            return Ok(orders);
+            int totalItem = orders.Count;
+            int totalPages = (int)Math.Ceiling(totalItem / (double)10);
+            if (page > totalPages) return BadRequest("Page number exceeds total pages");
+
+            var Elements = orders.Skip((page * 10)).Take(10).Select(x => new
+            {
+                ID = x.id,
+                Source_id = x.source_id,
+                Order_date = x.order_date,
+                Request_date = x.request_date,
+                Reference = x.reference,
+                Reference_extra = x.reference_extra,
+                Order_status = x.order_status,
+                Notes = x.notes,
+                Shipping_notes = x.shipping_notes,
+                Picking_notes = x.picking_notes,
+                Warehouse_id = x.warehouse_id,
+                Ship_to = x.ship_to,
+                Bill_to = x.bill_to,
+                Shipment_id = x.shipment_id,
+                Total_amount = x.total_amount,
+                Total_discount = x.total_discount,
+                Total_tax = x.total_tax,
+                Total_Surcharge = x.total_surcharge,
+                Created_at = x.created_at,
+                Updated_at = x.updated_at,
+                Items = x.items
+            }).ToList().OrderBy(_ => _.ID);
+
+            var Response = new
+            {
+                Page = page,
+                PageSize = 10,
+                TotalItems = totalItem,
+                TotalPages = totalPages,
+                Order = Elements
+            };
+
+            return Ok(Response);
         }
 
         [HttpGet("{id}")]

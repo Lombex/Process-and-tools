@@ -54,3 +54,9 @@ CSharpAPI/obj/
 *.cache
 *.editorconfig
 project.assets.json
+CSharpAPI/.vs/CSharpAPI/FileContentIndex
+CSharpAPI/.vs
+CSharpAPI/Database/Data.db-shm
+CSharpAPI/Database/Data.db-wal
+CSharpAPI/bin
+CSharpAPI/obj

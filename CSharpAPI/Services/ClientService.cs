@@ -58,13 +58,11 @@ namespace CSharpAPI.Services
 
             existingClient.name = client.name;
             existingClient.address = client.address;
-            existingClient.contact_email = client.contact_email;
-            existingClient.contact_phone = client.contact_phone;
+            existingClient.contact = client.contact;
             existingClient.city = client.city;
             existingClient.zip_code = client.zip_code;
             existingClient.province = client.province;
             existingClient.country = client.country;
-            existingClient.contact_name = client.contact_name;
             existingClient.updated_at = DateTime.Now;
 
             _Db.ClientModels.Update(existingClient);

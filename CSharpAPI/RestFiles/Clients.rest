@@ -26,9 +26,12 @@ API_KEY: SEjDY2hB63IuwzdVNy/nzcMJaoX5kVTsxbQ5VkT0zzE=
   "zip_code": "28301",
   "province": "Colorado",
   "country": "United States",
-  "contact_name": "Bryan Clark",
-  "contact_phone": "242.732.3483x2573",
-  "contact_email": "robertcharles@example.net"
+  "contact": {
+    "name": "Bryan Clark",
+    "phone": "242.732.3483x2573",
+    "email": "robertcharles@example.net"
+  }
+  
 }
 
 ### Update client (Admin)

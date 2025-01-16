@@ -6,7 +6,7 @@ namespace CSharpAPI.Service
 {
     public interface IItemLineService
     {
-        Task<IEnumerable<ItemLineModel>> GetAllItemLines();
+        Task<List<ItemLineModel>> GetAllItemLines();
         Task<ItemLineModel> GetItemLineById(int id);
         Task CreateItemLine(ItemLineModel itemLine);
         Task<bool> UpdateItemLine(int id, ItemLineModel itemLine);
@@ -23,7 +23,7 @@ namespace CSharpAPI.Service
             _Db = context;
         }
 
-        public async Task<IEnumerable<ItemLineModel>> GetAllItemLines()
+        public async Task<List<ItemLineModel>> GetAllItemLines()
         {
             return await _Db.ItemLine.ToListAsync();
         }

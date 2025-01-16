@@ -26,14 +26,44 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<ActionResult<IEnumerable<InventorieModel>>> GetAllInventories()
+        public async Task<IActionResult> GetAllInventories([FromQuery] int page)
         {
             if (!await CheckAccess("GET"))
                 return Forbid();
 
             var inventories = await _inventoriesService.GetAllInventories();
-            return Ok(inventories);
+
+            int totalItem = inventories.Count;
+            int totalPages = (int)Math.Ceiling(totalItem / (double)10);
+            if (page > totalPages) return BadRequest("Page number exceeds total pages");
+
+            var Elements = inventories.Skip((page * 10)).Take(10).Select(x => new
+            {
+                ID = x.id,
+                Item_id = x.item_id,
+                Description = x.description,
+                Item_reference = x.item_reference,
+                Locations = x.locations,
+                Total_on_hand = x.total_on_hand,
+                Total_expected = x.total_expected,
+                Total_ordered = x.total_ordered,
+                Total_allocated = x.total_allocated,
+                Total_available = x.total_available,
+                Created_at = x.created_at,
+                Updated_at = x.updated_at
+            }).ToList().OrderBy(_ => _.ID);
+
+            var Response = new
+            {
+                Page = page,
+                PageSize = 10,
+                TotalItems = totalItem,
+                TotalPages = totalPages,
+                Inventories = Elements
+            };
+            return Ok(Response);
         }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<InventorieModel>> GetInventoryById(int id)

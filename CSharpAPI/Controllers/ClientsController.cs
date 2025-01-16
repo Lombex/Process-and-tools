@@ -27,13 +27,39 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<ActionResult<IEnumerable<ClientModel>>> GetAllClients()
+        public async Task<IActionResult> GetAllClients([FromQuery] int page)
         {
-            if (!await CheckAccess("GET"))
-                return Forbid();
+            if (!await CheckAccess("GET")) return Forbid();
 
             var clients = await _clientsService.GetAllClients();
-            return Ok(clients);
+
+            int totalItem = clients.Count;
+            int totalPages = (int)Math.Ceiling(totalItem / (double)10);
+            if (page > totalPages) return BadRequest("Page number exceeds total pages");
+
+            var Elements = clients.Skip((page * 10)).Take(10).Select(x => new
+            {
+                ID = x.id,
+                Name = x.name,
+                Address = x.address,
+                City = x.city,
+                Zip_code = x.zip_code,
+                Province = x.province,
+                Country = x.country,
+                Contact = x.contact,
+                Created_at = x.created_at,
+                Updated_at = x.updated_at
+            }).ToList().OrderBy(_ => _.ID);
+
+            var Response = new
+            {
+                Page = page,
+                PageSize = 10,
+                TotalItems = totalItem,
+                TotalPages = totalPages,
+                Client = Elements
+            };
+            return Ok(Response);
         }
 
         [HttpGet("{id}")]

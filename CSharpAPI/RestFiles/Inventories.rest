@@ -10,6 +10,7 @@ Content-Type: application/json
 ### Create new Inventorie
 POST http://localhost:5001/api/v1/inventories
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 {
   "item_id": "ITEM001",
