@@ -40,6 +40,10 @@ namespace CSharpAPI.Service
             var amount = await GetAllItems();
             item.uid = $"P{(amount.Count + 1).ToString("D6")}";
 
+            if (item.item_line > 0 && !(await _Db.ItemLine.AnyAsync(x => x.id == item.item_line))) throw new Exception("item_line does not exist!");
+            if (item.item_group > 0 && !(await _Db.ItemGroups.AnyAsync(x => x.id == item.item_group))) throw new Exception("item_group does not exist!");
+            if (item.item_type > 0 && !(await _Db.ItemType.AnyAsync(x => x.id == item.item_type))) throw new Exception("item_type does not exist!");
+
             await _Db.itemModels.AddAsync(item);
             await _Db.SaveChangesAsync();
         }
