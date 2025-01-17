@@ -53,68 +53,41 @@ namespace CSharpAPI.Service {
         // Commit a transfer
         public async Task CommitTransfer(int id)
         {
-            // Begin a database transaction
-            using var transaction = await _Db.Database.BeginTransactionAsync();
-            try
+            var transfer = await _Db.Transfer
+                                    .Where(x => x.id == id && x.transfer_status == "Pending")
+                                    .FirstOrDefaultAsync();
+            if (transfer == null) throw new Exception("No pending transfer found with the given ID!");
+            foreach (var item in transfer.items)
             {
-                // Find the pending transfer
-                var transfer = await _Db.Transfer
-                                        .Include(t => t.items) // Ensure items are loaded
-                                        .FirstOrDefaultAsync(x => x.id == id && x.transfer_status == "Pending");
+                var inventories = await _Db.Inventors
+                                            .Where(y => y.item_id == item.item_id)
+                                            .ToListAsync();
 
-                if (transfer == null)
-                    throw new Exception("No pending transfer found with the given ID!");
-
-                foreach (var item in transfer.items)
+                foreach (var inventory in inventories)
                 {
-                    // Get source inventory for the item
-                    var sourceInventory = await _Db.Inventors
-                                                .FirstOrDefaultAsync(inv => inv.item_id == item.item_id && inv.locations.Contains(transfer.transfer_from.Value));
-
-                    if (sourceInventory == null)
-                        throw new Exception($"Source inventory not found for item {item.item_id} at location {transfer.transfer_from}.");
-
-                    if (sourceInventory.total_on_hand < item.amount)
-                        throw new Exception($"Insufficient inventory for item {item.item_id} at location {transfer.transfer_from}.");
-
-                    // Deduct items from the source location
-                    sourceInventory.total_on_hand -= item.amount;
-                    sourceInventory.total_expected = sourceInventory.total_on_hand + sourceInventory.total_ordered;
-                    sourceInventory.total_available = sourceInventory.total_on_hand - sourceInventory.total_allocated;
-
-                    _Db.Inventors.Update(sourceInventory);
-
-                    // Get destination inventory for the item
-                    var destinationInventory = await _Db.Inventors
-                                                        .FirstOrDefaultAsync(inv => inv.item_id == item.item_id && inv.locations.Contains(transfer.transfer_to));
-
-                    if (destinationInventory == null)
-                        throw new Exception($"Destination inventory not found for item {item.item_id} at location {transfer.transfer_to}.");
-
-                    // Add items to the destination location
-                    destinationInventory.total_on_hand += item.amount;
-                    destinationInventory.total_expected = destinationInventory.total_on_hand + destinationInventory.total_ordered;
-                    destinationInventory.total_available = destinationInventory.total_on_hand - destinationInventory.total_allocated;
-
-                    _Db.Inventors.Update(destinationInventory);
+                    if (inventory.locations.Contains((int)transfer.transfer_from))
+                    {
+                        // verminder de aantalen op de locatie
+                        inventory.total_on_hand -= item.amount;
+                        inventory.total_expected = inventory.total_on_hand + inventory.total_ordered;
+                        inventory.total_available = inventory.total_on_hand - inventory.total_allocated;
+                        _Db.Inventors.Update(inventory);
+                    }
+                    else if (inventory.locations.Contains((int)transfer.transfer_to))
+                    {
+                        //optellen van de aantallen op de locatie
+                        inventory.total_on_hand += item.amount;
+                        inventory.total_expected = inventory.total_on_hand + inventory.total_ordered;
+                        inventory.total_available = inventory.total_on_hand - inventory.total_allocated;
+                        _Db.Inventors.Update(inventory);
+                    }
                 }
-
-                // Mark the transfer as completed
-                transfer.transfer_status = "Completed";
-                transfer.updated_at = DateTime.Now;
-
-                _Db.Transfer.Update(transfer);
-
-                // Save changes and commit the transaction
-                await _Db.SaveChangesAsync();
-                await transaction.CommitAsync();
             }
-            catch (Exception)
-            {
-                // Rollback the transaction in case of any error
-                await transaction.RollbackAsync();
-                throw;
-            }
+            transfer.transfer_status = "Completed";
+            transfer.updated_at = DateTime.Now;
+
+            _Db.Transfer.Update(transfer);
+            await _Db.SaveChangesAsync();
         }
 
 

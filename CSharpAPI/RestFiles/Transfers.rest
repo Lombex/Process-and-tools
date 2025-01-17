@@ -50,7 +50,7 @@ API_KEY: admin_key_2024
   ]
 }
 ### commit transfer
-POST http://localhost:5001/api/v1/transfers/2/commit
+POST http://localhost:5001/api/v1/transfers/1/commit
 Content-Type: application/json
 API_KEY: admin_key_2024
 
