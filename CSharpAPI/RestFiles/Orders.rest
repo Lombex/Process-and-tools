@@ -29,7 +29,7 @@ API_KEY: admin_key_2024
   "shipping_notes": "Buurman betalen plaats bewolkt.",
   "picking_notes": "Ademen fijn volgorde scherp aardappel op leren.",
   "warehouse_id": 18,
-  "ship_to": 3,
+  "ship_to": 1,
   "bill_to": 1,
   "shipment_id": 1,
   "total_amount": 9905.13,
@@ -59,5 +59,15 @@ API_KEY: admin_key_2024
 
 ### Delete order
 DELETE http://localhost:5001/api/v1/orders/1
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### Alle shipments van een order ophalen
+GET http://localhost:5001/api/v1/orders/2/shipments
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### Shipment toevoegen aan order
+POST http://localhost:5001/api/v1/orders/2/shipments/5
 Content-Type: application/json
 API_KEY: admin_key_2024

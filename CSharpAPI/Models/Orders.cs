@@ -15,7 +15,6 @@ namespace CSharpAPI.Models
         public int warehouse_id { get; set; }
         public int ship_to { get; set; }
         public int bill_to { get; set; }
-        public int shipment_id { get; set; }
         public float total_amount { get; set; }
         public float total_discount { get; set; }
         public float total_tax { get; set; }

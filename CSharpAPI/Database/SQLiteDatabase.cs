@@ -10,6 +10,7 @@ namespace CSharpAPI.Data
     {
         public SQLiteDatabase(DbContextOptions<SQLiteDatabase> options) : base(options) { }
         public DbSet<WarehouseModel> Warehouse { get; set; }
+        public DbSet<OrderShipmentMapping> OrderShipments { get; set; }
         public DbSet<TransferModel> Transfer { get; set; }
         public DbSet<SupplierModel> Suppliers { get; set; }
         public DbSet<ShipmentModel> Shipment { get; set; }
@@ -37,8 +38,24 @@ namespace CSharpAPI.Data
             modelBuilder.Entity<ClientModel>().OwnsOne(c => c.contact);
             modelBuilder.Entity<SupplierModel>().OwnsOne(c => c.contact);
 
-            #pragma warning disable 
+            #pragma warning disable
+            modelBuilder.Entity<ShipmentModel>().Property(x => x.items)
+                .HasConversion(new ValueConverter<List<Items>, string>(
+                    i => JsonConvert.SerializeObject(i),
+                    i => JsonConvert.DeserializeObject<List<Items>>(i)));
 
+            modelBuilder.Entity<OrderModel>().Property(x => x.items)
+                .HasConversion(new ValueConverter<List<Items>, string>(
+                    i => JsonConvert.SerializeObject(i),
+                    i => JsonConvert.DeserializeObject<List<Items>>(i)));
+
+
+
+            modelBuilder.Entity<OrderShipmentMapping>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            });
             modelBuilder.Entity<TransferModel>().Property(x => x.items).HasConversion(new ValueConverter<List<Items>, string>(
                 i => JsonConvert.SerializeObject(i), i => JsonConvert.DeserializeObject<List<Items>>(i)));
 

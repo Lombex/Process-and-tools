@@ -37,7 +37,6 @@ namespace CSharpAPI.Controllers
             var Elements = shipments.Skip((page * 10)).Take(10).Select(x => new
             {
                 ID = x.id,
-                Order_id = x.order_id,
                 Source_id = x.source_id,
                 Order_date = x.order_date,
                 Request_date = x.request_date,
@@ -91,16 +90,6 @@ namespace CSharpAPI.Controllers
             return Ok(items);
         }
 
-        [HttpGet("{id}/orders")]
-        public async Task<IActionResult> GetOrderByShipmentId(int id)
-        {
-            if (!await CheckAccess("GET"))
-                return Forbid();
-
-            var order = await _service.GetOrderByshipmentId(id);
-            return Ok(order);
-        }
-
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ShipmentModel shipment)
         {
@@ -142,6 +131,57 @@ namespace CSharpAPI.Controllers
 
             await _service.Delete(id);
             return Ok("Shipment has been deleted!");
+        }
+
+        [HttpGet("{id}/orders")]
+        public async Task<IActionResult> GetShipmentOrders(int id)
+        {
+            if (!await CheckAccess("GET"))
+                return Forbid();
+
+            try
+            {
+                var orders = await _service.GetOrdersByShipmentId(id);
+                return Ok(orders);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("{shipmentId}/orders/{orderId}")]
+        public async Task<IActionResult> AddOrderToShipment(int shipmentId, int orderId)
+        {
+            if (!await CheckAccess("POST"))
+                return Forbid();
+
+            try
+            {
+                await _service.AddOrderToShipment(shipmentId, orderId);
+                return Ok("Order added to shipment successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{shipmentId}/orders/{orderId}")]
+        public async Task<IActionResult> RemoveOrderFromShipment(int shipmentId, int orderId)
+        {
+            if (!await CheckAccess("DELETE"))
+                return Forbid();
+
+            try
+            {
+                await _service.RemoveOrderFromShipment(shipmentId, orderId);
+                return Ok("Order removed from shipment successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
