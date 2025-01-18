@@ -51,7 +51,7 @@ jobs:
           path: ./publish
           retention-days: 5
 
-    test:
+  test:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -83,10 +83,10 @@ jobs:
             --collect:"XPlat Code Coverage" \
             --results-directory:"./TestResults" \
             --logger "trx;LogFileName=test-results.trx" \
-            /p:CollectCoverage=true \
-            /p:CoverletOutputFormat=cobertura \
-            /p:CoverletOutput=./TestResults/Coverage/ \
-            '/p:Exclude=[*]*Models.*,[*]*Migrations.*,[*]*Data.*'
+            '/p:CollectCoverage=true' \
+            '/p:CoverletOutputFormat=cobertura' \
+            '/p:CoverletOutput=./TestResults/Coverage/' \
+            '/p:ExcludeByFile="**/Models/*.cs;**/Migrations/*.cs;**/Data/*.cs"'
 
       - name: Install ReportGenerator
         run: dotnet tool install -g dotnet-reportgenerator-globaltool
@@ -97,7 +97,29 @@ jobs:
             -reports:"./TestResults/Coverage/coverage.cobertura.xml" \
             -targetdir:"coveragereport" \
             -reporttypes:"Html;MarkdownSummary" \
-            -classfilters:"+*Controller*;+*Service*;-*Model*;-*Migration*;-*Program*;-*Startup*;-*Data*"
+            -classfilters:"+*Controller*;+*Service*;-*Models.*-*Migrations.*-*Data.*"
+
+      - name: Check Coverage Threshold
+        run: |
+          COVERAGE=$(grep -oP '(?<=Line coverage:)[^%]*' coveragereport/Summary.md)
+          if (( $(echo "$COVERAGE < ${{ env.MINIMUM_CODE_COVERAGE }}" | bc -l) )); then
+            echo "Code coverage is below minimum threshold of ${{ env.MINIMUM_CODE_COVERAGE }}%"
+            exit 1
+          fi
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults
+          retention-days: 5
+
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coveragereport
+          retention-days: 5
 
   security-scan:
     needs: test
