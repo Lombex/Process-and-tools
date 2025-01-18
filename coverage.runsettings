@@ -1,20 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <RunSettings>
   <DataCollectionRunSettings>
     <DataCollectors>
-      <DataCollector friendlyName="Code Coverage">
+      <DataCollector friendlyName="XPlat Code Coverage">
         <Configuration>
-          <!-- Alleen controllers en services -->
+          <!-- Output format configuration -->
+          <Format>cobertura,opencover</Format>
+          <UseSourceLink>true</UseSourceLink>
+          <SingleHit>false</SingleHit>
+          <IncludeTestAssembly>false</IncludeTestAssembly>
+          
+          <!-- Include patterns for controllers and services -->
           <Include>
-            <ClassName>.*Controller.*</ClassName>
-            <ClassName>.*Service.*</ClassName>
+            <ModulePath>.*\.dll$</ModulePath>
+            <ClassName>.*\.Controllers\..*</ClassName>
+            <ClassName>.*\.Service\..*</ClassName>
+            <ClassName>.*\.Services\..*</ClassName>
+            <ClassName>.*Controller$</ClassName>
+            <ClassName>.*Service$</ClassName>
           </Include>
-          <!-- Sluit models en migrations uit -->
+
+          <!-- Exclude patterns -->
           <Exclude>
-            <ClassName>.*Model.*</ClassName>
-            <ClassName>.*Migration.*</ClassName>
+            <ClassName>.*\.Models\..*</ClassName>
+            <ClassName>.*Model$</ClassName>
+            <ClassName>.*\.Migrations\..*</ClassName>
+            <ClassName>.*Migration$</ClassName>
+            <ClassName>.*\.Program$</ClassName>
+            <ClassName>.*\.Startup$</ClassName>
+            <ClassName>.*\.Tests\..*</ClassName>
           </Exclude>
+
+          <!-- Exclude attributes -->
+          <ExcludeByAttribute>
+            GeneratedCodeAttribute,
+            CompilerGeneratedAttribute,
+            ExcludeFromCodeCoverageAttribute,
+            ObsoleteAttribute
+          </ExcludeByAttribute>
+
+          <!-- Exclude file patterns -->
+          <ExcludeByFile>
+            **/Migrations/*.cs,
+            **/Models/*.cs,
+            **/obj/**/*.cs,
+            **/bin/**/*.cs
+          </ExcludeByFile>
         </Configuration>
       </DataCollector>
     </DataCollectors>
   </DataCollectionRunSettings>
+
+  <!-- Test run configuration -->
+  <RunConfiguration>
+    <MaxCpuCount>1</MaxCpuCount>
+    <ResultsDirectory>./TestResults</ResultsDirectory>
+    <TargetPlatform>x64</TargetPlatform>
+    <TargetFrameworkVersion>net8.0</TargetFrameworkVersion>
+    <CollectSourceInformation>true</CollectSourceInformation>
+  </RunConfiguration>
+
+  <!-- MSTest configuration -->
+  <MSTest>
+    <MapInconclusiveToFailed>false</MapInconclusiveToFailed>
+    <CaptureTraceOutput>true</CaptureTraceOutput>
+    <DeleteDeploymentDirectoryAfterTestRunIsComplete>true</DeleteDeploymentDirectoryAfterTestRunIsComplete>
+    <DeploymentEnabled>false</DeploymentEnabled>
+  </MSTest>
 </RunSettings>
