@@ -10,27 +10,20 @@ env:
   DOTNET_VERSION: '8.0.x'
   PROJECT_PATH: './CSharpAPI/CSharpAPI.csproj'
   TEST_PROJECT_PATH: './Integrationtest/Integrationtest.csproj'
-  MINIMUM_CODE_COVERAGE: 80
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Ensures full git history for versioning
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Cache NuGet packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: ${{ runner.os }}-nuget-
 
       - name: Restore dependencies
         run: dotnet restore ${{ env.PROJECT_PATH }}
@@ -40,11 +33,6 @@ jobs:
 
       - name: Create publish output
         run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ./publish
-
-      - name: Generate API Documentation
-        run: |
-          dotnet tool install -g Swashbuckle.AspNetCore.Cli
-          swagger tofile --output ./publish/swagger.json ./publish/CSharpAPI.dll v1
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -57,110 +45,105 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v3
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          name: build-artifacts
+          path: ./publish
 
-      - name: Run Tests with Coverage
+      - name: Run unit and integration tests
+        run: dotnet test ${{ env.TEST_PROJECT_PATH }} \
+          --collect:"XPlat Code Coverage" \
+          --settings ./coverage.runsettings
+
+      - name: Install ReportGenerator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+
+      - name: Generate Detailed Coverage Report
         run: |
-          dotnet test ${{ env.TEST_PROJECT_PATH }} \
-            --collect:"XPlat Code Coverage" \
-            --settings ./coverage.runsettings \
-            --logger "trx;LogFileName=test-results.trx"
+          reportgenerator \
+            -reports:"**/coverage.cobertura.xml" \
+            -targetdir:"coverage-report" \
+            -reporttypes:"HtmlInline_AzurePipelines;MarkdownSummary" \
+            -classfilters:"+*Controller*;+*Service*;-*Model*;-*Migration*" \
+            -historydir:"coverage-history"
 
-      - name: Check Code Coverage Threshold
+      - name: Add Coverage Summary to GitHub Actions
         run: |
-          coverage_percentage=$(grep -oP '(?<=Line coverage:)[^%]*' coverage/coverage.info)
-          if (( $(echo "$coverage_percentage < $MINIMUM_CODE_COVERAGE" | bc -l) )); then
-            echo "Code coverage is below minimum threshold of $MINIMUM_CODE_COVERAGE%"
-            exit 1
-          fi
+          echo "## Code Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          cat coverage-report/Summary.md >> $GITHUB_STEP_SUMMARY
 
-      - name: Upload test results
+      - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
-          path: TestResults
+          name: coverage-report
+          path: coverage-report
           retention-days: 5
 
-  security:
+  security-scan:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Run SAST Scan
-        uses: github/codeql-action/analyze@v2
+      - name: Run Dependency Vulnerability Scan
+        run: dotnet list package --vulnerable
+
+      - name: Run Security Scan with Snyk
+        uses: snyk/actions/dotnet@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          languages: csharp
+          command: test
 
-      - name: Run Dependency Check
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          project: 'CSharpAPI'
-          format: 'HTML'
-          out: 'reports'
-
-      - name: Run Container Scan
-        uses: azure/container-scan@v0
-        with:
-          image-name: your-registry/csharp-api:${{ github.sha }}
-
-  docker:
-    needs: [test, security]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: ${{ github.ref == 'refs/heads/main' }}
-          tags: your-registry/csharp-api:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  deploy-staging:
-    needs: docker
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop'
-    environment: staging
-    steps:
-      - name: Deploy to Staging
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'staging-api'
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          images: your-registry/csharp-api:${{ github.sha }}
-
-  deploy-production:
-    needs: [deploy-staging]
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+  deployment:
+    needs: [test, security-scan]
+    runs-on: self-hosted
     environment: production
+    if: github.ref == 'refs/heads/master'  # Only deploy from master
     steps:
-      - name: Deploy to Production
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'production-api'
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          images: your-registry/csharp-api:${{ github.sha }}
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-  notify:
-    needs: [deploy-staging, deploy-production]
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: ./publish
+
+      - name: Deploy to Production Server
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+        run: |
+          echo "Starting deployment to production server..."
+          
+          # Securely copy files
+          scp -i $SSH_KEY -o StrictHostKeyChecking=no -r ./publish/* $SSH_USER@$SERVER_IP:/path/to/deployment/directory/
+          
+          # Restart application service
+          ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$SERVER_IP << EOF
+            sudo systemctl stop my-application.service
+            sudo rm -rf /path/to/deployment/directory/*
+            sudo cp -r /tmp/publish/* /path/to/deployment/directory/
+            sudo systemctl start my-application.service
+          EOF
+
+  notification:
+    needs: [deployment]
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - name: Notify Teams
-        uses: aliencube/microsoft-teams-actions@v0.8.0
+      - name: Notify Slack on Workflow Status
+        uses: 8398a7/action-slack@v3
         with:
-          webhook_uri: ${{ secrets.TEAMS_WEBHOOK_URL }}
-          title: 'Deployment Status'
-          text: 'Deployment to ${{ github.ref }} completed with status: ${{ job.status }}'
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
