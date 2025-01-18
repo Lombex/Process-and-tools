@@ -9,7 +9,7 @@ on:
 env:
   DOTNET_VERSION: '8.0.x'
   PROJECT_PATH: './CSharpAPI/CSharpAPI.csproj'
-  TEST_PROJECT_PATH: './Integrationtest/Integrationtest.csproj'
+  TEST_PROJECT_PATH: './Integration.Tests/Integration.Tests.csproj'
   MINIMUM_CODE_COVERAGE: 80
 
 jobs:

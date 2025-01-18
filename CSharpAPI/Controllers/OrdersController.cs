@@ -3,7 +3,7 @@ using CSharpAPI.Service;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography.Xml;
 
-namespace CShartpAPI.Controller
+namespace CSharpAPI.Controller
 {
     [ApiController]
     [Route("api/v1/orders")]
