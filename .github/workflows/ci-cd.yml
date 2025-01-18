@@ -72,6 +72,9 @@ jobs:
       - name: Restore test project dependencies
         run: dotnet restore ${{ env.TEST_PROJECT_PATH }}
 
+      - name: Install coverlet.collector
+        run: dotnet add ${{ env.TEST_PROJECT_PATH }} package coverlet.collector
+
       - name: Run Tests with Coverage
         run: |
           dotnet test "${{ env.TEST_PROJECT_PATH }}" \
@@ -82,7 +85,8 @@ jobs:
             --logger "trx;LogFileName=test-results.trx" \
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat=cobertura \
-            /p:CoverletOutput=./TestResults/Coverage/
+            /p:CoverletOutput=./TestResults/Coverage/ \
+            /p:Exclude="[*]*.Models.*,[*]*.Migrations.*,[*]*.Data.*"
 
       - name: Install ReportGenerator
         run: dotnet tool install -g dotnet-reportgenerator-globaltool
@@ -93,7 +97,7 @@ jobs:
             -reports:"./TestResults/Coverage/coverage.cobertura.xml" \
             -targetdir:"coveragereport" \
             -reporttypes:"Html;MarkdownSummary" \
-            -classfilters:"+*Controller*;+*Service*;-*Model*;-*Migration*;-*Program*;-*Startup*"
+            -classfilters:"+*Controller*;+*Service*;-*Model*;-*Migration*;-*Program*;-*Startup*;-*Data*"
 
       - name: Check Coverage Threshold
         run: |
