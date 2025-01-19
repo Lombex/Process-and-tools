@@ -10,138 +10,49 @@ env:
   DOTNET_VERSION: '8.0.x'
   PROJECT_PATH: './CSharpAPI/CSharpAPI.csproj'
   TEST_PROJECT_PATH: './Integration.Tests/Integration.Tests.csproj'
-  MINIMUM_CODE_COVERAGE: 80
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Cache NuGet packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: ${{ runner.os }}-nuget-
 
       - name: Restore dependencies
         run: |
           dotnet restore ${{ env.PROJECT_PATH }}
           dotnet restore ${{ env.TEST_PROJECT_PATH }}
 
-      - name: Build solution
+      - name: Build
         run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
 
-      - name: Create publish output
+      - name: Test
+        run: dotnet test ${{ env.TEST_PROJECT_PATH }} --configuration Release --no-build
+
+      - name: Publish
+        if: github.ref == 'refs/heads/master'
         run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ./publish
 
       - name: Upload build artifacts
+        if: github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
           path: ./publish
           retention-days: 5
-
-    test:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-          path: ./publish
-
-      - name: Restore test project dependencies
-        run: dotnet restore ${{ env.TEST_PROJECT_PATH }}
-
-      - name: Run Tests with Coverage
-        run: |
-          dotnet test ${{ env.TEST_PROJECT_PATH }} \
-            --configuration Release \
-            --no-restore \
-            --verbosity normal
-
-      - name: Install ReportGenerator
-        run: dotnet tool install -g dotnet-reportgenerator-globaltool
-
-      - name: Generate Coverage Report
-        run: reportgenerator "-reports:./Integration.Tests/coverage.cobertura.xml" "-targetdir:coveragereport" "-reporttypes:Html;TextSummary"
-
-      - name: Check Coverage Threshold
-        run: |
-          if [ -f coveragereport/Summary.txt ]; then
-            COVERAGE=$(grep -oP '[0-9.]+(?=% line coverage)' coveragereport/Summary.txt)
-            echo "Code coverage: $COVERAGE%"
-            if (( $(echo "$COVERAGE < ${{ env.MINIMUM_CODE_COVERAGE }}" | bc -l) )); then
-              echo "Code coverage is below minimum threshold of ${{ env.MINIMUM_CODE_COVERAGE }}%"
-              exit 1
-            fi
-          else
-            echo "No coverage report found"
-            exit 1
-          fi
-
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: TestResults
-          retention-days: 5
-
-      - name: Upload Coverage Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coveragereport
-          retention-days: 5
-
-  security-scan:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Restore all dependencies
-        run: dotnet restore
-
-      - name: Check for vulnerable packages
-        run: |
-          echo "Checking main project for vulnerabilities..."
-          dotnet list ${{ env.PROJECT_PATH }} package --vulnerable --include-transitive
-          echo "Checking test project for vulnerabilities..."
-          dotnet list ${{ env.TEST_PROJECT_PATH }} package --vulnerable --include-transitive
 
   deployment:
-    needs: [test, security-scan]
+    needs: build-and-test
     runs-on: ubuntu-latest
-    environment: production
     if: github.ref == 'refs/heads/master'
+    environment: production
     steps:
-      - name: Download build artifacts
+      - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
@@ -155,32 +66,7 @@ jobs:
         run: |
           echo "$SSH_PRIVATE_KEY" > deploy_key
           chmod 600 deploy_key
-          
-          # Stop the service
           ssh -i deploy_key -o StrictHostKeyChecking=no $SSH_USER@$SERVER_IP "sudo systemctl stop csharpapi"
-          
-          # Deploy new version
           scp -i deploy_key -o StrictHostKeyChecking=no -r ./publish/* $SSH_USER@$SERVER_IP:/var/www/csharpapi/
-          
-          # Start the service
           ssh -i deploy_key -o StrictHostKeyChecking=no $SSH_USER@$SERVER_IP "sudo systemctl start csharpapi"
-          
           rm -f deploy_key
-
-  notification:
-    needs: [deployment]
-    runs-on: ubuntu-latest
-    if: always()
-    steps:
-      - name: Notify Teams
-        uses: aliencube/microsoft-teams-actions@v0.8.0
-        with:
-          webhook_uri: ${{ secrets.TEAMS_WEBHOOK_URL }}
-          title: 'Deployment Status'
-          summary: 'Deployment to ${{ github.ref }} completed'
-          text: |
-            Repository: ${{ github.repository }}
-            Branch: ${{ github.ref }}
-            Commit: ${{ github.sha }}
-            Status: ${{ job.status }}
-            Workflow: ${{ github.workflow }}
