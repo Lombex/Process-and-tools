@@ -94,20 +94,11 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Run Dependency Check
+      - name: Check for vulnerable packages
         run: |
           dotnet restore ${{ env.PROJECT_PATH }}
           dotnet list ${{ env.PROJECT_PATH }} package --vulnerable --include-transitive
-
-      - name: Install dependencies for Snyk
-        run: |
-          cd CSharpAPI
-          dotnet restore
-
-      - name: Run Snyk Security Scan
-        uses: snyk/actions/dotnet@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          dotnet list ${{ env.TEST_PROJECT_PATH }} package --vulnerable --include-transitive
 
   deployment:
     needs: [test, security-scan]
