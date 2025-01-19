@@ -72,14 +72,45 @@ jobs:
       - name: Restore test project dependencies
         run: dotnet restore ${{ env.TEST_PROJECT_PATH }}
 
-      - name: Run Tests
-        run: dotnet test ${{ env.TEST_PROJECT_PATH }} --configuration Release --no-restore
+      - name: Run Tests with Coverage
+        run: dotnet test ${{ env.TEST_PROJECT_PATH }} --configuration Release --no-restore --verbosity normal
+
+      - name: Install ReportGenerator
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
+
+      - name: Generate Coverage Report
+        run: |
+          reportgenerator \
+          -reports:"./Integration.Tests/coverage.cobertura.xml" \
+          -targetdir:"coveragereport" \
+          -reporttypes:Html;MarkdownSummary
+
+      - name: Check Coverage Threshold
+        run: |
+          if [ -f coveragereport/Summary.md ]; then
+            COVERAGE=$(grep -oP '(?<=Line coverage:)[^%]*' coveragereport/Summary.md)
+            echo "Code coverage: $COVERAGE%"
+            if (( $(echo "$COVERAGE < ${{ env.MINIMUM_CODE_COVERAGE }}" | bc -l) )); then
+              echo "Code coverage is below minimum threshold of ${{ env.MINIMUM_CODE_COVERAGE }}%"
+              exit 1
+            fi
+          else
+            echo "No coverage report found"
+            exit 1
+          fi
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: TestResults
+          retention-days: 5
+
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coveragereport
           retention-days: 5
 
   security-scan:
@@ -94,10 +125,14 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Restore all dependencies
+        run: dotnet restore
+
       - name: Check for vulnerable packages
         run: |
-          dotnet restore ${{ env.PROJECT_PATH }}
+          echo "Checking main project for vulnerabilities..."
           dotnet list ${{ env.PROJECT_PATH }} package --vulnerable --include-transitive
+          echo "Checking test project for vulnerabilities..."
           dotnet list ${{ env.TEST_PROJECT_PATH }} package --vulnerable --include-transitive
 
   deployment:
