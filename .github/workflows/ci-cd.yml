@@ -51,7 +51,7 @@ jobs:
           path: ./publish
           retention-days: 5
 
-  test:
+    test:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -73,22 +73,22 @@ jobs:
         run: dotnet restore ${{ env.TEST_PROJECT_PATH }}
 
       - name: Run Tests with Coverage
-        run: dotnet test ${{ env.TEST_PROJECT_PATH }} --configuration Release --no-restore --verbosity normal
+        run: |
+          dotnet test ${{ env.TEST_PROJECT_PATH }} \
+            --configuration Release \
+            --no-restore \
+            --verbosity normal
 
       - name: Install ReportGenerator
         run: dotnet tool install -g dotnet-reportgenerator-globaltool
 
       - name: Generate Coverage Report
-        run: |
-          reportgenerator \
-          -reports:"./Integration.Tests/coverage.cobertura.xml" \
-          -targetdir:"coveragereport" \
-          -reporttypes:Html;MarkdownSummary
+        run: reportgenerator "-reports:./Integration.Tests/coverage.cobertura.xml" "-targetdir:coveragereport" "-reporttypes:Html;TextSummary"
 
       - name: Check Coverage Threshold
         run: |
-          if [ -f coveragereport/Summary.md ]; then
-            COVERAGE=$(grep -oP '(?<=Line coverage:)[^%]*' coveragereport/Summary.md)
+          if [ -f coveragereport/Summary.txt ]; then
+            COVERAGE=$(grep -oP '[0-9.]+(?=% line coverage)' coveragereport/Summary.txt)
             echo "Code coverage: $COVERAGE%"
             if (( $(echo "$COVERAGE < ${{ env.MINIMUM_CODE_COVERAGE }}" | bc -l) )); then
               echo "Code coverage is below minimum threshold of ${{ env.MINIMUM_CODE_COVERAGE }}%"
