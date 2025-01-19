@@ -96,8 +96,8 @@ jobs:
 
       - name: Run Dependency Check
         run: |
-          dotnet restore
-          dotnet list package --vulnerable --include-transitive
+          dotnet restore ${{ env.PROJECT_PATH }}
+          dotnet list ${{ env.PROJECT_PATH }} package --vulnerable --include-transitive
 
       - name: Run Security Scan with Snyk
         uses: snyk/actions/dotnet@master
@@ -105,6 +105,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --severity-threshold=high
+          file: ${{ env.PROJECT_PATH }}
 
   deployment:
     needs: [test, security-scan]
