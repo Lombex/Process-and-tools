@@ -83,10 +83,10 @@ jobs:
             --collect:"XPlat Code Coverage" \
             --results-directory:"./TestResults" \
             --logger "trx;LogFileName=test-results.trx" \
-            '/p:CollectCoverage=true' \
-            '/p:CoverletOutputFormat=cobertura' \
-            '/p:CoverletOutput=./TestResults/Coverage/' \
-            '/p:ExcludeByFile="**/Models/*.cs;**/Migrations/*.cs;**/Data/*.cs"'
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=cobertura \
+            /p:CoverletOutput=./TestResults/Coverage/ \
+            /p:Exclude="[*]*.Models.*,[*]*.Migrations.*,[*]*.Data.*"
 
       - name: Install ReportGenerator
         run: dotnet tool install -g dotnet-reportgenerator-globaltool
@@ -97,7 +97,7 @@ jobs:
             -reports:"./TestResults/Coverage/coverage.cobertura.xml" \
             -targetdir:"coveragereport" \
             -reporttypes:"Html;MarkdownSummary" \
-            -classfilters:"+*Controller*;+*Service*;-*Models.*-*Migrations.*-*Data.*"
+            -classfilters:"+*Controller*;+*Service*;-*Model*;-*Migration*;-*Program*;-*Startup*;-*Data*"
 
       - name: Check Coverage Threshold
         run: |
