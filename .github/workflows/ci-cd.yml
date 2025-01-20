@@ -10,6 +10,7 @@ env:
   DOTNET_VERSION: '8.0.x'
   PROJECT_PATH: './CSharpAPI/CSharpAPI.csproj'
   TEST_PROJECT_PATH: './Integration.Tests/Integration.Tests.csproj'
+  MINIMUM_CODE_COVERAGE: 80
 
 jobs:
   build-and-test:
@@ -29,12 +30,44 @@ jobs:
           dotnet restore ${{ env.TEST_PROJECT_PATH }}
 
       - name: Build
-        run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
+        run: dotnet build --configuration Release --no-restore
 
-      - name: Test
-        run: dotnet test ${{ env.TEST_PROJECT_PATH }} --configuration Release --no-build
+      - name: Test with coverage
+        run: |
+          dotnet test ${{ env.TEST_PROJECT_PATH }} \
+            --configuration Release \
+            --no-restore \
+            --verbosity normal \
+            --collect:"XPlat Code Coverage" \
+            /p:CollectCoverage=true \
+            /p:CoverletOutput=./TestResults/Coverage/ \
+            /p:CoverletOutputFormat=cobertura
 
-      - name: Publish
+      - name: Install ReportGenerator
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
+
+      - name: Generate coverage report
+        run: |
+          reportgenerator \
+          "-reports:./Integration.Tests/TestResults/Coverage/coverage.cobertura.xml" \
+          "-targetdir:coveragereport" \
+          "-reporttypes:Html;TextSummary"
+
+      - name: Check coverage
+        run: |
+          if [ -f coveragereport/Summary.txt ]; then
+            COVERAGE=$(grep -oP '[0-9.]+(?=% line)' coveragereport/Summary.txt)
+            echo "Code coverage: $COVERAGE%"
+            if (( $(echo "$COVERAGE < ${{ env.MINIMUM_CODE_COVERAGE }}" | bc -l) )); then
+              echo "Code coverage is below minimum threshold of ${{ env.MINIMUM_CODE_COVERAGE }}%"
+              exit 1
+            fi
+          else
+            echo "No coverage report found"
+            exit 1
+          fi
+
+      - name: Create publish output
         if: github.ref == 'refs/heads/master'
         run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ./publish
 
@@ -48,8 +81,8 @@ jobs:
 
   deployment:
     needs: build-and-test
-    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
     environment: production
     steps:
       - name: Download artifacts
