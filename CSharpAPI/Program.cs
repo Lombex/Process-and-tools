@@ -35,6 +35,7 @@ builder.Services.AddScoped<IClientsService, ClientsService>();
 builder.Services.AddScoped<IItemTypeService, ItemTypeService>();
 builder.Services.AddScoped<IItemLineService, ItemLineService>();
 builder.Services.AddScoped<IItemGroupService, ItemGroupService>();
+builder.Services.AddScoped<IDockService, DockService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
 

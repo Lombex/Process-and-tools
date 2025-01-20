@@ -1,0 +1,45 @@
+### Get All Docks
+GET http://localhost:5001/api/v1/docks/all
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### Get Dock by ID
+GET http://localhost:5001/api/v1/docks/1
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### Get Docks by Warehouse ID
+GET http://localhost:5001/api/v1/docks/warehouse/1
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### Create a New Dock
+POST http://localhost:5001/api/v1/docks
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+  "warehouse_id": 1,
+  "code": "DOCK001",
+  "name": "Main Dock",
+  "created_at": "2025-01-20T12:00:00Z",
+  "updated_at": "2025-01-20T12:00:00Z"
+}
+
+### Update a Dock
+PUT http://localhost:5001/api/v1/docks/1
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+  "warehouse_id": 1,
+  "code": "DOCK002",
+  "name": "Updated Dock",
+  "created_at": "2025-01-19T12:00:00Z",
+  "updated_at": "2025-01-20T12:00:00Z"
+}
+
+### Delete a Dock
+DELETE http://localhost:5001/api/v1/docks/1
+Content-Type: application/json
+API_KEY: admin_key_2024
