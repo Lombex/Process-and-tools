@@ -66,8 +66,15 @@ jobs:
       - name: Check coverage
         run: |
           if [ -f coveragereport/Summary.txt ]; then
-            COVERAGE=$(grep -oP '[0-9.]+(?=% line)' coveragereport/Summary.txt || echo "0")
+            # Debug to ensure parsing works correctly
+            echo "Coverage Summary:"
+            cat coveragereport/Summary.txt
+
+            # Extract coverage using grep
+            COVERAGE=$(grep -oP '(?<=Line coverage: )[0-9.]+' coveragereport/Summary.txt || echo "0")
             echo "Code coverage: $COVERAGE%"
+            
+            # Compare coverage to threshold
             if (( $(echo "$COVERAGE < ${{ env.MINIMUM_CODE_COVERAGE }}" | bc -l) )); then
               echo "Code coverage is below minimum threshold of ${{ env.MINIMUM_CODE_COVERAGE }}%"
               exit 1
