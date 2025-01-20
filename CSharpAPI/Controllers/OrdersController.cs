@@ -4,9 +4,9 @@ using CSharpAPI.Models.Auth;
 using CSharpAPI.Services.Auth;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CShartpAPI.Controller
+namespace CSharpAPI.Controllers
 {
-    [ApiController]
+     [ApiController]
     [Route("api/v1/orders")]
     public class OrdersControllers : ControllerBase
     {
@@ -51,7 +51,7 @@ namespace CShartpAPI.Controller
                 Warehouse_id = x.warehouse_id,
                 Ship_to = x.ship_to,
                 Bill_to = x.bill_to,
-                Shipment_id = x.shipment_id,
+                // Shipment_id = x.shipment_id,
                 Total_amount = x.total_amount,
                 Total_discount = x.total_discount,
                 Total_tax = x.total_tax,
@@ -125,6 +125,57 @@ namespace CShartpAPI.Controller
 
             await _orderService.DeleteOrder(id);
             return Ok("Order has been deleted!");
+        }
+
+        [HttpPost("{orderId}/shipments/{shipmentId}")]
+        public async Task<IActionResult> AddShipmentToOrder(int orderId, int shipmentId)
+        {
+            if (!await CheckAccess("POST"))
+                return Forbid();
+
+            try
+            {
+                await _orderService.AddShipmentToOrder(orderId, shipmentId);
+                return Ok("Shipment added to order successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{orderId}/shipments/{shipmentId}")]
+        public async Task<IActionResult> RemoveShipmentFromOrder(int orderId, int shipmentId)
+        {
+            if (!await CheckAccess("DELETE"))
+                return Forbid();
+
+            try
+            {
+                await _orderService.RemoveShipmentFromOrder(orderId, shipmentId);
+                return Ok("Shipment removed from order successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("{orderId}/shipments")]
+        public async Task<IActionResult> GetOrderShipments(int orderId)
+        {
+            if (!await CheckAccess("GET"))
+                return Forbid();
+
+            try
+            {
+                var shipments = await _orderService.GetShipmentsByOrderId(orderId);
+                return Ok(shipments);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

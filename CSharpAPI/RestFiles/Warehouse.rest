@@ -4,13 +4,14 @@ Content-Type: application/json
 API_KEY: admin_key_2024
 
 ### Get Warehouse By ID
-GET http://localhost:5001/api/v1/warehouses/1
+GET http://localhost:5001/api/v1/warehouses/2
 Content-Type: application/json
 API_KEY: admin_key_2024
 
 ### Get Location from warehouse
 GET http://localhost:5001/api/v1/warehouses/1/location
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Create new Warehouse
 POST http://localhost:5001/api/v1/warehouses

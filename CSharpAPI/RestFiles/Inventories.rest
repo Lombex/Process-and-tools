@@ -6,6 +6,7 @@ API_KEY: admin_key_2024
 ### Get inventorie id
 GET http://localhost:5001/api/v1/inventories/0
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Create new Inventorie
 POST http://localhost:5001/api/v1/inventories
@@ -17,13 +18,13 @@ API_KEY: admin_key_2024
   "description": "Default Inventory",
   "item_reference": null,
   "locations": [
-    0,1,2,3
+    2
   ],
-  "total_on_hand": 0,
-  "total_expected": 0,
-  "total_ordered": 0,
-  "total_allocated": 0,
-  "total_available": 0
+  "total_on_hand": 100,
+  "total_expected": 100,
+  "total_ordered": 100,
+  "total_allocated": 100,
+  "total_available": 1000
 }
 
 ###  Update Inventorie

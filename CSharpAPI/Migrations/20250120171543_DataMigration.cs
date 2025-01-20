@@ -53,6 +53,23 @@ namespace CSharpAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DockModels",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    warehouse_id = table.Column<int>(type: "INTEGER", nullable: false),
+                    code = table.Column<string>(type: "TEXT", nullable: true),
+                    name = table.Column<string>(type: "TEXT", nullable: true),
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DockModels", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Inventors",
                 columns: table => new
                 {
@@ -199,7 +216,6 @@ namespace CSharpAPI.Migrations
                     warehouse_id = table.Column<int>(type: "INTEGER", nullable: false),
                     ship_to = table.Column<int>(type: "INTEGER", nullable: false),
                     bill_to = table.Column<int>(type: "INTEGER", nullable: false),
-                    shipment_id = table.Column<int>(type: "INTEGER", nullable: false),
                     total_amount = table.Column<float>(type: "REAL", nullable: false),
                     total_discount = table.Column<float>(type: "REAL", nullable: false),
                     total_tax = table.Column<float>(type: "REAL", nullable: false),
@@ -211,6 +227,21 @@ namespace CSharpAPI.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Order", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderShipments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    OrderId = table.Column<int>(type: "INTEGER", nullable: false),
+                    ShipmentId = table.Column<int>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderShipments", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -239,7 +270,6 @@ namespace CSharpAPI.Migrations
                 {
                     id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    order_id = table.Column<int>(type: "INTEGER", nullable: false),
                     source_id = table.Column<int>(type: "INTEGER", nullable: false),
                     order_date = table.Column<string>(type: "TEXT", nullable: true),
                     request_date = table.Column<string>(type: "TEXT", nullable: true),
@@ -297,7 +327,7 @@ namespace CSharpAPI.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     reference = table.Column<string>(type: "TEXT", nullable: true),
                     transfer_from = table.Column<int>(type: "INTEGER", nullable: true),
-                    transfer_to = table.Column<int>(type: "INTEGER", nullable: false),
+                    transfer_to = table.Column<int>(type: "INTEGER", nullable: true),
                     transfer_status = table.Column<string>(type: "TEXT", nullable: true),
                     created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
                     updated_at = table.Column<DateTime>(type: "TEXT", nullable: true),
@@ -355,6 +385,9 @@ namespace CSharpAPI.Migrations
                 name: "ClientModels");
 
             migrationBuilder.DropTable(
+                name: "DockModels");
+
+            migrationBuilder.DropTable(
                 name: "Inventors");
 
             migrationBuilder.DropTable(
@@ -377,6 +410,9 @@ namespace CSharpAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "Order");
+
+            migrationBuilder.DropTable(
+                name: "OrderShipments");
 
             migrationBuilder.DropTable(
                 name: "RolePermissions");

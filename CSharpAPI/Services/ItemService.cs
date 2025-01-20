@@ -15,6 +15,7 @@ namespace CSharpAPI.Service
         Task<IEnumerable<ItemModel>> GetItemsByLineId(int lineId);
         Task<IEnumerable<ItemModel>> GetItemsByGroupId(int groupId);
         Task<IEnumerable<ItemModel>> GetItemsBySupplierId(int supplierId);
+        Task<IEnumerable<ItemModel>> GetItemsByTypeId(int item_type);
     }
 
     public class ItemsService : IItemsService
@@ -38,6 +39,10 @@ namespace CSharpAPI.Service
 
             var amount = await GetAllItems();
             item.uid = $"P{(amount.Count + 1).ToString("D6")}";
+
+            if (item.item_line > 0 && !(await _Db.ItemLine.AnyAsync(x => x.id == item.item_line))) throw new Exception("item_line does not exist!");
+            if (item.item_group > 0 && !(await _Db.ItemGroups.AnyAsync(x => x.id == item.item_group))) throw new Exception("item_group does not exist!");
+            if (item.item_type > 0 && !(await _Db.ItemType.AnyAsync(x => x.id == item.item_type))) throw new Exception("item_type does not exist!");
 
             await _Db.itemModels.AddAsync(item);
             await _Db.SaveChangesAsync();
@@ -86,6 +91,12 @@ namespace CSharpAPI.Service
         {
             var _items = await GetAllItems();
             return _items.Where(x => x.supplier_id == supplierId);
+        }
+
+                public async Task<IEnumerable<ItemModel>> GetItemsByTypeId(int item_type)
+        {
+            var _items = await GetAllItems();
+            return _items.Where(x => x.item_type == item_type);
         }
     }
 }

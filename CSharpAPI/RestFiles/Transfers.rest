@@ -5,7 +5,7 @@ Content-Type: application/json
 API_KEY: admin_key_2024
 
 ### Get transfer by ID
-GET http://localhost:5001/api/v1/transfers/119240
+GET http://localhost:5001/api/v1/transfers/1
 Content-Type: application/json
 API_KEY: admin_key_2024
 
@@ -21,9 +21,9 @@ API_KEY: admin_key_2024
 
 {
   "reference": "Test",
-  "transfer_from": 1,
-  "transfer_to": 1,
-  "transfer_status": "Test Status",
+  "transfer_from": null,
+  "transfer_to": 100,
+  "transfer_status": "Pending",
   "items": [
     {
       "item_id": "Test1",
@@ -39,8 +39,8 @@ API_KEY: admin_key_2024
 {
   "id": 1,
   "reference": "Updated Test",
-  "transfer_from": 1,
-  "transfer_to": 1,
+  "transfer_from": ,
+  "transfer_to": 100,
   "transfer_status": "Test Status",
   "items": [
     {
@@ -49,4 +49,25 @@ API_KEY: admin_key_2024
     }
   ]
 }
+### commit transfer
+POST http://localhost:5001/api/v1/transfers/4/commit
+Content-Type: application/json
+API_KEY: admin_key_2024
 
+###
+### Delete transfer
+DELETE http://localhost:5001/api/v1/transfers/3
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+####
+### Get locationFROM from transfer
+GET http://localhost:5001/api/v1/transfers/3/from/3
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+####
+### Get locationTO from transfer 
+GET http://localhost:5001/api/v1/transfers/3/to/7
+Content-Type: application/json
+API_KEY: admin_key_2024

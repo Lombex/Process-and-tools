@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 
 namespace CSharpAPI.Service {
     public class TransferSerivce : ITransfersService {
+
         private readonly SQLiteDatabase _Db;
         public TransferSerivce(SQLiteDatabase sQLite) 
         {
@@ -56,9 +57,7 @@ namespace CSharpAPI.Service {
             var transfer = await _Db.Transfer
                                     .Where(x => x.id == id && x.transfer_status == "Pending")
                                     .FirstOrDefaultAsync();
-
             if (transfer == null) throw new Exception("No pending transfer found with the given ID!");
-
             foreach (var item in transfer.items)
             {
                 var inventories = await _Db.Inventors
@@ -73,7 +72,6 @@ namespace CSharpAPI.Service {
                         inventory.total_on_hand -= item.amount;
                         inventory.total_expected = inventory.total_on_hand + inventory.total_ordered;
                         inventory.total_available = inventory.total_on_hand - inventory.total_allocated;
-
                         _Db.Inventors.Update(inventory);
                     }
                     else if (inventory.locations.Contains((int)transfer.transfer_to))
@@ -82,7 +80,6 @@ namespace CSharpAPI.Service {
                         inventory.total_on_hand += item.amount;
                         inventory.total_expected = inventory.total_on_hand + inventory.total_ordered;
                         inventory.total_available = inventory.total_on_hand - inventory.total_allocated;
-
                         _Db.Inventors.Update(inventory);
                     }
                 }
@@ -94,12 +91,42 @@ namespace CSharpAPI.Service {
             await _Db.SaveChangesAsync();
         }
 
+
         public async Task DeleteTransfer(int id)
         {
             var _transfer = await GetTransferById(id);
             _Db.Transfer.Remove(_transfer);
             await _Db.SaveChangesAsync();
         }
+        public async Task TransferToLocation(int id, int locationId)
+        {
+            var transfer = await GetTransferById(id);
+            var location = await _Db.Location.FirstOrDefaultAsync(x => x.id == locationId);
+            if (location == null) throw new Exception("Location not found!");
+            transfer.transfer_to = locationId;
+            transfer.updated_at = DateTime.Now;
+            _Db.Transfer.Update(transfer);
+            await _Db.SaveChangesAsync();
+        }
+
+        public async Task TransferFromLocation(int id, int locationId)
+        {
+            var transfer = await GetTransferById(id);
+
+            // Handle dock-specific logic if transfer_from is null
+            if (transfer.transfer_from == null)
+            {
+                var dock = await _Db.DockModels.FirstOrDefaultAsync(d => d.id == locationId);
+                if (dock == null) throw new Exception("Dock not found!");
+            }
+            transfer.transfer_from = locationId;
+            transfer.updated_at = DateTime.Now;
+            _Db.Transfer.Update(transfer);
+            await _Db.SaveChangesAsync();
+        }
+
+
+        
     }
 
     public interface ITransfersService {
@@ -110,5 +137,7 @@ namespace CSharpAPI.Service {
         Task UpdateTransfer(int id, TransferModel updateTransfer);
         Task CommitTransfer(int id);
         Task DeleteTransfer(int id);
+        Task TransferToLocation(int id, int location);
+        Task TransferFromLocation(int id, int location);
     }
 }

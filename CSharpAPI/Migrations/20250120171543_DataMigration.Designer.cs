@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CSharpAPI.Migrations
 {
     [DbContext(typeof(SQLiteDatabase))]
-    [Migration("20250115194309_DataMigration")]
+    [Migration("20250120171543_DataMigration")]
     partial class DataMigration
     {
         /// <inheritdoc />
@@ -128,6 +128,32 @@ namespace CSharpAPI.Migrations
                     b.HasKey("id");
 
                     b.ToTable("ClientModels");
+                });
+
+            modelBuilder.Entity("CSharpAPI.Models.DockModel", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("code")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("created_at")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("name")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("updated_at")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("warehouse_id")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("id");
+
+                    b.ToTable("DockModels");
                 });
 
             modelBuilder.Entity("CSharpAPI.Models.InventorieModel", b =>
@@ -385,9 +411,6 @@ namespace CSharpAPI.Migrations
                     b.Property<int>("ship_to")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("shipment_id")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("shipping_notes")
                         .HasColumnType("TEXT");
 
@@ -417,6 +440,28 @@ namespace CSharpAPI.Migrations
                     b.ToTable("Order");
                 });
 
+            modelBuilder.Entity("CSharpAPI.Models.OrderShipmentMapping", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ShipmentId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrderShipments");
+                });
+
             modelBuilder.Entity("CSharpAPI.Models.ShipmentModel", b =>
                 {
                     b.Property<int>("id")
@@ -440,9 +485,6 @@ namespace CSharpAPI.Migrations
 
                     b.Property<string>("order_date")
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("order_id")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("payment_type")
                         .HasColumnType("TEXT");
@@ -547,7 +589,7 @@ namespace CSharpAPI.Migrations
                     b.Property<string>("transfer_status")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("transfer_to")
+                    b.Property<int?>("transfer_to")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("updated_at")

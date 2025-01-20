@@ -7,14 +7,18 @@ namespace CSharpAPI.Service
 {
     public interface IShipmentService
     {
-        Task<List<ShipmentModel>> GetAll();
-        Task<ShipmentModel> GetById(int id);
-        Task<List<Items>> GetItems(int id);
-        Task UpdateItems(int id, ShipmentModel model);
-        Task<OrderModel> GetOrderByshipmentId(int id);
-        Task Add(ShipmentModel shipment);
-        Task Update(int id, ShipmentModel shipment);
-        Task Delete(int id);
+    Task<List<ShipmentModel>> GetAll();
+    Task<ShipmentModel> GetById(int id);
+    Task<List<Items>> GetItems(int id);
+    Task UpdateItems(int id, ShipmentModel model);
+    Task Add(ShipmentModel shipment);
+    Task Update(int id, ShipmentModel shipment);
+    Task Delete(int id);
+
+    // Nieuwe methodes voor order management
+    Task<List<OrderModel>> GetOrdersByShipmentId(int shipmentId);
+    Task AddOrderToShipment(int shipmentId, int orderId);
+    Task RemoveOrderFromShipment(int shipmentId, int orderId);
     }
 
     public class ShipmentService : IShipmentService
@@ -50,13 +54,6 @@ namespace CSharpAPI.Service
             await _Db.SaveChangesAsync();
         } 
 
-        public async Task<OrderModel> GetOrderByshipmentId(int id)
-        {
-            var _order = await _Db.Order.FirstOrDefaultAsync(x => x.shipment_id == id);
-            if (_order == null) throw new Exception("Order not found!");
-            return _order;
-        }
-
         public async Task Add(ShipmentModel shipment)
         {
             if (shipment == null) throw new ArgumentNullException(nameof(shipment));
@@ -68,7 +65,6 @@ namespace CSharpAPI.Service
         {
             var _shipment = await GetById(id);
 
-            _shipment.order_id = shipment.order_id;
             _shipment.source_id = shipment.source_id;
             _shipment.order_date = shipment.order_date;
             _shipment.request_date = shipment.request_date;
@@ -96,5 +92,55 @@ namespace CSharpAPI.Service
             _Db.Shipment.Remove(_shipment);
             await _Db.SaveChangesAsync();
         }
+
+        public async Task<List<OrderModel>> GetOrdersByShipmentId(int shipmentId)
+        {
+            return await _Db.OrderShipments
+                .Where(m => m.ShipmentId == shipmentId)
+                .Join(_Db.Order,
+                    m => m.OrderId,
+                    o => o.id,
+                    (m, o) => o)
+                .ToListAsync();
+        }
+        public async Task AddOrderToShipment(int shipmentId, int orderId)
+        {
+            // Check if shipment exists
+            var shipment = await GetById(shipmentId);
+            
+            // Check if order exists
+            var order = await _Db.Order.FindAsync(orderId);
+            if (order == null)
+                throw new Exception("Order not found!");
+
+            // Check if mapping already exists
+            var existingMapping = await _Db.OrderShipments
+                .FirstOrDefaultAsync(m => m.ShipmentId == shipmentId && m.OrderId == orderId);
+            
+            if (existingMapping == null)
+            {
+                var mapping = new OrderShipmentMapping
+                {
+                    OrderId = orderId,
+                    ShipmentId = shipmentId,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                await _Db.OrderShipments.AddAsync(mapping);
+                await _Db.SaveChangesAsync();
+            }
+        }
+        public async Task RemoveOrderFromShipment(int shipmentId, int orderId)
+        {
+            var mapping = await _Db.OrderShipments
+                .FirstOrDefaultAsync(m => m.ShipmentId == shipmentId && m.OrderId == orderId);
+                
+            if (mapping != null)
+            {
+                _Db.OrderShipments.Remove(mapping);
+                await _Db.SaveChangesAsync();
+            }
+        }
+
     }
 }

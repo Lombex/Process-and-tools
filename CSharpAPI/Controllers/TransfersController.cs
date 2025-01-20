@@ -126,5 +126,37 @@ namespace CSharpAPI.Controller
                 return BadRequest($"Error processing transfer {id}: {ex.Message}");
             }
         }
+
+        [HttpGet("{id}/to/{location}")]
+        public async Task<IActionResult> TransferToLocation(int id, int location)
+        {
+            try
+            {
+                await _transferSerivces.TransferToLocation(id, location);
+                return Ok($"Transfer {id} has been processed to location {location}");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error processing transfer {id}: {ex.Message}");
+            }
+        }
+
+        [HttpGet("{id}/from/{location}")]
+
+        public async Task<IActionResult> TransferFromLocation(int id, int location)
+        {
+            try
+            {
+                await _transferSerivces.TransferFromLocation(id, location);
+                return Ok($"Transfer {id} has been processed from location {location}");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error processing transfer {id}: {ex.Message}");
+            }
+        }
+
+
+
     }
 }

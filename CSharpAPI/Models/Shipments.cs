@@ -1,8 +1,8 @@
-namespace CSharpAPI.Models {
-
-    public class ShipmentModel { 
+namespace CSharpAPI.Models
+{
+    public class ShipmentModel
+    { 
         public int id { get; set; }
-        public int order_id { get; set ;}
         public int source_id { get; set; }
         public string? order_date { get; set; }
         public string? request_date { get; set; }
@@ -19,6 +19,6 @@ namespace CSharpAPI.Models {
         public float total_package_weight { get; set; }
         public DateTime created_at { get; set; }
         public DateTime updated_at { get; set; }
-        public List<Items>? items { get; set; } = new List<Items>();
+        public List<Items>? items { get; set; }
     }
 }
