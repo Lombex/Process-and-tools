@@ -53,19 +53,19 @@ jobs:
           "-targetdir:coveragereport" \
           "-reporttypes:Html;TextSummary"
 
-          - name: Check coverage
-          run: |
-            if [ -f coveragereport/Summary.txt ]; then
-              COVERAGE=$(grep -oP '[0-9.]+(?=% line)' coveragereport/Summary.txt || echo "0")
-              echo "Code coverage: $COVERAGE%"
-              if (( $(echo "$COVERAGE < ${{ env.MINIMUM_CODE_COVERAGE }}" | bc -l) )); then
-                echo "Code coverage is below minimum threshold of ${{ env.MINIMUM_CODE_COVERAGE }}%"
-                exit 1
-              fi
-            else
-              echo "No coverage report found"
+      - name: Check coverage
+        run: |
+          if [ -f coveragereport/Summary.txt ]; then
+            COVERAGE=$(grep -oP '[0-9.]+(?=% line)' coveragereport/Summary.txt || echo "0")
+            echo "Code coverage: $COVERAGE%"
+            if (( $(echo "$COVERAGE < ${{ env.MINIMUM_CODE_COVERAGE }}" | bc -l) )); then
+              echo "Code coverage is below minimum threshold of ${{ env.MINIMUM_CODE_COVERAGE }}%"
               exit 1
             fi
+          else
+            echo "No coverage report found"
+            exit 1
+          fi
         
 
       - name: Create publish output
