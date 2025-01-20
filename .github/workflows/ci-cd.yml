@@ -1,10 +1,14 @@
-name: CI/CD Workflow for CSharpAPI
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "CI/CD_C#2.0", "master" ]
+    branches: 
+      - main
+      - develop
   pull_request:
-    branches: [ "CI/CD_C#2.0", "master" ]
+    branches: 
+      - main
+      - develop
 
 env:
   DOTNET_VERSION: '8.0.x'
@@ -15,10 +19,10 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up .NET
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
@@ -29,55 +33,73 @@ jobs:
           dotnet restore ${{ env.TEST_PROJECT_PATH }}
 
       - name: Build
-        run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
+        run: dotnet build ${{ env.PROJECT_PATH }} -c Release --no-restore
 
-      - name: Test with Coverage
+      - name: Run tests
+        run: dotnet test ${{ env.TEST_PROJECT_PATH }} -c Release --no-build
+
+      - name: Run code coverage
         run: |
           dotnet test ${{ env.TEST_PROJECT_PATH }} \
-            --configuration Release \
-            --no-build \
             /p:CollectCoverage=true \
-            /p:CoverletOutputFormat=cobertura
+            /p:CoverletOutputFormat=cobertura \
+            /p:CoverletOutput=./coverage/
 
-      - name: Upload coverage reports to Codecov
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        continue-on-error: true
 
-      - name: Publish
-        if: github.ref == 'refs/heads/master'
-        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ./publish
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Upload build artifacts
-        if: github.ref == 'refs/heads/master'
-        uses: actions/upload-artifact@v4
+      - name: Run CodeQL Analysis
+        uses: github/codeql-action/init@v3
         with:
-          name: build-artifacts
-          path: ./publish
-          retention-days: 5
+          languages: 'csharp'
+
+      - name: Build
+        run: dotnet build ${{ env.PROJECT_PATH }}
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
 
   deployment:
-    needs: build-and-test
+    needs: [build-and-test, code-quality]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-    environment: production
+    if: github.ref == 'refs/heads/main'
+    
     steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
-          name: build-artifacts
-          path: ./publish
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Publish
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ./publish
 
       - name: Deploy to Production
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /path/to/your/application
+            sudo systemctl stop your-application
+            rm -rf /path/to/your/application/*
+            scp -r ${{ github.workspace }}/publish/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/path/to/your/application/
+            sudo systemctl start your-application
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ./publish/*
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SERVER_IP: ${{ secrets.SERVER_IP }}
-        run: |
-          echo "$SSH_PRIVATE_KEY" > deploy_key
-          chmod 600 deploy_key
-          ssh -i deploy_key -o StrictHostKeyChecking=no $SSH_USER@$SERVER_IP "sudo systemctl stop csharpapi"
-          scp -i deploy_key -o StrictHostKeyChecking=no -r ./publish/* $SSH_USER@$SERVER_IP:/var/www/csharpapi/
-          ssh -i deploy_key -o StrictHostKeyChecking=no $SSH_USER@$SERVER_IP "sudo systemctl start csharpapi"
-          rm -f deploy_key
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
