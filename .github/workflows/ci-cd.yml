@@ -53,6 +53,16 @@ jobs:
           "-targetdir:coveragereport" \
           "-reporttypes:Html;TextSummary"
 
+      - name: Debug coverage report
+        run: |
+          if [ -f coveragereport/Summary.txt ]; then
+            echo "Coverage summary found:"
+            cat coveragereport/Summary.txt
+          else
+            echo "Summary.txt not found"
+            exit 1
+          fi
+
       - name: Check coverage
         run: |
           if [ -f coveragereport/Summary.txt ]; then
@@ -66,7 +76,6 @@ jobs:
             echo "No coverage report found"
             exit 1
           fi
-        
 
       - name: Create publish output
         if: github.ref == 'refs/heads/master'
