@@ -127,6 +127,32 @@ namespace CSharpAPI.Migrations
                     b.ToTable("ClientModels");
                 });
 
+            modelBuilder.Entity("CSharpAPI.Models.DockModel", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("code")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("created_at")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("name")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("updated_at")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("warehouse_id")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("id");
+
+                    b.ToTable("DockModels");
+                });
+
             modelBuilder.Entity("CSharpAPI.Models.InventorieModel", b =>
                 {
                     b.Property<int>("id")
@@ -560,7 +586,7 @@ namespace CSharpAPI.Migrations
                     b.Property<string>("transfer_status")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("transfer_to")
+                    b.Property<int?>("transfer_to")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("updated_at")
