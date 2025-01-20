@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 
 namespace CSharpAPI.Service {
     public class TransferSerivce : ITransfersService {
+
         private readonly SQLiteDatabase _Db;
         public TransferSerivce(SQLiteDatabase sQLite) 
         {
@@ -97,6 +98,28 @@ namespace CSharpAPI.Service {
             _Db.Transfer.Remove(_transfer);
             await _Db.SaveChangesAsync();
         }
+        public async Task TransferToLocation(int id, int locationId)
+        {
+            var transfer = await GetTransferById(id);
+            var location = await _Db.Location.FirstOrDefaultAsync(x => x.id == locationId);
+            if (location == null) throw new Exception("Location not found!");
+            transfer.transfer_to = locationId;
+            transfer.updated_at = DateTime.Now;
+            _Db.Transfer.Update(transfer);
+            await _Db.SaveChangesAsync();
+        }
+
+        public async Task TransferFromLocation(int id, int locationId)
+        {
+            var transfer = await GetTransferById(id);
+            var location = await _Db.Location.FirstOrDefaultAsync(x => x.id == locationId);
+            if (location == null) throw new Exception("Location not found!");
+            transfer.transfer_from = locationId;
+            transfer.updated_at = DateTime.Now;
+            _Db.Transfer.Update(transfer);
+            await _Db.SaveChangesAsync();
+        }
+
     }
 
     public interface ITransfersService {
@@ -107,5 +130,7 @@ namespace CSharpAPI.Service {
         Task UpdateTransfer(int id, TransferModel updateTransfer);
         Task CommitTransfer(int id);
         Task DeleteTransfer(int id);
+        Task TransferToLocation(int id, int location);
+        Task TransferFromLocation(int id, int location);
     }
 }

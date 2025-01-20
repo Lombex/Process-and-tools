@@ -63,11 +63,11 @@ Content-Type: application/json
 API_KEY: admin_key_2024
 
 ### Alle shipments van een order ophalen
-GET http://localhost:5001/api/v1/orders/2/shipments
+GET http://localhost:5001/api/v1/orders/1/shipments
 Content-Type: application/json
 API_KEY: admin_key_2024
 
 ### Shipment toevoegen aan order
-POST http://localhost:5001/api/v1/orders/2/shipments/5
+POST http://localhost:5001/api/v1/orders/1/shipments/1
 Content-Type: application/json
 API_KEY: admin_key_2024
