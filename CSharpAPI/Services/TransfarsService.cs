@@ -112,14 +112,21 @@ namespace CSharpAPI.Service {
         public async Task TransferFromLocation(int id, int locationId)
         {
             var transfer = await GetTransferById(id);
-            var location = await _Db.Location.FirstOrDefaultAsync(x => x.id == locationId);
-            if (location == null) throw new Exception("Location not found!");
+
+            // Handle dock-specific logic if transfer_from is null
+            if (transfer.transfer_from == null)
+            {
+                var dock = await _Db.DockModels.FirstOrDefaultAsync(d => d.id == locationId);
+                if (dock == null) throw new Exception("Dock not found!");
+            }
             transfer.transfer_from = locationId;
             transfer.updated_at = DateTime.Now;
             _Db.Transfer.Update(transfer);
             await _Db.SaveChangesAsync();
         }
 
+
+        
     }
 
     public interface ITransfersService {
