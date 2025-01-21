@@ -6,10 +6,12 @@ API_KEY: admin_key_2024
 ### Get ItemType by ID
 GET http://localhost:5001/api/v1/itemtypes/13
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Create ItemType
 POST http://localhost:5001/api/v1/itemtypes
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 {
     "name": "New Testtype",
@@ -19,6 +21,7 @@ Content-Type: application/json
 ### Update ItemType
 PUT http://localhost:5001/api/v1/itemtypes/13
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 {
     "name": "Updated Type",
@@ -28,3 +31,4 @@ Content-Type: application/json
 ### Delete itemtype
 DELETE http://localhost:5001/api/v1/itemtypes/13
 Content-Type: application/json
+API_KEY: admin_key_2024

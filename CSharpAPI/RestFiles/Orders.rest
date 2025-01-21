@@ -6,14 +6,17 @@ API_KEY: admin_key_2024
 ### Get order by id
 GET http://localhost:5001/api/v1/orders/1
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Get order item by id
 GET http://localhost:5001/api/v1/orders/1/items
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Create new Order
 POST http://localhost:5001/api/v1/orders
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 {
   "source_id": 33,
@@ -21,40 +24,6 @@ Content-Type: application/json
   "request_date": "2019-04-07T11:33:15Z",
   "reference": "ORD00001",
   "reference_extra": "Bedreven arm straffen bureau.",
-  "order_status": "Delivered",
-  "notes": "Voedsel vijf vork heel.",
-  "shipping_notes": "Buurman betalen plaats bewolkt.",
-  "picking_notes": "Ademen fijn volgorde scherp aardappel op leren.",
-  "warehouse_id": 18,
-  "ship_to": 3,
-  "bill_to": 2,
-  "shipment_id": 1,
-  "total_amount": 9905.13,
-  "total_discount": 150.77,
-  "total_tax": 372.72,
-  "total_surcharge": 77.6,
-  "items": [
-      {
-          "item_id": "P007435",
-          "amount": 23
-      },
-      {
-          "item_id": "P009557",
-          "amount": 1
-      }
-  ]      
-}
-
-### Update Order
-PUT http://localhost:5001/api/v1/orders/1
-Content-Type: application/json
-
-{
-  "source_id": 33,
-  "order_date": "2019-04-03T11:33:15Z",
-  "request_date": "2019-04-07T11:33:15Z",
-  "reference": "ORD00001",
-  "reference_extra": "ALALLALALALALALLALA",
   "order_status": "Delivered",
   "notes": "Voedsel vijf vork heel.",
   "shipping_notes": "Buurman betalen plaats bewolkt.",
@@ -79,6 +48,26 @@ Content-Type: application/json
   ]      
 }
 
+### Update Order
+PUT http://localhost:5001/api/v1/orders/1
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+  // Request body remains the same
+}
+
 ### Delete order
 DELETE http://localhost:5001/api/v1/orders/1
 Content-Type: application/json
+API_KEY: admin_key_2024
+
+### Alle shipments van een order ophalen
+GET http://localhost:5001/api/v1/orders/1/shipments
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### Shipment toevoegen aan order
+POST http://localhost:5001/api/v1/orders/1/shipments/1
+Content-Type: application/json
+API_KEY: admin_key_2024

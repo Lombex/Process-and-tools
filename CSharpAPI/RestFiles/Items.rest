@@ -11,6 +11,7 @@ API_KEY: admin_key_2024
 ### Create Item
 POST http://localhost:5001/api/v1/items
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 {
   "code": "DEFAULT001",
@@ -20,8 +21,8 @@ Content-Type: application/json
   "model_number": null,
   "commodity_code": null,
   "item_line": 0,
-  "item_group": 0,
-  "item_type": 0,
+  "item_group": 2,
+  "item_type": 18,
   "unit_purchase_quantity": 0,
   "unit_order_quantity": 0,
   "pack_order_quantity": 0,
@@ -33,6 +34,7 @@ Content-Type: application/json
 ### Update Item
 PUT http://localhost:5001/api/v1/items/P000001
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 {
   "code": "DEFAULT001",
@@ -43,7 +45,7 @@ Content-Type: application/json
   "commodity_code": null,
   "item_line": 0,
   "item_group": 0,
-  "item_type": 0,
+  "item_type": 18,
   "unit_purchase_quantity": 0,
   "unit_order_quantity": 0,
   "pack_order_quantity": 0,
@@ -53,17 +55,26 @@ Content-Type: application/json
 }
 
 ### Delete Item
-DELETE http://localhost:5001/api/v1/items/P000006
+DELETE http://localhost:5001/api/v1/items/P000001
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### get item Line:
-GET http://localhost:5001/api/v1/items/line/0
+GET http://localhost:5001/api/v1/items/line/1
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### get Item Groups
-GET http://localhost:5001/api/v1/items/group/0
+GET http://localhost:5001/api/v1/items/group/2
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### get Item supplier
 GET http://localhost:5001/api/v1/items/supplier/0
 Content-Type: application/json
+API_KEY: admin_key_2024
+
+### get Item Type
+GET http://localhost:5001/api/v1/items/type/18
+Content-Type: application/json
+API_KEY: admin_key_2024
