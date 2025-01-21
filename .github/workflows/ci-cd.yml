@@ -2,9 +2,9 @@ name: CI/CD Workflow for CSharpAPI
 
 on:
   push:
-    branches: [ "CI/CD_C#2.0", "master" ]
+    branches: [ "CI/CD_C#2.4", "master" ]
   pull_request:
-    branches: [ "CI/CD_C#2.0", "master" ]
+    branches: [ "CI/CD_C#2.4", "master" ]
 
 env:
   DOTNET_VERSION: '8.0.x'
