@@ -1,10 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using CSharpAPI.Data;
 using CSharpAPI.Models;
-using Microsoft.Identity.Client;
 
 namespace CSharpAPI.Service
 {
@@ -12,12 +12,10 @@ namespace CSharpAPI.Service
     {
         Task<List<DockModel>> GetAllDocks();
         Task<DockModel> GetDockById(int id);
-
         Task AddDock(DockModel dock);
         Task UpdateDock(int id, DockModel dock);
         Task DeleteDock(int id);
-
-        Task<DockModel> GetDockByWarhouseId(int warehouseId);
+        Task<List<DockModel>> GetDocksByWarehouseId(int warehouseId);
     }
 
     public class DockService : IDockService
@@ -27,18 +25,20 @@ namespace CSharpAPI.Service
         {
             _Db = sQLite;
         }
+
         public async Task<List<DockModel>> GetAllDocks() => await _Db.DockModels.AsQueryable().ToListAsync();   
 
-        public  async Task<DockModel> GetDockByWarhouseId(int warehouseId)
+        public async Task<List<DockModel>> GetDocksByWarehouseId(int warehouseId)
         {
-            var dock = await _Db.DockModels.FirstOrDefaultAsync(d => d.warehouse_id == warehouseId);
-            if (dock == null) throw new Exception("Dock not found!");
-            return dock;
+            var docks = await _Db.DockModels.Where(d => d.warehouse_id == warehouseId).ToListAsync();
+            if (docks == null || !docks.Any()) throw new Exception("No docks found for this warehouse!");
+            return docks;
         }
 
         public async Task<DockModel> GetDockById(int id)
         {
             var dock = await _Db.DockModels.FirstOrDefaultAsync(d => d.id == id);
+            if (dock == null) throw new Exception("Dock not found!");
             return dock;
         }
 
@@ -63,7 +63,7 @@ namespace CSharpAPI.Service
                 await _Db.SaveChangesAsync();
             }
             else
-            throw new Exception("Dock not found!");
+                throw new Exception("Dock not found!");
         }
 
         public async Task DeleteDock(int id)
@@ -74,7 +74,7 @@ namespace CSharpAPI.Service
                 throw new Exception("Dock not found!");
             }
 
-            // Maak een kopie in de archieftabel
+            // Create a copy in the archive table
             var archivedDock = new ArchivedDockModel
             {
                 id = dock.id,
@@ -83,15 +83,15 @@ namespace CSharpAPI.Service
                 name = dock.name,
                 created_at = dock.created_at,
                 updated_at = dock.updated_at,
-                archived_at = DateTime.UtcNow // Tijdstip van archivering
+                archived_at = DateTime.UtcNow // Time of archiving
             };
 
             await _Db.ArchivedDocks.AddAsync(archivedDock);
 
-            // Verwijder het originele record
+            // Remove the original record
             _Db.DockModels.Remove(dock);
 
-            // Sla wijzigingen op in de database
+            // Save changes to the database
             await _Db.SaveChangesAsync();
         }
     }

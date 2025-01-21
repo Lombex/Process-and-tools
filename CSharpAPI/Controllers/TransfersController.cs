@@ -27,7 +27,10 @@ namespace CSharpAPI.Controller
 
         [HttpGet("all")]
         public async Task<IActionResult> GetAllTransfers([FromQuery] int page)
-        {
+        {   
+            if (!await CheckAccess("GET"))
+                return Forbid();
+
             var transfers = await _transferSerivces.GetAllTransfers();
 
             int totalItem = transfers.Count;
@@ -116,6 +119,9 @@ namespace CSharpAPI.Controller
         [HttpPost("{id}/commit")]
         public async Task<IActionResult> CommitTransfer(int id)
         {
+            if (!await CheckAccess("GET"))
+                return Forbid();
+
             try
             {
                 await _transferSerivces.CommitTransfer(id);
@@ -130,6 +136,9 @@ namespace CSharpAPI.Controller
         [HttpGet("{id}/to/{location}")]
         public async Task<IActionResult> TransferToLocation(int id, int location)
         {
+            if (!await CheckAccess("GET"))
+                return Forbid();
+
             try
             {
                 await _transferSerivces.TransferToLocation(id, location);
@@ -145,6 +154,9 @@ namespace CSharpAPI.Controller
 
         public async Task<IActionResult> TransferFromLocation(int id, int location)
         {
+            if (!await CheckAccess("GET"))
+                return Forbid();
+                
             try
             {
                 await _transferSerivces.TransferFromLocation(id, location);
