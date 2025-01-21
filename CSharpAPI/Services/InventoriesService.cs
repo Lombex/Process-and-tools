@@ -70,12 +70,40 @@ namespace CSharpAPI.Service
             return true;
         }
 
-        public async Task<bool> DeleteInventory(int id)
+       public async Task<bool> DeleteInventory(int id)
         {
             var inventory = await _Db.Inventors.FirstOrDefaultAsync(x => x.id == id);
             if (inventory == null) return false;
 
+            // Log de gegevens van de inventaris
+            Console.WriteLine($"Archiving Inventory: {inventory.id}, {inventory.description}");
+
+            var archivedInventory = new ArchivedInventorieModel
+            {
+                id = inventory.id,
+                item_id = inventory.item_id,
+                description = inventory.description,
+                item_reference = inventory.item_reference,
+                locations = inventory.locations,
+                total_on_hand = inventory.total_on_hand,
+                total_expected = inventory.total_expected,
+                total_ordered = inventory.total_ordered,
+                total_allocated = inventory.total_allocated,
+                total_available = inventory.total_available,
+                created_at = inventory.created_at,
+                updated_at = inventory.updated_at,
+                archived_at = DateTime.UtcNow
+            };
+
+            // Controleer of de archiefdata correct is gevuld
+            Console.WriteLine($"Archived Inventory: {archivedInventory.id}, {archivedInventory.description}");
+
+            await _Db.ArchivedInventories.AddAsync(archivedInventory);
+
+            // Verwijder het originele record
             _Db.Inventors.Remove(inventory);
+
+            // Sla wijzigingen op
             await _Db.SaveChangesAsync();
 
             return true;

@@ -40,6 +40,6 @@ API_KEY: admin_key_2024
 }
 
 ### Delete a Dock
-DELETE http://localhost:5001/api/v1/docks/1
+DELETE http://localhost:5001/api/v1/docks/2
 Content-Type: application/json
 API_KEY: admin_key_2024

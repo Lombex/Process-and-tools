@@ -5,6 +5,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CSharpAPI.Service
 {
+     public interface IWarehouseService
+    {
+        Task<List<WarehouseModel>> GetAllWarehouses();
+        Task<WarehouseModel> GetWarehouseById(int id);
+        Task<List<LocationModel>> GetLocationFromWarehouseID(int id);
+        Task AddWarehouse(WarehouseModel model);
+        Task UpdateWarehouse(int id, WarehouseModel model);
+        Task DeleteWarehouse(int id);
+    }
     public class WarehouseService : IWarehouseService
     {
         private readonly SQLiteDatabase _Db;
@@ -53,17 +62,32 @@ namespace CSharpAPI.Service
         public async Task DeleteWarehouse(int id)
         {
             var _warehouse = await GetWarehouseById(id);
+            if (_warehouse == null) throw new Exception("Warehouse not found!");
+
+            // Maak een kopie in de archieftabel
+            var archivedWarehouse = new ArchivedWarehouseModel
+            {
+                id = _warehouse.id,
+                code = _warehouse.code,
+                name = _warehouse.name,
+                address = _warehouse.address,
+                zip = _warehouse.zip,
+                city = _warehouse.city,
+                province = _warehouse.province,
+                country = _warehouse.country,
+                contact = _warehouse.contact,
+                created_at = _warehouse.created_at,
+                updated_at = _warehouse.updated_at,
+                archived_at = DateTime.UtcNow // Tijdstip van archivering
+            };
+
+            await _Db.ArchivedWarehouses.AddAsync(archivedWarehouse);
+
+            // Verwijder het originele record
             _Db.Warehouse.Remove(_warehouse);
+
+            // Sla wijzigingen op in de database
             await _Db.SaveChangesAsync();
         }
-    }
-    public interface IWarehouseService
-    {
-        Task<List<WarehouseModel>> GetAllWarehouses();
-        Task<WarehouseModel> GetWarehouseById(int id);
-        Task<List<LocationModel>> GetLocationFromWarehouseID(int id);
-        Task AddWarehouse(WarehouseModel model);
-        Task UpdateWarehouse(int id, WarehouseModel model);
-        Task DeleteWarehouse(int id);
     }
 }

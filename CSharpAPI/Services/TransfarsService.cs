@@ -5,6 +5,17 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace CSharpAPI.Service {
+        public interface ITransfersService {
+        Task<List<TransferModel>> GetAllTransfers();
+        Task<TransferModel> GetTransferById(int id);
+        Task<List<Items>> GetItemFromTransferId(int id);
+        Task CreateTransfer(TransferModel transfer);
+        Task UpdateTransfer(int id, TransferModel updateTransfer);
+        Task CommitTransfer(int id);
+        Task DeleteTransfer(int id);
+        Task TransferToLocation(int id, int location);
+        Task TransferFromLocation(int id, int location);
+    }
     public class TransferSerivce : ITransfersService {
 
         private readonly SQLiteDatabase _Db;
@@ -92,10 +103,30 @@ namespace CSharpAPI.Service {
         }
 
 
-        public async Task DeleteTransfer(int id)
+       public async Task DeleteTransfer(int id)
         {
             var _transfer = await GetTransferById(id);
+            if (_transfer == null) throw new Exception("Transfer not found!");
+
+            // Maak een kopie in de archieftabel
+            var archivedTransfer = new ArchivedTransferModel
+            {
+                id = _transfer.id,
+                reference = _transfer.reference,
+                transfer_from = _transfer.transfer_from,
+                transfer_to = _transfer.transfer_to,
+                transfer_status = _transfer.transfer_status,
+                created_at = _transfer.created_at,
+                updated_at = _transfer.updated_at,
+                archived_at = DateTime.UtcNow // Tijdstip van archivering
+            };
+
+            await _Db.ArchivedTransfers.AddAsync(archivedTransfer);
+
+            // Verwijder het originele record
             _Db.Transfer.Remove(_transfer);
+
+            // Sla wijzigingen op in de database
             await _Db.SaveChangesAsync();
         }
         public async Task TransferToLocation(int id, int locationId)
@@ -124,20 +155,5 @@ namespace CSharpAPI.Service {
             _Db.Transfer.Update(transfer);
             await _Db.SaveChangesAsync();
         }
-
-
-        
-    }
-
-    public interface ITransfersService {
-        Task<List<TransferModel>> GetAllTransfers();
-        Task<TransferModel> GetTransferById(int id);
-        Task<List<Items>> GetItemFromTransferId(int id);
-        Task CreateTransfer(TransferModel transfer);
-        Task UpdateTransfer(int id, TransferModel updateTransfer);
-        Task CommitTransfer(int id);
-        Task DeleteTransfer(int id);
-        Task TransferToLocation(int id, int location);
-        Task TransferFromLocation(int id, int location);
     }
 }

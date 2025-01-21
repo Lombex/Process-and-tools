@@ -31,6 +31,18 @@ namespace CSharpAPI.Data
         public DbSet<ArchivedOrderModel> ArchivedOrders { get; set; }
         public DbSet<ArchivedShipmentModel> ArchivedShipments { get; set; }
         public DbSet<ArchivedItemModel> ArchivedItems { get; set; }
+        public DbSet<ArchivedClientModel> ArchivedClients { get; set; }
+        public DbSet<ArchivedDockModel> ArchivedDocks { get; set; }
+
+        public DbSet<ArchivedInventorieModel> ArchivedInventories { get; set; }
+        public DbSet<ArchivedItemGroupModel> ArchivedItemGroups { get; set; }
+        public DbSet<ArchivedItemLineModel> ArchivedItemLines { get; set; }
+        public DbSet<ArchivedItemTypeModel> ArchivedItemTypes { get; set; }
+        public DbSet<ArchivedLocationModel> ArchivedLocations { get; set; }
+        public DbSet<ArchivedSupplierModel> ArchivedSuppliers { get; set; }
+        public DbSet<ArchivedTransferModel> ArchivedTransfers { get; set; }
+        public DbSet<ArchivedWarehouseModel> ArchivedWarehouses { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

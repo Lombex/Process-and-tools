@@ -72,8 +72,26 @@ namespace CSharpAPI.Service
                 return false;
             }
 
+            // Maak een kopie in de archieftabel
+            var archivedLocation = new ArchivedLocationModel
+            {
+                id = location.id,
+                warehouse_id = location.warehouse_id,
+                code = location.code,
+                name = location.name,
+                created_at = location.created_at,
+                updated_at = location.updated_at,
+                archived_at = DateTime.UtcNow // Tijdstip van archivering
+            };
+
+            await _Db.ArchivedLocations.AddAsync(archivedLocation);
+
+            // Verwijder het originele record
             _Db.Location.Remove(location);
+
+            // Sla wijzigingen op in de database
             await _Db.SaveChangesAsync();
+
             return true;
         }
 

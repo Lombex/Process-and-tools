@@ -70,7 +70,33 @@ namespace CSharpAPI.Service
         public async Task DeleteSupplier(int id)
         {
             var _supplier = await GetSupplierById(id);
+            if (_supplier == null) throw new Exception("Supplier not found!");
+
+            // Maak een kopie in de archieftabel
+            var archivedSupplier = new ArchivedSupplierModel
+            {
+                id = _supplier.id,
+                code = _supplier.code,
+                name = _supplier.name,
+                address = _supplier.address,
+                address_extra = _supplier.address_extra,
+                city = _supplier.city,
+                zip_code = _supplier.zip_code,
+                province = _supplier.province,
+                country = _supplier.country,
+                contact = _supplier.contact,
+                reference = _supplier.reference,
+                created_at = _supplier.created_at,
+                updated_at = _supplier.updated_at,
+                archived_at = DateTime.UtcNow // Tijdstip van archivering
+            };
+
+            await _Db.ArchivedSuppliers.AddAsync(archivedSupplier);
+
+            // Verwijder het originele record
             _Db.Suppliers.Remove(_supplier);
+
+            // Sla wijzigingen op in de database
             await _Db.SaveChangesAsync();
         }
     }

@@ -4,7 +4,7 @@ Content-Type: application/json
 API_KEY: admin_key_2024
 
 ### Get inventorie id
-GET http://localhost:5001/api/v1/inventories/0
+GET http://localhost:5001/api/v1/inventories/3
 Content-Type: application/json
 API_KEY: admin_key_2024
 
@@ -30,7 +30,7 @@ API_KEY: admin_key_2024
 ###  Update Inventorie
 PUT http://localhost:5001/api/v1/inventories/2
 Content-Type: application/json
-
+API_KEY: admin_key_2024
 {
   "item_id": "ITEM001",
   "description": "Updated Inventorie",
@@ -46,9 +46,9 @@ Content-Type: application/json
 }
 
 ### Delete Inventorie
-DELETE http://localhost:5001/api/v1/inventories/1
+DELETE http://localhost:5001/api/v1/inventories/4
 Content-Type: application/json
-
+API_KEY: admin_key_2024
 
 ### Get Inventorie item
 GET http://localhost:5001/api/v1/inventories/item/ITEM001

@@ -74,8 +74,29 @@ namespace CSharpAPI.Services
             var client = await GetClientById(id);
             if (client == null) throw new Exception("Client not found!");
 
+            // Maak een kopie in de archieftabel
+            var archivedClient = new ArchivedClientModel
+            {
+                id = client.id,
+                name = client.name,
+                address = client.address,
+                city = client.city,
+                zip_code = client.zip_code,
+                province = client.province,
+                country = client.country,
+                contact = client.contact,
+                created_at = client.created_at,
+                updated_at = client.updated_at,
+                archived_at = DateTime.UtcNow
+            };
+            await _Db.ArchivedClients.AddAsync(archivedClient);
+
+            // Verwijder het originele record
             _Db.ClientModels.Remove(client);
+
+            // Sla wijzigingen op
             await _Db.SaveChangesAsync();
         }
+
     }
 }

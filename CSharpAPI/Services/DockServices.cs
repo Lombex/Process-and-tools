@@ -69,13 +69,30 @@ namespace CSharpAPI.Service
         public async Task DeleteDock(int id)
         {
             var dock = await _Db.DockModels.FirstOrDefaultAsync(d => d.id == id);
-            if (dock != null)
+            if (dock == null)
             {
-                _Db.DockModels.Remove(dock);
-                await _Db.SaveChangesAsync();
+                throw new Exception("Dock not found!");
             }
-            else
-            throw new Exception("Dock not found!");
+
+            // Maak een kopie in de archieftabel
+            var archivedDock = new ArchivedDockModel
+            {
+                id = dock.id,
+                warehouse_id = dock.warehouse_id,
+                code = dock.code,
+                name = dock.name,
+                created_at = dock.created_at,
+                updated_at = dock.updated_at,
+                archived_at = DateTime.UtcNow // Tijdstip van archivering
+            };
+
+            await _Db.ArchivedDocks.AddAsync(archivedDock);
+
+            // Verwijder het originele record
+            _Db.DockModels.Remove(dock);
+
+            // Sla wijzigingen op in de database
+            await _Db.SaveChangesAsync();
         }
     }
 }

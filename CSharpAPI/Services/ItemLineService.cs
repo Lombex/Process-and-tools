@@ -65,8 +65,25 @@ namespace CSharpAPI.Service
             var itemLine = await _Db.ItemLine.FirstOrDefaultAsync(x => x.id == id);
             if (itemLine == null) return false;
 
+            // Maak een kopie in de archieftabel
+            var archivedItemLine = new ArchivedItemLineModel
+            {
+                id = itemLine.id,
+                name = itemLine.name,
+                description = itemLine.description,
+                created_at = itemLine.created_at,
+                updated_at = itemLine.updated_at,
+                archived_at = DateTime.UtcNow // Tijdstip van archivering
+            };
+
+            await _Db.ArchivedItemLines.AddAsync(archivedItemLine);
+
+            // Verwijder het originele record
             _Db.ItemLine.Remove(itemLine);
+
+            // Sla wijzigingen op in de database
             await _Db.SaveChangesAsync();
+
             return true;
         }
     }

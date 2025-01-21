@@ -48,7 +48,25 @@ namespace CSharpAPI.Service
         public async Task Delete(int id)
         {
             var _itemtype = await GetById(id);
+            if (_itemtype == null) throw new Exception("ItemType not found!");
+
+            // Maak een kopie in de archieftabel
+            var archivedItemType = new ArchivedItemTypeModel
+            {
+                id = _itemtype.id,
+                name = _itemtype.name,
+                description = _itemtype.description,
+                created_at = _itemtype.created_at,
+                updated_at = _itemtype.updated_at,
+                archived_at = DateTime.UtcNow // Tijdstip van archivering
+            };
+
+            await _Db.ArchivedItemTypes.AddAsync(archivedItemType);
+
+            // Verwijder het originele record
             _Db.ItemType.Remove(_itemtype);
+
+            // Sla wijzigingen op in de database
             await _Db.SaveChangesAsync();
         }
     }
