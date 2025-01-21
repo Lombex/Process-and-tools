@@ -98,11 +98,11 @@ jobs:
           fi
 
       - name: Create publish output
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/Development_CI/CD#2.4'
         run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ./publish
 
       - name: Upload build artifacts
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/Development_CI/CD#2.4'
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
@@ -111,7 +111,7 @@ jobs:
 
   deployment:
     needs: build-and-test
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/Development_CI/CD#2.4'
     runs-on: ubuntu-latest
     environment: production
     steps:
