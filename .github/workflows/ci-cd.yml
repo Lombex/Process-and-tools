@@ -10,6 +10,7 @@ env:
   DOTNET_VERSION: '8.0.x'
   PROJECT_PATH: './CSharpAPI/CSharpAPI.csproj'
   TEST_PROJECT_PATH: './Integration.Tests/Integration.Tests.csproj'
+  UNIT_TEST_PROJECT_PATH: './Unit.Tests/Unit.Tests.csproj'
   MINIMUM_CODE_COVERAGE: 1
 
 jobs:
@@ -28,13 +29,25 @@ jobs:
         run: |
           dotnet restore ${{ env.PROJECT_PATH }}
           dotnet restore ${{ env.TEST_PROJECT_PATH }}
+          dotnet restore ${{ env.UNIT_TEST_PROJECT_PATH }}
 
       - name: Build
         run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
 
-      - name: Test with coverage
+      - name: Run Integration Tests
         run: |
           dotnet test ${{ env.TEST_PROJECT_PATH }} \
+            --configuration Release \
+            --no-restore \
+            --verbosity normal \
+            --collect:"XPlat Code Coverage" \
+            /p:CollectCoverage=true \
+            /p:CoverletOutput=./TestResults/Coverage/ \
+            /p:CoverletOutputFormat=cobertura
+
+      - name: Run Unit Tests
+        run: |
+          dotnet test ${{ env.UNIT_TEST_PROJECT_PATH }} \
             --configuration Release \
             --no-restore \
             --verbosity normal \
@@ -49,7 +62,7 @@ jobs:
       - name: Generate coverage report
         run: |
           reportgenerator \
-          "-reports:./Integration.Tests/TestResults/Coverage/coverage.cobertura.xml" \
+          "-reports:./Integration.Tests/TestResults/Coverage/coverage.cobertura.xml;./Unit.Tests/TestResults/Coverage/coverage.cobertura.xml" \
           "-targetdir:coveragereport" \
           "-reporttypes:Html;TextSummary"
 

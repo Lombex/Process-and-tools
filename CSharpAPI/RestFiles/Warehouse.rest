@@ -4,14 +4,14 @@ Content-Type: application/json
 API_KEY: admin_key_2024
 
 ### Get Warehouse By ID
-GET http://localhost:5001/api/v1/warehouses/2
+GET http://localhost:5001/api/v1/warehouses/63
 Content-Type: application/json
-API_KEY: admin_key_2024
+API_KEY: k8fHP+5WaYQbzt0JHs7an3Q6MM1y44hyC+bZUNYlQm8=
 
 ### Get Location from warehouse
-GET http://localhost:5001/api/v1/warehouses/1/location
+GET http://localhost:5001/api/v1/warehouses/63/location
 Content-Type: application/json
-API_KEY: admin_key_2024
+API_KEY: k8fHP+5WaYQbzt0JHs7an3Q6MM1y44hyC+bZUNYlQm8=
 
 ### Create new Warehouse
 POST http://localhost:5001/api/v1/warehouses
@@ -53,6 +53,6 @@ API_KEY: admin_key_2024
 }
 
 ### Delete Warehouse
-DELETE http://localhost:5001/api/v1/warehouses/1
+DELETE http://localhost:5001/api/v1/warehouses/63
 Content-Type: application/json
 API_KEY: admin_key_2024

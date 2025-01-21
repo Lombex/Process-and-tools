@@ -7,7 +7,7 @@ API_KEY: admin_key_2024
 {
     "app": "Warehouse Application",
     "role": "Warehouse_Manager",
-    "warehouse_id": 1
+    "warehouse_id": 63
 }
 
 ### Get all API Keys (Admin only)

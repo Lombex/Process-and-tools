@@ -16,7 +16,7 @@ API_KEY: admin_key_2024
 ### Create a New Dock
 POST http://localhost:5001/api/v1/docks
 Content-Type: application/json
-API_KEY: admin_key_2024
+API_KEY: ZH6+DyPOzz1stD6QC+ppOczXU6TYvWHjTolTdGpt8/0=
 
 {
   "warehouse_id": 1,

@@ -1,0 +1,253 @@
+# CargoHub API Verbeteringen Demo
+# Dit scenario demonstreert zowel de nieuwe functionaliteiten als normale magazijnoperaties
+
+### 1. Setup Test Data
+# Eerst maken we de benodigde testdata aan
+
+### 1.1 Maak een nieuwe client aan
+POST http://localhost:5001/api/v1/clients
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+  "name": "Test Client BV",
+  "address": "Teststraat 123",
+  "city": "Amsterdam",
+  "zip_code": "1234 AB",
+  "province": "Noord-Holland",
+  "country": "Netherlands",
+  "contact": {
+    "name": "Jan Tester",
+    "phone": "0612345678",
+    "email": "jan@testclient.nl"
+  }
+}
+
+### 1.2 Maak een warehouse aan
+POST http://localhost:5001/api/v1/warehouses
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+  "code": "WH001",
+  "name": "Test Warehouse",
+  "address": "Magazijnweg 1",
+  "zip": "1234 AB",
+  "city": "Rotterdam",
+  "province": "Zuid-Holland",
+  "country": "Netherlands",
+  "contact": {
+    "name": "Piet Manager",
+    "phone": "0687654321",
+    "email": "piet@warehouse.nl"
+  }
+}
+
+### 1.3 Maak een dock aan in het warehouse
+POST http://localhost:5001/api/v1/docks
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+  "warehouse_id": 1,
+  "code": "DOCK001",
+  "name": "Receiving Dock 1"
+}
+
+### 1.4 Maak een storage locatie aan
+POST http://localhost:5001/api/v1/locations
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+  "warehouse_id": 1,
+  "code": "STORE001",
+  "name": "Storage Location A1"
+}
+
+### 2. Normale Magazijnoperaties Demo
+
+### 2.1 Ontvang nieuwe goederen op het dock
+POST http://localhost:5001/api/v1/transfers
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+  "id": 1,
+  "reference": "RECEIVE-001",
+  "transfer_from": 1,
+  "transfer_to": 2,
+  "transfer_status": "Scheduled",
+  "items": [
+    {
+      "item_id": "ITEM001",
+      "amount": 100
+    }
+  ]
+}
+
+### 2.2 Verwerk de ontvangst
+PUT http://localhost:5001/api/v1/transfers/1
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+  "id": 1,
+  "reference": "RECEIVE-001",
+  "transfer_from": 1,
+  "transfer_to": 2,
+  "transfer_status": "Processing",
+  "items": [
+    {
+      "item_id": "ITEM001",
+      "amount": 100
+    }
+  ]
+}
+
+### 2.3 Verplaats goederen van dock naar storage locatie
+POST http://localhost:5001/api/v1/transfers
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+  "id": 2,
+  "reference": "MOVE-001",
+  "transfer_from": 2,
+  "transfer_to": 3,
+  "transfer_status": "Scheduled",
+  "items": [
+    {
+      "item_id": "ITEM001",
+      "amount": 100
+    }
+  ]
+}
+
+### 2.4 Bevestig de verplaatsing
+PUT http://localhost:5001/api/v1/transfers/2
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+  "id": 2,
+  "reference": "MOVE-001",
+  "transfer_from": 2,
+  "transfer_to": 3,
+  "transfer_status": "Processing",
+  "items": [
+    {
+      "item_id": "ITEM001",
+      "amount": 100
+    }
+  ]
+}
+
+### 3. Client Lifecycle & Archiving Demo
+
+### 3.1 Bekijk de aangemaakte client
+GET http://localhost:5001/api/v1/clients/998
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### 3.2 Update client informatie
+PUT http://localhost:5001/api/v1/clients/998
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+  "name": "Test Client BV",
+  "address": "Nieuwe Teststraat 456",
+  "city": "Amsterdam",
+  "zip_code": "1234 AB",
+  "province": "Noord-Holland",
+  "country": "Netherlands",
+  "contact": {
+    "name": "Jan Tester",
+    "phone": "0612345678",
+    "email": "jan@testclient.nl"
+  }
+}
+
+### 3.3 Archiveer de client (Soft Delete)
+DELETE http://localhost:5001/api/v1/clients/998
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### 3.4 Controleer dat de client gearchiveerd is
+
+
+### 4. Inventory Tracking Demo
+
+### 4.1 Bekijk voorraad op dock
+GET http://localhost:5001/api/v1/inventories/location/1
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### 4.2 Bekijk voorraad in storage locatie
+GET http://localhost:5001/api/v1/inventories/location/2
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### 4.3 Bekijk totale voorraad van een item
+GET http://localhost:5001/api/v1/inventories/item/ITEM001
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### 5. Authenticatie & Autorisatie Demo
+
+### 5.1 Genereer Warehouse Manager key
+POST http://localhost:5001/api/v1/keys/generate
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+    "app": "Demo Application",
+    "role": "Warehouse_Manager",
+    "warehouse_id": 1
+}
+
+### 5.2 Test Warehouse Manager toegang (kan alleen bekijken)
+# Dit zou moeten werken
+GET http://localhost:5001/api/v1/transfers/1
+Content-Type: application/json
+API_KEY: k8fHP+5WaYQbzt0JHs7an3Q6MM1y44hyC+bZUNYlQm8=
+
+### 5.3 Test Warehouse Manager beperkingen
+
+# Dit zou moeten falen!
+
+POST http://localhost:5001/api/v1/transfers
+Content-Type: application/json
+API_KEY: k8fHP+5WaYQbzt0JHs7an3Q6MM1y44hyC+bZUNYlQm8=
+
+{
+  "reference": "FAIL-001",
+  "transfer_from": 1,
+  "transfer_to": 2,
+  "items": [
+    {
+      "item_id": "ITEM001",
+      "amount": 1
+    }
+  ]
+}
+
+# Belangrijkste verbeteringen ten opzichte van oude implementatie:
+# 1. Role-Based Access Control met verschillende gebruikersniveaus
+# 2. Soft Delete & Archivering in plaats van permanent verwijderen
+# 3. Database integriteit met SQLite i.p.v. JSON bestanden
+# 4. Paginering voor grote datasets
+# 5. Verbeterde relaties tussen entiteiten
+# 6. Uitgebreide foutafhandeling
+# 7. Audit trail met timestamps
+# 8. Consistente API responses
+# 9. Input validatie
+# 10. Transactie ondersteuning
+
+# De demo laat ook zien hoe normale magazijnprocessen worden afgehandeld:
+# 1. Goederen ontvangst op dock
+# 2. Verplaatsing naar storage locatie
+# 3. Voorraadregistratie en tracking
+# 4. Client management
+# 5. Verschillende autorisatieniveaus
