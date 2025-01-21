@@ -28,6 +28,10 @@ namespace CSharpAPI.Controllers
         [HttpGet("all")]
         public async Task<IActionResult> GetAll([FromQuery] int page)
         {
+            // Add this check
+            if (!await CheckAccess("GET"))
+                return Forbid();
+
             var shipments = await _service.GetAll();
 
             int totalItem = shipments.Count;
@@ -67,6 +71,7 @@ namespace CSharpAPI.Controllers
 
             return Ok(Response);
         }
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
