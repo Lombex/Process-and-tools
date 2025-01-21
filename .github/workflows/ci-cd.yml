@@ -121,15 +121,33 @@ jobs:
           name: build-artifacts
           path: ./publish
 
-      - name: Deploy to Production
+      - name: Setup SSH
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          eval $(ssh-agent -s)
+          ssh-add ~/.ssh/deploy_key
+
+      - name: Deploy to Production
+        env:
           SSH_USER: ${{ secrets.SSH_USER }}
           SERVER_IP: ${{ secrets.SERVER_IP }}
         run: |
-          echo "$SSH_PRIVATE_KEY" > deploy_key
-          chmod 600 deploy_key
-          ssh -i deploy_key -o StrictHostKeyChecking=no $SSH_USER@$SERVER_IP "sudo systemctl stop csharpapi"
-          scp -i deploy_key -o StrictHostKeyChecking=no -r ./publish/* $SSH_USER@$SERVER_IP:/var/www/csharpapi/
-          ssh -i deploy_key -o StrictHostKeyChecking=no $SSH_USER@$SERVER_IP "sudo systemctl start csharpapi"
-          rm -f deploy_key
+          # Add server to known hosts
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          
+          # Stop the service
+          ssh -i ~/.ssh/deploy_key ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "sudo systemctl stop csharpapi" || echo "Service not running"
+          
+          # Copy files
+          scp -i ~/.ssh/deploy_key -r ./publish/* ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/var/www/csharpapi/
+          
+          # Start the service
+          ssh -i ~/.ssh/deploy_key ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "sudo systemctl start csharpapi"
+
+      - name: Cleanup
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
