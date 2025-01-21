@@ -30,6 +30,303 @@ namespace CSharpAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ArchivedClients",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    name = table.Column<string>(type: "TEXT", nullable: true),
+                    address = table.Column<string>(type: "TEXT", nullable: true),
+                    city = table.Column<string>(type: "TEXT", nullable: true),
+                    zip_code = table.Column<string>(type: "TEXT", nullable: true),
+                    province = table.Column<string>(type: "TEXT", nullable: true),
+                    country = table.Column<string>(type: "TEXT", nullable: true),
+                    contact_name = table.Column<string>(type: "TEXT", nullable: true),
+                    contact_phone = table.Column<string>(type: "TEXT", nullable: true),
+                    contact_email = table.Column<string>(type: "TEXT", nullable: true),
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    archived_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArchivedClients", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ArchivedDocks",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    warehouse_id = table.Column<int>(type: "INTEGER", nullable: false),
+                    code = table.Column<string>(type: "TEXT", nullable: true),
+                    name = table.Column<string>(type: "TEXT", nullable: true),
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    archived_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArchivedDocks", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ArchivedInventories",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    item_id = table.Column<string>(type: "TEXT", nullable: true),
+                    description = table.Column<string>(type: "TEXT", nullable: true),
+                    item_reference = table.Column<string>(type: "TEXT", nullable: true),
+                    locations = table.Column<string>(type: "TEXT", nullable: true),
+                    total_on_hand = table.Column<int>(type: "INTEGER", nullable: false),
+                    total_expected = table.Column<int>(type: "INTEGER", nullable: false),
+                    total_ordered = table.Column<int>(type: "INTEGER", nullable: false),
+                    total_allocated = table.Column<int>(type: "INTEGER", nullable: false),
+                    total_available = table.Column<int>(type: "INTEGER", nullable: false),
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    archived_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArchivedInventories", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ArchivedItemGroups",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    name = table.Column<string>(type: "TEXT", nullable: true),
+                    description = table.Column<string>(type: "TEXT", nullable: true),
+                    itemtype_id = table.Column<int>(type: "INTEGER", nullable: false),
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    archived_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArchivedItemGroups", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ArchivedItemLines",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    name = table.Column<string>(type: "TEXT", nullable: true),
+                    description = table.Column<string>(type: "TEXT", nullable: true),
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    archived_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArchivedItemLines", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ArchivedItems",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    uid = table.Column<string>(type: "TEXT", nullable: true),
+                    description = table.Column<string>(type: "TEXT", nullable: true),
+                    short_description = table.Column<string>(type: "TEXT", nullable: true),
+                    upc_code = table.Column<string>(type: "TEXT", nullable: true),
+                    model_number = table.Column<string>(type: "TEXT", nullable: true),
+                    commodity_code = table.Column<string>(type: "TEXT", nullable: true),
+                    item_line = table.Column<int>(type: "INTEGER", nullable: true),
+                    item_group = table.Column<int>(type: "INTEGER", nullable: true),
+                    item_type = table.Column<int>(type: "INTEGER", nullable: true),
+                    unit_purchase_quantity = table.Column<float>(type: "REAL", nullable: false),
+                    unit_order_quantity = table.Column<float>(type: "REAL", nullable: false),
+                    pack_order_quantity = table.Column<float>(type: "REAL", nullable: false),
+                    supplier_id = table.Column<int>(type: "INTEGER", nullable: false),
+                    supplier_code = table.Column<string>(type: "TEXT", nullable: true),
+                    supplier_part_number = table.Column<string>(type: "TEXT", nullable: true),
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    archived_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArchivedItems", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ArchivedItemTypes",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    name = table.Column<string>(type: "TEXT", nullable: true),
+                    description = table.Column<string>(type: "TEXT", nullable: true),
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    archived_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArchivedItemTypes", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ArchivedLocations",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    warehouse_id = table.Column<int>(type: "INTEGER", nullable: false),
+                    code = table.Column<string>(type: "TEXT", nullable: true),
+                    name = table.Column<string>(type: "TEXT", nullable: true),
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    archived_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArchivedLocations", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ArchivedOrders",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    source_id = table.Column<int>(type: "INTEGER", nullable: false),
+                    order_date = table.Column<string>(type: "TEXT", nullable: true),
+                    request_date = table.Column<string>(type: "TEXT", nullable: true),
+                    reference = table.Column<string>(type: "TEXT", nullable: true),
+                    reference_extra = table.Column<string>(type: "TEXT", nullable: true),
+                    order_status = table.Column<string>(type: "TEXT", nullable: true),
+                    notes = table.Column<string>(type: "TEXT", nullable: true),
+                    shipping_notes = table.Column<string>(type: "TEXT", nullable: true),
+                    picking_notes = table.Column<string>(type: "TEXT", nullable: true),
+                    warehouse_id = table.Column<int>(type: "INTEGER", nullable: false),
+                    ship_to = table.Column<int>(type: "INTEGER", nullable: false),
+                    bill_to = table.Column<int>(type: "INTEGER", nullable: false),
+                    total_amount = table.Column<float>(type: "REAL", nullable: false),
+                    total_discount = table.Column<float>(type: "REAL", nullable: false),
+                    total_tax = table.Column<float>(type: "REAL", nullable: false),
+                    total_surcharge = table.Column<float>(type: "REAL", nullable: false),
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    archived_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArchivedOrders", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ArchivedShipments",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    source_id = table.Column<int>(type: "INTEGER", nullable: false),
+                    order_date = table.Column<string>(type: "TEXT", nullable: true),
+                    request_date = table.Column<string>(type: "TEXT", nullable: true),
+                    shipment_date = table.Column<string>(type: "TEXT", nullable: true),
+                    shipment_type = table.Column<string>(type: "TEXT", nullable: true),
+                    shipment_status = table.Column<string>(type: "TEXT", nullable: true),
+                    notes = table.Column<string>(type: "TEXT", nullable: true),
+                    carrier_code = table.Column<string>(type: "TEXT", nullable: true),
+                    carrier_description = table.Column<string>(type: "TEXT", nullable: true),
+                    service_code = table.Column<string>(type: "TEXT", nullable: true),
+                    payment_type = table.Column<string>(type: "TEXT", nullable: true),
+                    transfer_mode = table.Column<string>(type: "TEXT", nullable: true),
+                    total_package_count = table.Column<int>(type: "INTEGER", nullable: false),
+                    total_package_weight = table.Column<float>(type: "REAL", nullable: false),
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    archived_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArchivedShipments", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ArchivedSuppliers",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    code = table.Column<string>(type: "TEXT", nullable: true),
+                    name = table.Column<string>(type: "TEXT", nullable: true),
+                    address = table.Column<string>(type: "TEXT", nullable: true),
+                    address_extra = table.Column<string>(type: "TEXT", nullable: true),
+                    city = table.Column<string>(type: "TEXT", nullable: true),
+                    zip_code = table.Column<string>(type: "TEXT", nullable: true),
+                    province = table.Column<string>(type: "TEXT", nullable: true),
+                    country = table.Column<string>(type: "TEXT", nullable: true),
+                    contact_name = table.Column<string>(type: "TEXT", nullable: true),
+                    contact_phone = table.Column<string>(type: "TEXT", nullable: true),
+                    contact_email = table.Column<string>(type: "TEXT", nullable: true),
+                    reference = table.Column<string>(type: "TEXT", nullable: true),
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    archived_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArchivedSuppliers", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ArchivedTransfers",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    reference = table.Column<string>(type: "TEXT", nullable: true),
+                    transfer_from = table.Column<int>(type: "INTEGER", nullable: true),
+                    transfer_to = table.Column<int>(type: "INTEGER", nullable: false),
+                    transfer_status = table.Column<string>(type: "TEXT", nullable: true),
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    archived_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArchivedTransfers", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ArchivedWarehouses",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    code = table.Column<string>(type: "TEXT", nullable: true),
+                    name = table.Column<string>(type: "TEXT", nullable: true),
+                    address = table.Column<string>(type: "TEXT", nullable: true),
+                    zip = table.Column<string>(type: "TEXT", nullable: true),
+                    city = table.Column<string>(type: "TEXT", nullable: true),
+                    province = table.Column<string>(type: "TEXT", nullable: true),
+                    country = table.Column<string>(type: "TEXT", nullable: true),
+                    contact_name = table.Column<string>(type: "TEXT", nullable: true),
+                    contact_phone = table.Column<string>(type: "TEXT", nullable: true),
+                    contact_email = table.Column<string>(type: "TEXT", nullable: true),
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    archived_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArchivedWarehouses", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ClientModels",
                 columns: table => new
                 {
@@ -67,6 +364,23 @@ namespace CSharpAPI.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DockModels", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "History",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    EntityType = table.Column<int>(type: "INTEGER", nullable: false),
+                    EntityId = table.Column<string>(type: "TEXT", nullable: false),
+                    Action = table.Column<string>(type: "TEXT", nullable: false),
+                    Changes = table.Column<string>(type: "TEXT", nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_History", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -151,18 +465,6 @@ namespace CSharpAPI.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_itemModels", x => x.uid);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Items",
-                columns: table => new
-                {
-                    item_id = table.Column<string>(type: "TEXT", nullable: false),
-                    amount = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Items", x => x.item_id);
                 });
 
             migrationBuilder.CreateTable(
@@ -327,7 +629,7 @@ namespace CSharpAPI.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     reference = table.Column<string>(type: "TEXT", nullable: true),
                     transfer_from = table.Column<int>(type: "INTEGER", nullable: true),
-                    transfer_to = table.Column<int>(type: "INTEGER", nullable: true),
+                    transfer_to = table.Column<int>(type: "INTEGER", nullable: false),
                     transfer_status = table.Column<string>(type: "TEXT", nullable: true),
                     created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
                     updated_at = table.Column<DateTime>(type: "TEXT", nullable: true),
@@ -362,11 +664,45 @@ namespace CSharpAPI.Migrations
                     table.PrimaryKey("PK_Warehouse", x => x.id);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Items",
+                columns: table => new
+                {
+                    item_id = table.Column<string>(type: "TEXT", nullable: false),
+                    amount = table.Column<int>(type: "INTEGER", nullable: false),
+                    ArchivedOrderModelid = table.Column<int>(type: "INTEGER", nullable: true),
+                    ArchivedShipmentModelid = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Items", x => x.item_id);
+                    table.ForeignKey(
+                        name: "FK_Items_ArchivedOrders_ArchivedOrderModelid",
+                        column: x => x.ArchivedOrderModelid,
+                        principalTable: "ArchivedOrders",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_Items_ArchivedShipments_ArchivedShipmentModelid",
+                        column: x => x.ArchivedShipmentModelid,
+                        principalTable: "ArchivedShipments",
+                        principalColumn: "id");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_ApiUsers_api_key",
                 table: "ApiUsers",
                 column: "api_key",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Items_ArchivedOrderModelid",
+                table: "Items",
+                column: "ArchivedOrderModelid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Items_ArchivedShipmentModelid",
+                table: "Items",
+                column: "ArchivedShipmentModelid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RolePermissions_role_resource",
@@ -382,10 +718,46 @@ namespace CSharpAPI.Migrations
                 name: "ApiUsers");
 
             migrationBuilder.DropTable(
+                name: "ArchivedClients");
+
+            migrationBuilder.DropTable(
+                name: "ArchivedDocks");
+
+            migrationBuilder.DropTable(
+                name: "ArchivedInventories");
+
+            migrationBuilder.DropTable(
+                name: "ArchivedItemGroups");
+
+            migrationBuilder.DropTable(
+                name: "ArchivedItemLines");
+
+            migrationBuilder.DropTable(
+                name: "ArchivedItems");
+
+            migrationBuilder.DropTable(
+                name: "ArchivedItemTypes");
+
+            migrationBuilder.DropTable(
+                name: "ArchivedLocations");
+
+            migrationBuilder.DropTable(
+                name: "ArchivedSuppliers");
+
+            migrationBuilder.DropTable(
+                name: "ArchivedTransfers");
+
+            migrationBuilder.DropTable(
+                name: "ArchivedWarehouses");
+
+            migrationBuilder.DropTable(
                 name: "ClientModels");
 
             migrationBuilder.DropTable(
                 name: "DockModels");
+
+            migrationBuilder.DropTable(
+                name: "History");
 
             migrationBuilder.DropTable(
                 name: "Inventors");
@@ -428,6 +800,12 @@ namespace CSharpAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "Warehouse");
+
+            migrationBuilder.DropTable(
+                name: "ArchivedOrders");
+
+            migrationBuilder.DropTable(
+                name: "ArchivedShipments");
         }
     }
 }
