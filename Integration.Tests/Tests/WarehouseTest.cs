@@ -1,4 +1,4 @@
-using CSharpAPI.Controllers;
+using CSharpAPI.Controller;
 using CSharpAPI.Models;
 using CSharpAPI.Service;
 using CSharpAPI.Data;
@@ -88,10 +88,10 @@ namespace Integration.Tests.Tests
         }
 
         [Fact]
-        public async Task GetAllWarehouses_ReturnsAllWarehouses_WhenAuthorized()
+        public async Task GetAll_ReturnsAllWarehouses_WhenAuthorized()
         {
             // Act
-            var actionResult = await _controller.GetAllWarehouses(0);
+            var actionResult = await _controller.GetAll(0);
             
             // Assert
             actionResult.Should().NotBeNull();
@@ -109,7 +109,7 @@ namespace Integration.Tests.Tests
             var pageSizeProperty = responseType.GetProperty("PageSize").GetValue(response) as int?;
             var totalItemsProperty = responseType.GetProperty("TotalItems").GetValue(response) as int?;
             var totalPagesProperty = responseType.GetProperty("TotalPages").GetValue(response) as int?;
-            var warehousesProperty = responseType.GetProperty("Warehouse").GetValue(response) as IEnumerable<object>;
+            var warehousesProperty = responseType.GetProperty("Warehouses").GetValue(response) as IEnumerable<object>;
 
             pageProperty.Should().Be(0);
             pageSizeProperty.Should().Be(10);
@@ -132,27 +132,30 @@ namespace Integration.Tests.Tests
         }
 
         [Fact]
-        public async Task GetAllWarehouses_ReturnsForbidden_WhenUnauthorized()
+        public async Task GetAll_ReturnsForbidden_WhenUnauthorized()
         {
             // Arrange
             SetupUserContextByRole(_controller, "Operative");
 
             // Act
-            var result = await _controller.GetAllWarehouses(0);
+            var result = await _controller.GetAll(0);
 
             // Assert
-            result.Should().BeOfType<ForbidResult>();
+            result.Should().BeOfType<ObjectResult>();
+            var objectResult = result as ObjectResult;
+            objectResult.StatusCode.Should().Be(403);
+            objectResult.Value.Should().BeEquivalentTo(new { message = "Access denied" });
         }
 
         [Fact]
-        public async Task GetWarehouseById_ReturnsWarehouse_WhenAuthorized()
+        public async Task Get_ReturnsWarehouse_WhenAuthorized()
         {
             // Arrange
             var warehouse = await DbContext.Warehouse.FirstOrDefaultAsync(w => w.code == "WH001");
             warehouse.Should().NotBeNull();
 
             // Act
-            var result = await _controller.GetWarehouseById(warehouse.id) as OkObjectResult;
+            var result = await _controller.Get(warehouse.id) as OkObjectResult;
             var returnedWarehouse = result?.Value as WarehouseModel;
 
             // Assert
@@ -166,7 +169,7 @@ namespace Integration.Tests.Tests
         }
 
         [Fact]
-        public async Task GetWarehouseById_ReturnsForbidden_WhenUnauthorized()
+        public async Task Get_ReturnsForbidden_WhenUnauthorized()
         {
             // Arrange
             SetupUserContextByRole(_controller, "Operative");
@@ -174,14 +177,17 @@ namespace Integration.Tests.Tests
             warehouse.Should().NotBeNull();
 
             // Act
-            var result = await _controller.GetWarehouseById(warehouse.id);
+            var result = await _controller.Get(warehouse.id);
 
             // Assert
-            result.Should().BeOfType<ForbidResult>();
+            result.Should().BeOfType<ObjectResult>();
+            var objectResult = result as ObjectResult;
+            objectResult.StatusCode.Should().Be(403);
+            objectResult.Value.Should().BeEquivalentTo(new { message = "Access denied" });
         }
 
         [Fact]
-        public async Task CreateWarehouse_AddsNewWarehouse_WhenAuthorized()
+        public async Task Post_AddsNewWarehouse_WhenAuthorized()
         {
             // Arrange
             var newWarehouse = new WarehouseModel
@@ -204,7 +210,7 @@ namespace Integration.Tests.Tests
             };
 
             // Act
-            var result = await _controller.CreateWarehouse(newWarehouse) as CreatedAtActionResult;
+            var result = await _controller.Post(newWarehouse) as CreatedAtActionResult;
 
             // Assert
             result.Should().NotBeNull();
@@ -216,7 +222,7 @@ namespace Integration.Tests.Tests
         }
 
         [Fact]
-        public async Task CreateWarehouse_ReturnsForbidden_WhenUnauthorized()
+        public async Task Post_ReturnsForbidden_WhenUnauthorized()
         {
             // Arrange
             SetupUserContextByRole(_controller, "Operative");
@@ -227,14 +233,17 @@ namespace Integration.Tests.Tests
             };
 
             // Act
-            var result = await _controller.CreateWarehouse(newWarehouse);
+            var result = await _controller.Post(newWarehouse);
 
             // Assert
-            result.Should().BeOfType<ForbidResult>();
+            result.Should().BeOfType<ObjectResult>();
+            var objectResult = result as ObjectResult;
+            objectResult.StatusCode.Should().Be(403);
+            objectResult.Value.Should().BeEquivalentTo(new { message = "Access denied" });
         }
 
         [Fact]
-        public async Task UpdateWarehouse_UpdatesExistingWarehouse_WhenAuthorized()
+        public async Task Put_UpdatesExistingWarehouse_WhenAuthorized()
         {
             // Arrange
             var warehouse = await DbContext.Warehouse.FirstOrDefaultAsync(w => w.code == "WH001");
@@ -253,12 +262,12 @@ namespace Integration.Tests.Tests
             };
 
             // Act
-            var result = await _controller.UpdateWarehouse(warehouse.id, updateWarehouse) as OkObjectResult;
+            var result = await _controller.Put(warehouse.id, updateWarehouse) as OkObjectResult;
 
             // Assert
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(200);
-            result.Value.Should().Be($"Warehouse {updateWarehouse.name} has been updated!");
+            result.Value.Should().Be("Warehouse has been updated");
 
             var updatedWarehouse = await DbContext.Warehouse.FirstOrDefaultAsync(w => w.id == warehouse.id);
             updatedWarehouse.Should().NotBeNull();
@@ -267,7 +276,7 @@ namespace Integration.Tests.Tests
         }
 
         [Fact]
-        public async Task UpdateWarehouse_ReturnsForbidden_WhenUnauthorized()
+        public async Task Put_ReturnsForbidden_WhenUnauthorized()
         {
             // Arrange
             SetupUserContextByRole(_controller, "Operative");
@@ -281,33 +290,36 @@ namespace Integration.Tests.Tests
             };
 
             // Act
-            var result = await _controller.UpdateWarehouse(warehouse.id, updateWarehouse);
+            var result = await _controller.Put(warehouse.id, updateWarehouse);
 
             // Assert
-            result.Should().BeOfType<ForbidResult>();
+            result.Should().BeOfType<ObjectResult>();
+            var objectResult = result as ObjectResult;
+            objectResult.StatusCode.Should().Be(403);
+            objectResult.Value.Should().BeEquivalentTo(new { message = "Access denied" });
         }
 
         [Fact]
-        public async Task DeleteWarehouse_RemovesWarehouse_WhenAuthorized()
+        public async Task Delete_RemovesWarehouse_WhenAuthorized()
         {
             // Arrange
             var warehouse = await DbContext.Warehouse.FirstOrDefaultAsync(w => w.code == "WH001");
             warehouse.Should().NotBeNull();
 
             // Act
-            var result = await _controller.DeleteWarehouse(warehouse.id) as OkObjectResult;
+            var result = await _controller.Delete(warehouse.id) as OkObjectResult;
 
             // Assert
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(200);
-            result.Value.Should().Be("Warehouse has been deleted.");
+            result.Value.Should().Be("Warehouse has been deleted");
 
             var deletedWarehouse = await DbContext.Warehouse.FirstOrDefaultAsync(w => w.id == warehouse.id);
             deletedWarehouse.Should().BeNull();
         }
 
         [Fact]
-        public async Task DeleteWarehouse_ReturnsForbidden_WhenUnauthorized()
+        public async Task Delete_ReturnsForbidden_WhenUnauthorized()
         {
             // Arrange
             SetupUserContextByRole(_controller, "Operative");
@@ -315,10 +327,13 @@ namespace Integration.Tests.Tests
             warehouse.Should().NotBeNull();
 
             // Act
-            var result = await _controller.DeleteWarehouse(warehouse.id);
+            var result = await _controller.Delete(warehouse.id);
 
             // Assert
-            result.Should().BeOfType<ForbidResult>();
+            result.Should().BeOfType<ObjectResult>();
+            var objectResult = result as ObjectResult;
+            objectResult.StatusCode.Should().Be(403);
+            objectResult.Value.Should().BeEquivalentTo(new { message = "Access denied" });
         }
     }
 }

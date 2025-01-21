@@ -118,10 +118,11 @@ namespace CSharpAPI.Controller
             var accessCheck = await CheckAccess("GET");
             if (accessCheck != null)
                 return accessCheck;
-
-            var dock = await _dockService.GetDockByWarhouseId(warehouseId);
-            if (dock == null) return NotFound($"Dock with warehouse id {warehouseId} not found.");
-            return Ok(dock);
+        
+            var docks = await _dockService.GetDocksByWarehouseId(warehouseId);
+            if (docks == null || !docks.Any()) 
+                return NotFound($"No docks found for warehouse with id {warehouseId}.");
+            return Ok(docks);
         }
     }
 }
