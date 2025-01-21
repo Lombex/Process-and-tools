@@ -8,12 +8,12 @@ namespace CSharpAPI.Controllers
 {
      [ApiController]
     [Route("api/v1/orders")]
-    public class OrdersControllers : ControllerBase
+    public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
         private readonly IAuthService _authService;
 
-        public OrdersControllers(IOrderService orderService, IAuthService authService)
+        public OrdersController(IOrderService orderService, IAuthService authService)
         {
             _orderService = orderService;
             _authService = authService;

@@ -1,0 +1,122 @@
+name: CI/CD Workflow for CSharpAPI
+
+on:
+  push:
+    branches: [ "CI/CD_C#2.0", "master" ]
+  pull_request:
+    branches: [ "CI/CD_C#2.0", "master" ]
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  PROJECT_PATH: './CSharpAPI/CSharpAPI.csproj'
+  TEST_PROJECT_PATH: './Integration.Tests/Integration.Tests.csproj'
+  MINIMUM_CODE_COVERAGE: 1
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: |
+          dotnet restore ${{ env.PROJECT_PATH }}
+          dotnet restore ${{ env.TEST_PROJECT_PATH }}
+
+      - name: Build
+        run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
+
+      - name: Test with coverage
+        run: |
+          dotnet test ${{ env.TEST_PROJECT_PATH }} \
+            --configuration Release \
+            --no-restore \
+            --verbosity normal \
+            --collect:"XPlat Code Coverage" \
+            /p:CollectCoverage=true \
+            /p:CoverletOutput=./TestResults/Coverage/ \
+            /p:CoverletOutputFormat=cobertura
+
+      - name: Install ReportGenerator
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
+
+      - name: Generate coverage report
+        run: |
+          reportgenerator \
+          "-reports:./Integration.Tests/TestResults/Coverage/coverage.cobertura.xml" \
+          "-targetdir:coveragereport" \
+          "-reporttypes:Html;TextSummary"
+
+      - name: Debug coverage report
+        run: |
+          if [ -f coveragereport/Summary.txt ]; then
+            echo "Coverage summary found:"
+            cat coveragereport/Summary.txt
+          else
+            echo "Summary.txt not found"
+            exit 1
+          fi
+
+      - name: Check coverage
+        run: |
+          if [ -f coveragereport/Summary.txt ]; then
+            # Debug to ensure parsing works correctly
+            echo "Coverage Summary:"
+            cat coveragereport/Summary.txt
+
+            # Extract coverage using grep
+            COVERAGE=$(grep -oP '(?<=Line coverage: )[0-9.]+' coveragereport/Summary.txt || echo "0")
+            echo "Code coverage: $COVERAGE%"
+            
+            # Compare coverage to threshold
+            if (( $(echo "$COVERAGE < ${{ env.MINIMUM_CODE_COVERAGE }}" | bc -l) )); then
+              echo "Code coverage is below minimum threshold of ${{ env.MINIMUM_CODE_COVERAGE }}%"
+              exit 1
+            fi
+          else
+            echo "No coverage report found"
+            exit 1
+          fi
+
+      - name: Create publish output
+        if: github.ref == 'refs/heads/master'
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ./publish
+
+      - name: Upload build artifacts
+        if: github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: ./publish
+          retention-days: 5
+
+  deployment:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: ./publish
+
+      - name: Deploy to Production
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" > deploy_key
+          chmod 600 deploy_key
+          ssh -i deploy_key -o StrictHostKeyChecking=no $SSH_USER@$SERVER_IP "sudo systemctl stop csharpapi"
+          scp -i deploy_key -o StrictHostKeyChecking=no -r ./publish/* $SSH_USER@$SERVER_IP:/var/www/csharpapi/
+          ssh -i deploy_key -o StrictHostKeyChecking=no $SSH_USER@$SERVER_IP "sudo systemctl start csharpapi"
+          rm -f deploy_key

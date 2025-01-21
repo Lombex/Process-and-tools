@@ -3,16 +3,41 @@
     <DataCollectors>
       <DataCollector friendlyName="Code Coverage">
         <Configuration>
-          <!-- Alleen controllers en services -->
+          <!-- Only include controllers and services -->
           <Include>
             <ClassName>.*Controller.*</ClassName>
             <ClassName>.*Service.*</ClassName>
           </Include>
-          <!-- Sluit models en migrations uit -->
+          
+          <!-- Exclude models and migrations -->
           <Exclude>
             <ClassName>.*Model.*</ClassName>
             <ClassName>.*Migration.*</ClassName>
+            <ClassName>.*Test.*</ClassName>
+            <ClassName>.*Infrastructure.*</ClassName>
           </Exclude>
+          
+          <!-- Additional configuration for comprehensive coverage -->
+          <CodeCoverage>
+            <ModulePaths>
+              <Include>
+                <ModulePath>.*\.dll$</ModulePath>
+              </Include>
+              <Exclude>
+                <ModulePath>.*Tests\.dll$</ModulePath>
+                <ModulePath>.*xunit\..*</ModulePath>
+              </Exclude>
+            </ModulePaths>
+            
+            <!-- Optionally specify attributes that exclude code from coverage -->
+            <Attributes>
+              <Exclude>
+                <Attribute>^System\.Diagnostics\.DebuggerHiddenAttribute$</Attribute>
+                <Attribute>^System\.Diagnostics\.DebuggerNonUserCodeAttribute$</Attribute>
+                <Attribute>^System\.CodeDom\.Compiler\.GeneratedCodeAttribute$</Attribute>
+              </Exclude>
+            </Attributes>
+          </CodeCoverage>
         </Configuration>
       </DataCollector>
     </DataCollectors>
