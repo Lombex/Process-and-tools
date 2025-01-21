@@ -6,9 +6,9 @@ Content-Type: application/json
 API_KEY: admin_key_2024
 
 ### Get client by id (Admin)
-GET http://localhost:5001/api/v1/clients/9821
+GET http://localhost:5001/api/Warehouse Application/clients/9821
 Content-Type: application/json
-API_KEY: VkWlxnR5uDmReqaSwVda5mywa/8LZuESJSACVRbRA5w=
+API_KEY: ZH6+DyPOzz1stD6QC+ppOczXU6TYvWHjTolTdGpt8/0=
 ### Get order by client id (Admin)
 GET http://localhost:5001/api/v1/clients/3/orders
 Content-Type: application/json
@@ -61,7 +61,7 @@ API_KEY: admin_key_2024
 ### Get all clients (Warehouse Manager)
 GET http://localhost:5001/api/v1/clients/all
 Content-Type: application/json
-API_KEY: warehouse_key_2024
+API_KEY: LWY2PpVpJ2/7Z6a0Zu2eq7Y7qBDtJPpFn1KesX+Z2FU=
 
 ### Get client by id (Warehouse Manager)
 GET http://localhost:5001/api/v1/clients/9821

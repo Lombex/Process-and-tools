@@ -2,14 +2,15 @@ name: CI/CD Workflow for CSharpAPI
 
 on:
   push:
-    branches: [ "CI/CD_C#2.0", "master" ]
+    branches: [ "Development_CI/CD#2.4", "master" ]
   pull_request:
-    branches: [ "CI/CD_C#2.0", "master" ]
+    branches: [ "Development_CI/CD#2.4", "master" ]
 
 env:
   DOTNET_VERSION: '8.0.x'
   PROJECT_PATH: './CSharpAPI/CSharpAPI.csproj'
   TEST_PROJECT_PATH: './Integration.Tests/Integration.Tests.csproj'
+  UNIT_TEST_PROJECT_PATH: './Unit.Tests/Unit.Tests.csproj'
   MINIMUM_CODE_COVERAGE: 1
 
 jobs:
@@ -28,13 +29,25 @@ jobs:
         run: |
           dotnet restore ${{ env.PROJECT_PATH }}
           dotnet restore ${{ env.TEST_PROJECT_PATH }}
+          dotnet restore ${{ env.UNIT_TEST_PROJECT_PATH }}
 
       - name: Build
         run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
 
-      - name: Test with coverage
+      - name: Run Integration Tests
         run: |
           dotnet test ${{ env.TEST_PROJECT_PATH }} \
+            --configuration Release \
+            --no-restore \
+            --verbosity normal \
+            --collect:"XPlat Code Coverage" \
+            /p:CollectCoverage=true \
+            /p:CoverletOutput=./TestResults/Coverage/ \
+            /p:CoverletOutputFormat=cobertura
+
+      - name: Run Unit Tests
+        run: |
+          dotnet test ${{ env.UNIT_TEST_PROJECT_PATH }} \
             --configuration Release \
             --no-restore \
             --verbosity normal \
@@ -49,7 +62,7 @@ jobs:
       - name: Generate coverage report
         run: |
           reportgenerator \
-          "-reports:./Integration.Tests/TestResults/Coverage/coverage.cobertura.xml" \
+          "-reports:./Integration.Tests/TestResults/Coverage/coverage.cobertura.xml;./Unit.Tests/TestResults/Coverage/coverage.cobertura.xml" \
           "-targetdir:coveragereport" \
           "-reporttypes:Html;TextSummary"
 
@@ -85,11 +98,11 @@ jobs:
           fi
 
       - name: Create publish output
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/Development_CI/CD#2.4'
         run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ./publish
 
       - name: Upload build artifacts
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/Development_CI/CD#2.4'
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
@@ -98,7 +111,7 @@ jobs:
 
   deployment:
     needs: build-and-test
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/Development_CI/CD#2.4'
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -108,15 +121,33 @@ jobs:
           name: build-artifacts
           path: ./publish
 
-      - name: Deploy to Production
+      - name: Setup SSH
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          eval $(ssh-agent -s)
+          ssh-add ~/.ssh/deploy_key
+
+      - name: Deploy to Production
+        env:
           SSH_USER: ${{ secrets.SSH_USER }}
           SERVER_IP: ${{ secrets.SERVER_IP }}
         run: |
-          echo "$SSH_PRIVATE_KEY" > deploy_key
-          chmod 600 deploy_key
-          ssh -i deploy_key -o StrictHostKeyChecking=no $SSH_USER@$SERVER_IP "sudo systemctl stop csharpapi"
-          scp -i deploy_key -o StrictHostKeyChecking=no -r ./publish/* $SSH_USER@$SERVER_IP:/var/www/csharpapi/
-          ssh -i deploy_key -o StrictHostKeyChecking=no $SSH_USER@$SERVER_IP "sudo systemctl start csharpapi"
-          rm -f deploy_key
+          # Add server to known hosts
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          
+          # Stop the service
+          ssh -i ~/.ssh/deploy_key ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "sudo systemctl stop csharpapi" || echo "Service not running"
+          
+          # Copy files
+          scp -i ~/.ssh/deploy_key -r ./publish/* ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/var/www/csharpapi/
+          
+          # Start the service
+          ssh -i ~/.ssh/deploy_key ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "sudo systemctl start csharpapi"
+
+      - name: Cleanup
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
