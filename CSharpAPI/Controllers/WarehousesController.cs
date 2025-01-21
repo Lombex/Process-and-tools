@@ -8,12 +8,12 @@ namespace CSharpAPI.Controller
 {
     [Route("api/v1/warehouses")]
     [ApiController]
-    public class WarehousesController : ControllerBase
+    public class WarehouseController : ControllerBase
     {
         private readonly IWarehouseService _warehouseService;
         private readonly IAuthService _authService;
 
-        public WarehousesController(IWarehouseService warehouseService, IAuthService authService)
+        public WarehouseController(IWarehouseService warehouseService, IAuthService authService)
         {
             _warehouseService = warehouseService;
             _authService = authService;
