@@ -85,12 +85,47 @@ namespace CSharpAPI.Service
         }
         public async Task DeleteItem(string uid)
         {
-            var _item = await GetItemById(uid);
-            _Db.itemModels.Remove(_item);
-            await _Db.SaveChangesAsync();
-            await _historyService.LogAsync(EntityType.Item, uid, "Deleted", $"Item {_item.description} met UID: {uid} is verwijderd");
+            var item = await GetItemById(uid);
+            if (item == null) throw new Exception("Item not found!");
 
+            // Maak een kopie in de archieftabel
+            var archivedItem = new ArchivedItemModel
+            {
+                uid = item.uid,
+                description = item.description,
+                short_description = item.short_description,
+                upc_code = item.upc_code,
+                model_number = item.model_number,
+                commodity_code = item.commodity_code,
+                item_line = item.item_line,
+                item_group = item.item_group,
+                item_type = item.item_type,
+                unit_purchase_quantity = item.unit_purchase_quantity,
+                unit_order_quantity = item.unit_order_quantity,
+                pack_order_quantity = item.pack_order_quantity,
+                supplier_id = item.supplier_id,
+                supplier_code = item.supplier_code,
+                supplier_part_number = item.supplier_part_number,
+                created_at = item.created_at,
+                updated_at = item.updated_at,
+                archived_at = DateTime.UtcNow
+            };
+
+            await _Db.ArchivedItems.AddAsync(archivedItem);
+
+            // Log de verwijdering in de History-tabel
+            await _historyService.LogAsync(
+                EntityType.Item,
+                uid,
+                "Archived",
+                $"Item {item.uid} is gearchiveerd in plaats van verwijderd."
+            );
+
+            // Verwijder het originele item
+            _Db.itemModels.Remove(item);
+            await _Db.SaveChangesAsync();
         }
+
         public async Task<IEnumerable<ItemModel>> GetItemsByLineId(int lineId)
         {
             var _items = await GetAllItems();

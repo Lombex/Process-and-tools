@@ -3,6 +3,7 @@ using System;
 using CSharpAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CSharpAPI.Migrations
 {
     [DbContext(typeof(SQLiteDatabase))]
-    partial class SQLiteDatabaseModelSnapshot : ModelSnapshot
+    [Migration("20250121083627_ChangedArchivemodel")]
+    partial class ChangedArchivemodel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
@@ -121,6 +124,9 @@ namespace CSharpAPI.Migrations
                     b.Property<int>("ship_to")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("shipment_id")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("shipping_notes")
                         .HasColumnType("TEXT");
 
@@ -173,6 +179,9 @@ namespace CSharpAPI.Migrations
 
                     b.Property<string>("order_date")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("order_id")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("payment_type")
                         .HasColumnType("TEXT");

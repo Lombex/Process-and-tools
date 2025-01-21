@@ -154,11 +154,48 @@ namespace CSharpAPI.Service
 
         public async Task DeleteOrder(int id)
         {
-            var _order = await GetOrderById(id);
-            _Db.Order.Remove(_order);
-            await _Db.SaveChangesAsync();
-            await _historyService.LogAsync(EntityType.Order, id.ToString(), "Deleted", $"Order {_order.reference} is verwijderd");
+            var order = await GetOrderById(id);
+            if (order == null) throw new Exception("Order not found!");
 
+            // Maak een kopie in de archieftabel
+            var archivedOrder = new ArchivedOrderModel
+            {
+                id = order.id,
+                source_id = order.source_id,
+                order_date = order.order_date,
+                request_date = order.request_date,
+                reference = order.reference,
+                reference_extra = order.reference_extra,
+                order_status = order.order_status,
+                notes = order.notes,
+                shipping_notes = order.shipping_notes,
+                picking_notes = order.picking_notes,
+                warehouse_id = order.warehouse_id,
+                ship_to = order.ship_to,
+                bill_to = order.bill_to,
+                total_amount = order.total_amount,
+                total_discount = order.total_discount,
+                total_tax = order.total_tax,
+                total_surcharge = order.total_surcharge,
+                created_at = order.created_at,
+                updated_at = order.updated_at,
+                archived_at = DateTime.UtcNow,
+                items = order.items
+            };
+
+            await _Db.ArchivedOrders.AddAsync(archivedOrder);
+
+            // Log de verwijdering in de History-tabel
+            await _historyService.LogAsync(
+                EntityType.Order,
+                id.ToString(),
+                "Archived",
+                $"Order {order.reference} is gearchiveerd in plaats van verwijderd."
+            );
+
+            // Verwijder de originele order
+            _Db.Order.Remove(order);
+            await _Db.SaveChangesAsync();
         }
     }
 }

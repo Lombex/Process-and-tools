@@ -11,9 +11,9 @@ public class ArchivedItemModel
     public string? upc_code { get; set; }
     public string? model_number { get; set; }
     public string? commodity_code { get; set; }
-    public string? item_line { get; set; }
-    public string? item_group { get; set; }
-    public string? item_type { get; set; }
+    public int? item_line { get; set; }
+    public int? item_group { get; set; }
+    public int? item_type { get; set; }
     public float unit_purchase_quantity { get; set; }
     public float unit_order_quantity { get; set; }
     public float pack_order_quantity { get; set; }

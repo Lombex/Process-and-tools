@@ -97,12 +97,48 @@ namespace CSharpAPI.Service
 
         public async Task Delete(int id)
         {
-            var _shipment = await GetById(id);
-            _Db.Shipment.Remove(_shipment);
-            await _Db.SaveChangesAsync();
-            await _historyService.LogAsync(EntityType.Shipment, id.ToString(), "Deleted", $"Shipment {_shipment.id} met status {_shipment.shipment_status} is verwijderd");
+            var shipment = await GetById(id);
+            if (shipment == null) throw new Exception("Shipment not found!");
 
+            // Maak een kopie in de archieftabel
+            var archivedShipment = new ArchivedShipmentModel
+            {
+                id = shipment.id,
+                source_id = shipment.source_id,
+                order_date = shipment.order_date,
+                request_date = shipment.request_date,
+                shipment_date = shipment.shipment_date,
+                shipment_type = shipment.shipment_type,
+                shipment_status = shipment.shipment_status,
+                notes = shipment.notes,
+                carrier_code = shipment.carrier_code,
+                carrier_description = shipment.carrier_description,
+                service_code = shipment.service_code,
+                payment_type = shipment.payment_type,
+                transfer_mode = shipment.transfer_mode,
+                total_package_count = shipment.total_package_count,
+                total_package_weight = shipment.total_package_weight,
+                created_at = shipment.created_at,
+                updated_at = shipment.updated_at,
+                archived_at = DateTime.UtcNow,
+                items = shipment.items
+            };
+
+            await _Db.ArchivedShipments.AddAsync(archivedShipment);
+
+            // Log de verwijdering in de History-tabel
+            await _historyService.LogAsync(
+                EntityType.Shipment,
+                id.ToString(),
+                "Archived",
+                $"Shipment {shipment.id} is gearchiveerd in plaats van verwijderd."
+            );
+
+            // Verwijder de originele zending
+            _Db.Shipment.Remove(shipment);
+            await _Db.SaveChangesAsync();
         }
+
 
         public async Task<List<OrderModel>> GetOrdersByShipmentId(int shipmentId)
         {
