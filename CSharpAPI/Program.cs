@@ -38,6 +38,7 @@ builder.Services.AddScoped<IItemGroupService, ItemGroupService>();
 builder.Services.AddScoped<IDockService, DockService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
+builder.Services.AddScoped<HistoryService>();
 
 // Add CORS
 builder.Services.AddCors(options =>

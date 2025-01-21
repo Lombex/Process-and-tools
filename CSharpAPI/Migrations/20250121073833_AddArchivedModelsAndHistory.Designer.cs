@@ -3,6 +3,7 @@ using System;
 using CSharpAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,213 +11,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CSharpAPI.Migrations
 {
     [DbContext(typeof(SQLiteDatabase))]
-    partial class SQLiteDatabaseModelSnapshot : ModelSnapshot
+    [Migration("20250121073833_AddArchivedModelsAndHistory")]
+    partial class AddArchivedModelsAndHistory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
-
-            modelBuilder.Entity("CSharpAPI.Models.ArchivedItemModel", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("archived_at")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("commodity_code")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("created_at")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("description")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("item_group")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("item_line")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("item_type")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("model_number")
-                        .HasColumnType("TEXT");
-
-                    b.Property<float>("pack_order_quantity")
-                        .HasColumnType("REAL");
-
-                    b.Property<string>("short_description")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("supplier_code")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("supplier_id")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("supplier_part_number")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("uid")
-                        .HasColumnType("TEXT");
-
-                    b.Property<float>("unit_order_quantity")
-                        .HasColumnType("REAL");
-
-                    b.Property<float>("unit_purchase_quantity")
-                        .HasColumnType("REAL");
-
-                    b.Property<string>("upc_code")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("updated_at")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("id");
-
-                    b.ToTable("ArchivedItems");
-                });
-
-            modelBuilder.Entity("CSharpAPI.Models.ArchivedOrderModel", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("archived_at")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("bill_to")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("created_at")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("notes")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("order_date")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("order_status")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("picking_notes")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("reference")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("reference_extra")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("request_date")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ship_to")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("shipment_id")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("shipping_notes")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("source_id")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<float>("total_amount")
-                        .HasColumnType("REAL");
-
-                    b.Property<float>("total_discount")
-                        .HasColumnType("REAL");
-
-                    b.Property<float>("total_surcharge")
-                        .HasColumnType("REAL");
-
-                    b.Property<float>("total_tax")
-                        .HasColumnType("REAL");
-
-                    b.Property<DateTime>("updated_at")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("warehouse_id")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("id");
-
-                    b.ToTable("ArchivedOrders");
-                });
-
-            modelBuilder.Entity("CSharpAPI.Models.ArchivedShipmentModel", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("archived_at")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("carrier_code")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("carrier_description")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("created_at")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("notes")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("order_date")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("order_id")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("payment_type")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("request_date")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("service_code")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("shipment_date")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("shipment_status")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("shipment_type")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("source_id")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("total_package_count")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<float>("total_package_weight")
-                        .HasColumnType("REAL");
-
-                    b.Property<string>("transfer_mode")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("updated_at")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("id");
-
-                    b.ToTable("ArchivedShipments");
-                });
 
             modelBuilder.Entity("CSharpAPI.Models.Auth.ApiUser", b =>
                 {
@@ -565,20 +367,10 @@ namespace CSharpAPI.Migrations
                     b.Property<string>("item_id")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("ArchivedOrderModelid")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("ArchivedShipmentModelid")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("amount")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("item_id");
-
-                    b.HasIndex("ArchivedOrderModelid");
-
-                    b.HasIndex("ArchivedShipmentModelid");
 
                     b.ToTable("Items");
                 });
@@ -902,17 +694,6 @@ namespace CSharpAPI.Migrations
                     b.Navigation("contact");
                 });
 
-            modelBuilder.Entity("CSharpAPI.Models.Items", b =>
-                {
-                    b.HasOne("CSharpAPI.Models.ArchivedOrderModel", null)
-                        .WithMany("items")
-                        .HasForeignKey("ArchivedOrderModelid");
-
-                    b.HasOne("CSharpAPI.Models.ArchivedShipmentModel", null)
-                        .WithMany("items")
-                        .HasForeignKey("ArchivedShipmentModelid");
-                });
-
             modelBuilder.Entity("CSharpAPI.Models.SupplierModel", b =>
                 {
                     b.OwnsOne("CSharpAPI.Models.Contact", "contact", b1 =>
@@ -965,16 +746,6 @@ namespace CSharpAPI.Migrations
                         });
 
                     b.Navigation("contact");
-                });
-
-            modelBuilder.Entity("CSharpAPI.Models.ArchivedOrderModel", b =>
-                {
-                    b.Navigation("items");
-                });
-
-            modelBuilder.Entity("CSharpAPI.Models.ArchivedShipmentModel", b =>
-                {
-                    b.Navigation("items");
                 });
 #pragma warning restore 612, 618
         }

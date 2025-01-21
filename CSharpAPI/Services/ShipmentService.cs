@@ -1,5 +1,6 @@
 using CSharpAPI.Data;
 using CSharpAPI.Models;
+using CSharpAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -24,10 +25,12 @@ namespace CSharpAPI.Service
     public class ShipmentService : IShipmentService
     {
         private readonly SQLiteDatabase _Db;
+        private readonly HistoryService _historyService;
 
-        public ShipmentService(SQLiteDatabase sQLite)
+        public ShipmentService(SQLiteDatabase sQLite,HistoryService historyService)
         {
             _Db = sQLite;
+            _historyService = historyService;
         }
 
         public async Task<List<ShipmentModel>> GetAll() => await _Db.Shipment.AsQueryable().ToListAsync();
@@ -65,6 +68,10 @@ namespace CSharpAPI.Service
         {
             var _shipment = await GetById(id);
 
+             string changes = $"";
+            if (_shipment.shipment_status != shipment.shipment_status) changes += $"Status: {_shipment.shipment_status} -> {shipment.shipment_status}; ";
+            if (_shipment.total_package_weight != shipment.total_package_weight) changes += $"Total Weight: {_shipment.total_package_weight} -> {shipment.total_package_weight}; ";
+
             _shipment.source_id = shipment.source_id;
             _shipment.order_date = shipment.order_date;
             _shipment.request_date = shipment.request_date;
@@ -84,6 +91,8 @@ namespace CSharpAPI.Service
 
             _Db.Shipment.Update(_shipment);
             await _Db.SaveChangesAsync();
+            await _historyService.LogAsync(EntityType.Shipment, id.ToString(), "Updated", $"Wijzigingen: {changes}");
+
         }
 
         public async Task Delete(int id)
@@ -91,6 +100,8 @@ namespace CSharpAPI.Service
             var _shipment = await GetById(id);
             _Db.Shipment.Remove(_shipment);
             await _Db.SaveChangesAsync();
+            await _historyService.LogAsync(EntityType.Shipment, id.ToString(), "Deleted", $"Shipment {_shipment.id} met status {_shipment.shipment_status} is verwijderd");
+
         }
 
         public async Task<List<OrderModel>> GetOrdersByShipmentId(int shipmentId)

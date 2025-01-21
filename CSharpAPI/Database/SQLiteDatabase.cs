@@ -23,10 +23,14 @@ namespace CSharpAPI.Data
         public DbSet<Items> Items { get; set; }
         public DbSet<InventorieModel> Inventors { get; set; }
         public DbSet<ClientModel> ClientModels { get; set; }
+        public DbSet<History> History { get; set; }
         public DbSet<Contact> contacts { get; set; }
         public DbSet<ApiUser> ApiUsers { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
         public DbSet<DockModel> DockModels { get; set; }
+        public DbSet<ArchivedOrderModel> ArchivedOrders { get; set; }
+        public DbSet<ArchivedShipmentModel> ArchivedShipments { get; set; }
+        public DbSet<ArchivedItemModel> ArchivedItems { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

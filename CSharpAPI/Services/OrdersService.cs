@@ -1,5 +1,6 @@
 using CSharpAPI.Data;
 using CSharpAPI.Models;
+using CSharpAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -21,10 +22,13 @@ namespace CSharpAPI.Service
     public class OrderService : IOrderService
     {
         private readonly SQLiteDatabase _Db;
+        private readonly HistoryService _historyService;
+
         
-        public OrderService(SQLiteDatabase sQLite) 
+        public OrderService(SQLiteDatabase sQLite, HistoryService historyService) 
         {
             _Db = sQLite;
+            _historyService = historyService;
         }
 
         public async Task<List<OrderModel>> GetAllOrders() => 
@@ -100,6 +104,11 @@ namespace CSharpAPI.Service
         {
             var _order = await GetOrderById(id);
 
+            string changes = $"";
+            if (_order.reference != updatedOrders.reference) changes += $"Reference: {_order.reference} -> {updatedOrders.reference}; ";
+            if (_order.order_status != updatedOrders.order_status) changes += $"Status: {_order.order_status} -> {updatedOrders.order_status}; ";
+            if (_order.total_amount != updatedOrders.total_amount) changes += $"Total Amount: {_order.total_amount} -> {updatedOrders.total_amount}; ";
+
             _order.source_id = updatedOrders.source_id;
             _order.order_date = updatedOrders.order_date;
             _order.request_date = updatedOrders.request_date;
@@ -121,6 +130,8 @@ namespace CSharpAPI.Service
 
             _Db.Order.Update(_order);
             await _Db.SaveChangesAsync();
+            await _historyService.LogAsync(EntityType.Order, id.ToString(), "Updated", $"Wijzigingen: {changes}");
+
         }
 
         public async Task CreateOrder(OrderModel orders)
@@ -137,6 +148,7 @@ namespace CSharpAPI.Service
             orders.updated_at = DateTime.UtcNow;
 
             await _Db.Order.AddAsync(orders);
+            await _historyService.LogAsync(EntityType.Order, orders.id.ToString(), "Created", $"Order {orders.reference} is aangemaakt met totaalbedrag {orders.total_amount}");
             await _Db.SaveChangesAsync();
         }
 
@@ -145,6 +157,8 @@ namespace CSharpAPI.Service
             var _order = await GetOrderById(id);
             _Db.Order.Remove(_order);
             await _Db.SaveChangesAsync();
+            await _historyService.LogAsync(EntityType.Order, id.ToString(), "Deleted", $"Order {_order.reference} is verwijderd");
+
         }
     }
 }
