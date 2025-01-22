@@ -82,14 +82,16 @@ jobs:
           reportgenerator \
           "-reports:./Integration.Tests/TestResults/Coverage/coverage.cobertura.xml;./Unit.Tests/TestResults/Coverage/coverage.cobertura.xml" \
           "-targetdir:coveragereport" \
-          "-reporttypes:MarkdownSummary;Html"
+          "-reporttypes:TextSummary;Html;Cobertura"
 
       - name: Add coverage report to job summary
-        run: cat coveragereport/Summary.md >> $GITHUB_STEP_SUMMARY
+        run: |
+          echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
+          cat coveragereport/Summary.txt >> $GITHUB_STEP_SUMMARY
 
       - name: Check method coverage threshold
         run: |
-          METHOD_COVERAGE=$(grep -oP '(?<=Method coverage: )[0-9.]+' coveragereport/Summary.md || echo "0")
+          METHOD_COVERAGE=$(grep -oP '(?<=Method Coverage: )\d+.\d+(?=%)' coveragereport/Summary.txt || echo "0")
           echo "Method coverage: $METHOD_COVERAGE%"
           
           if (( $(echo "$METHOD_COVERAGE < ${{ env.MIN_METHOD_COVERAGE }}" | bc -l) )); then
