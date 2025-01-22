@@ -2,9 +2,9 @@ name: CI/CD Workflow for CSharpAPI
 
 on:
   push:
-    branches: [ "Development_CI/CD#2.5", "master" ]
+    branches: [ "Development_CI/CD2.5", "master" ]
   pull_request:
-    branches: [ "Development_CI/CD#2.5", "master" ]
+    branches: [ "Development_CI/CD2.5", "master" ]
 
 env:
   DOTNET_VERSION: '8.0.x'
@@ -111,7 +111,7 @@ jobs:
   # Job 3: Deployment/Merge to Master
   deployment:
     needs: test
-    if: github.ref == 'refs/heads/Development_CI/CD#2.4'
+    if: github.ref == 'refs/heads/Development_CI/CD2.5'
     runs-on: ubuntu-latest
     environment: production
     permissions:
@@ -121,7 +121,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: Development_CI/CD#2.4
+          ref: Development_CI/CD2.5
 
       - name: Configure Git
         run: |
@@ -131,10 +131,10 @@ jobs:
       - name: Merge to master
         run: |
           git checkout master
-          git merge --no-ff Development_CI/CD#2.4 -m "Merge Development_CI/CD#2.4 into master"
+          git merge --no-ff Development_CI/CD2.5 -m "Merge Development_CI/CD2.5 into master"
           git push origin master
 
       - name: Create success notice
         if: success()
         run: |
-          echo "::notice::Successfully merged Development_CI/CD#2.4 into master!"
+          echo "::notice::Successfully merged Development_CI/CD2.5 into master!"
