@@ -75,7 +75,7 @@ API_KEY: admin_key_2024
 }
 
 ### 4. Dock Management
-### 4.1 Bekijk bestaande docks
+### 4.1 Bekijk bestaande docks (leeg)
 GET http://localhost:5001/api/v1/docks/all?page=0
 Content-Type: application/json
 API_KEY: admin_key_2024
@@ -90,6 +90,11 @@ API_KEY: admin_key_2024
   "code": "DOCK001",
   "name": "Test Dock"
 }
+###
+DELETE http://localhost:5001/api/v1/docks/8
+Content-Type: application/json
+API_KEY: admin_key_2024
+
 
 ### 5. RBAC Demonstratie
 ### 5.1 Genereer Warehouse Manager key
