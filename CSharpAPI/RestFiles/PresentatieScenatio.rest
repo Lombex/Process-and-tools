@@ -1,0 +1,124 @@
+# CargoHub Business Scenario Tests
+# Demonstratie van basis warehouse operaties en RBAC
+
+### 1. Warehouse Management
+### 1.1 Bekijk bestaande warehouses
+GET http://localhost:5001/api/v1/warehouses/all?page=0
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### 1.2 Maak een nieuw warehouse aan
+POST http://localhost:5001/api/v1/warehouses
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+  "code": "WH001",
+  "name": "Main Warehouse",
+  "address": "Distributieweg 1",
+  "zip": "1234 AB",
+  "city": "Rotterdam",
+  "province": "Zuid-Holland",
+  "country": "Netherlands",
+  "contact": {
+    "name": "Jan Janssen",
+    "phone": "0612345678",
+    "email": "jan@warehouse.nl"
+  }
+}
+
+### 2. Location Management
+### 2.1 Bekijk bestaande locaties
+GET http://localhost:5001/api/v1/locations/all?page=0
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### 2.1.2 Bekijk tweede paginga bestaande locaties
+GET http://localhost:5001/api/v1/locations/all?page=1
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### 2.2 Maak een nieuwe locatie aan
+POST http://localhost:5001/api/v1/locations
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+  "warehouse_id": 63,
+  "code": "STOR001",
+  "name": "Storage Location A1"
+}
+
+### 3. Client Management
+### 3.1 Bekijk bestaande clients
+GET http://localhost:5001/api/v1/clients/all?page=0
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### 3.2 Maak een nieuwe client aan
+POST http://localhost:5001/api/v1/clients
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+  "name": "Test Client BV",
+  "address": "Teststraat 123",
+  "city": "Amsterdam",
+  "zip_code": "1234 AB",
+  "province": "Noord-Holland",
+  "country": "Netherlands",
+  "contact": {
+    "name": "Piet Pietersen",
+    "phone": "0687654321",
+    "email": "piet@testclient.nl"
+  }
+}
+
+### 4. Dock Management
+### 4.1 Bekijk bestaande docks
+GET http://localhost:5001/api/v1/docks/all?page=0
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### 4.2 Maak een nieuw dock aan
+POST http://localhost:5001/api/v1/docks
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+  "warehouse_id": 63,
+  "code": "DOCK001",
+  "name": "Test Dock"
+}
+
+### 5. RBAC Demonstratie
+### 5.1 Genereer Warehouse Manager key
+POST http://localhost:5001/api/v1/keys/generate
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+    "app": "Demo Application",
+    "role": "Warehouse_Manager",
+    "warehouse_id": 1
+}
+
+### 5.2 Test Warehouse Manager toegang (kan alleen bekijken)
+GET http://localhost:5001/api/v1/warehouses/all?page=0
+Content-Type: application/json
+API_KEY: fcAOaLhHr5vzKJYb6eGqppu/bQv+yKVA2qOoVwb7UUs=
+
+### 5.3 Test Warehouse Manager beperkingen (zou moeten falen met 403 Forbidden)
+DELETE http://localhost:5001/api/v1/warehouses/63
+Content-Type: application/json
+API_KEY: fcAOaLhHr5vzKJYb6eGqppu/bQv+yKVA2qOoVwb7UUs=
+
+# Belangrijke notities:
+# 1. Na elke POST, gebruik de corresponderende GET om de resultaten te verifiëren
+# 2. Het warehouse_id (63) wordt gebruikt voor het koppelen van locaties en docks
+# 3. Alle endpoints ondersteunen paginering via de page parameter
+# 4. Authenticatie gebeurt via de API_KEY header
+# 5. RBAC:
+#    - Admin key heeft volledige toegang
+#    - Warehouse Manager kan alleen lezen
+#    - Warehouse Manager mag GEEN warehouses verwijderen
