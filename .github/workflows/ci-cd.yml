@@ -2,9 +2,9 @@ name: CI/CD Workflow for CSharpAPI
 
 on:
   push:
-    branches: [ "Development_CI/CD#2.4", "master" ]
+    branches: [ "Development_CI/CD#2.4" ]
   pull_request:
-    branches: [ "Development_CI/CD#2.4", "master" ]
+    branches: [ "Development_CI/CD#2.4" ]
 
 env:
   DOTNET_VERSION: '8.0.x'
@@ -26,53 +26,63 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore dependencies
-        run: |
-          dotnet restore ${{ env.PROJECT_PATH }}
-          dotnet restore ${{ env.TEST_PROJECT_PATH }}
-          dotnet restore ${{ env.UNIT_TEST_PROJECT_PATH }}
+        run: dotnet restore ${{ env.PROJECT_PATH }}
 
       - name: Build
         run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
 
-      - name: Run Integration Tests
+      - name: Run Tests and Collect Coverage
         run: |
-          dotnet test ${{ env.TEST_PROJECT_PATH }} \
-            --configuration Release \
-            --no-restore \
-            --verbosity normal \
-            --collect:"XPlat Code Coverage" \
-            /p:CollectCoverage=true \
-            /p:CoverletOutput=./TestResults/Coverage/ \
-            /p:CoverletOutputFormat=cobertura
+          dotnet test ${{ env.TEST_PROJECT_PATH }} --no-restore --collect:"XPlat Code Coverage"
+          dotnet test ${{ env.UNIT_TEST_PROJECT_PATH }} --no-restore --collect:"XPlat Code Coverage"
+        env:
+          DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
-      - name: Run Unit Tests
+      - name: Generate Coverage Report
         run: |
-          dotnet test ${{ env.UNIT_TEST_PROJECT_PATH }} \
-            --configuration Release \
-            --no-restore \
-            --verbosity normal \
-            --collect:"XPlat Code Coverage" \
-            /p:CollectCoverage=true \
-            /p:CoverletOutput=./TestResults/Coverage/ \
-            /p:CoverletOutputFormat=cobertura
+          reportgenerator "-reports:**/coverage.cobertura.xml" "-targetdir:coveragereport" "-reporttypes:HtmlInline;Cobertura"
+          cat coveragereport/index.html
+        continue-on-error: true # Ensure workflow continues even if coverage is low
 
-      - name: Install ReportGenerator
-        run: dotnet tool install -g dotnet-reportgenerator-globaltool
-
-      - name: Generate coverage report
-        run: |
-          reportgenerator \
-          "-reports:./Integration.Tests/TestResults/Coverage/coverage.cobertura.xml;./Unit.Tests/TestResults/Coverage/coverage.cobertura.xml" \
-          "-targetdir:coveragereport" \
-          "-reporttypes:Html;TextSummary"
-
-      - name: Create publish output
-        if: success()
-        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ./publish
-
-      - name: Upload build artifacts
-        if: success()
+      - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
         with:
+          name: coverage-report
+          path: coveragereport/
+
+  publish:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/Development_CI/CD#2.4' && needs.build-and-test.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
           name: build-artifacts
-          path: ./publish
+
+      - name: Publish Artifacts
+        run: echo "Publishing build artifacts..."
+
+      - name: Auto Merge to Master
+        run: |
+          git config --global user.email "noreply@example.com"
+          git config --global user.name "GitHub Actions"
+          git fetch
+          git checkout master
+          git merge --no-ff ${{ github.sha }} -m "Merging successful build ${{ github.sha }} from Development_CI/CD#2.4"
+          git push origin master
+
+  coverage-summary:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Coverage Report
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+
+      - name: Display Coverage Summary
+        run: cat coveragereport/index.html
