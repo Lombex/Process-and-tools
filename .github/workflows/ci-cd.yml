@@ -68,13 +68,17 @@ jobs:
 
       - name: Send Email Notification
         if: always()
-        uses: peter-evans/sendgrid-action@v1
-        with:
-          sendgrid-api-key: ${{ secrets.SENDGRID_API_KEY }}
-          to: 'your-email@example.com'
-          from: 'no-reply@example.com'
-          subject: 'CI/CD Workflow Execution ${{ job.status }} for ${{ github.repository }}'
-          body: 'The CI/CD workflow execution on branch ${{ github.ref }} is ${{ job.status }}. Please check the GitHub Actions log for more details.'
+        run: |
+          curl --request POST \
+          --url https://api.sendgrid.com/v3/mail/send \
+          --header "Authorization: Bearer ${{ secrets.SENDGRID_API_KEY }}" \
+          --header 'Content-Type: application/json' \
+          --data '{
+            "personalizations": [{"to": [{"email": "your-email@example.com"}]}],
+            "from": {"email": "no-reply@example.com"},
+            "subject": "CI/CD Workflow Execution ${{ job.status }} for ${{ github.repository }}",
+            "content": [{"type": "text/plain", "value": "The CI/CD workflow execution on branch ${{ github.ref }} is ${{ job.status }}. Please check the GitHub Actions log for more details."}]
+          }'
 
       - name: Create publish output
         if: success()
@@ -107,11 +111,14 @@ jobs:
 
       - name: Notify Deployment Success
         if: success()
-        uses: peter-evans/sendgrid-action@v1
-        with:
-          sendgrid-api-key: ${{ secrets.SENDGRID_API_KEY }}
-          to: 'your-email@example.com'
-          from: 'no-reply@example.com'
-          subject: 'Successful Deployment to Production'
-          body: 'Deployment of ${{ github.repository }} to production was successful.'
-
+        run: |
+          curl --request POST \
+          --url https://api.sendgrid.com/v3/mail/send \
+          --header "Authorization: Bearer ${{ secrets.SENDGRID_API_KEY }}" \
+          --header 'Content-Type: application/json' \
+          --data '{
+            "personalizations": [{"to": [{"email": "your-email@example.com"}]}],
+            "from": {"email": "no-reply@example.com"},
+            "subject": "Successful Deployment to Production",
+            "content": [{"type": "text/plain", "value": "Deployment of ${{ github.repository }} to production was successful."}]
+          }'
