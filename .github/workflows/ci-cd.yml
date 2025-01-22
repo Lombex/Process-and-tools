@@ -134,10 +134,11 @@ jobs:
           git merge --no-ff Development_CI/CD2.5 -m "Merge Development_CI/CD2.5 into master"
           git push origin master
 
-      - name: Create success notice
+      - name: Send webhook notification
         if: success()
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
         run: |
-          echo "::notice::Successfully merged Development_CI/CD2.5 into master!"
           curl -X POST -H "Content-Type: application/json" \
           -d '{"content": "Deployment successful! Branch Development_CI/CD2.5 has been merged into master."}' \
           $WEBHOOK_URL
