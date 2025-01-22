@@ -11,10 +11,11 @@ env:
   PROJECT_PATH: './CSharpAPI/CSharpAPI.csproj'
   TEST_PROJECT_PATH: './Integration.Tests/Integration.Tests.csproj'
   UNIT_TEST_PROJECT_PATH: './Unit.Tests/Unit.Tests.csproj'
-  MINIMUM_CODE_COVERAGE: 1
+  MIN_METHOD_COVERAGE: 80
 
 jobs:
-  test-and-build:
+  # Job 1: Build
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -34,7 +35,26 @@ jobs:
       - name: Build
         run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
 
-      - name: Run Integration Tests
+  # Job 2: Test
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: |
+          dotnet restore ${{ env.PROJECT_PATH }}
+          dotnet restore ${{ env.TEST_PROJECT_PATH }}
+          dotnet restore ${{ env.UNIT_TEST_PROJECT_PATH }}
+
+      - name: Run Integration Tests with coverage
         run: |
           dotnet test ${{ env.TEST_PROJECT_PATH }} \
             --configuration Release \
@@ -45,7 +65,7 @@ jobs:
             /p:CoverletOutput=./TestResults/Coverage/ \
             /p:CoverletOutputFormat=cobertura
 
-      - name: Run Unit Tests
+      - name: Run Unit Tests with coverage
         run: |
           dotnet test ${{ env.UNIT_TEST_PROJECT_PATH }} \
             --configuration Release \
@@ -56,71 +76,63 @@ jobs:
             /p:CoverletOutput=./TestResults/Coverage/ \
             /p:CoverletOutputFormat=cobertura
 
-      - name: Install ReportGenerator
-        run: dotnet tool install -g dotnet-reportgenerator-globaltool
-
       - name: Generate coverage report
         run: |
+          dotnet tool install -g dotnet-reportgenerator-globaltool
           reportgenerator \
           "-reports:./Integration.Tests/TestResults/Coverage/coverage.cobertura.xml;./Unit.Tests/TestResults/Coverage/coverage.cobertura.xml" \
           "-targetdir:coveragereport" \
-          "-reporttypes:Html;TextSummary"
+          "-reporttypes:MarkdownSummary;Html"
 
-      - name: Upload coverage report
+      - name: Add coverage report to job summary
+        run: cat coveragereport/Summary.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Check method coverage threshold
+        run: |
+          METHOD_COVERAGE=$(grep -oP '(?<=Method coverage: )[0-9.]+' coveragereport/Summary.md || echo "0")
+          echo "Method coverage: $METHOD_COVERAGE%"
+          
+          if (( $(echo "$METHOD_COVERAGE < ${{ env.MIN_METHOD_COVERAGE }}" | bc -l) )); then
+            echo "❌ Method coverage ($METHOD_COVERAGE%) is below minimum threshold of ${{ env.MIN_METHOD_COVERAGE }}%"
+            exit 1
+          else
+            echo "✅ Method coverage ($METHOD_COVERAGE%) meets minimum threshold of ${{ env.MIN_METHOD_COVERAGE }}%"
+          fi
+
+      - name: Store coverage report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coveragereport
-          retention-days: 30
+        if: always()
 
-      - name: Check coverage
-        run: |
-          if [ -f coveragereport/Summary.txt ]; then
-            COVERAGE=$(grep -oP '(?<=Line coverage: )[0-9.]+' coveragereport/Summary.txt || echo "0")
-            echo "Code coverage: $COVERAGE%"
-            if (( $(echo "$COVERAGE < ${{ env.MINIMUM_CODE_COVERAGE }}" | bc -l) )); then
-              echo "Code coverage is below minimum threshold of ${{ env.MINIMUM_CODE_COVERAGE }}%"
-              exit 1
-            fi
-          else
-            echo "No coverage report found"
-            exit 1
-          fi
-
-      - name: Create publish output
-        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ./publish
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: ./publish
-          retention-days: 5
-
-  publish:
-    needs: test-and-build
+  # Job 3: Deployment/Merge to Master
+  deployment:
+    needs: test
     if: github.ref == 'refs/heads/Development_CI/CD#2.4'
     runs-on: ubuntu-latest
     environment: production
+    permissions:
+      contents: write
     steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          name: build-artifacts
-          path: ./publish
+          fetch-depth: 0
+          ref: Development_CI/CD#2.4
 
-      - name: Deploy to Production Server
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./publish/
-          server-dir: /var/www/csharpapi/
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@github.com"
 
-      # This step will intentionally fail if deployment succeeds, triggering GitHub's notification
-      - name: Trigger success notification
+      - name: Merge to master
+        run: |
+          git checkout master
+          git merge --no-ff Development_CI/CD#2.4 -m "Merge Development_CI/CD#2.4 into master"
+          git push origin master
+
+      - name: Create success notice
         if: success()
         run: |
-          echo "::notice::Deployment successful! The application has been deployed to production."
-          # This creates a notice in the GitHub Actions log that will be included in notifications
+          echo "::notice::Successfully merged Development_CI/CD#2.4 into master!"
