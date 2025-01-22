@@ -14,7 +14,7 @@ env:
   MINIMUM_CODE_COVERAGE: 1
 
 jobs:
-  build-and-test:
+  test-and-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -26,63 +26,101 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore dependencies
-        run: dotnet restore ${{ env.PROJECT_PATH }}
+        run: |
+          dotnet restore ${{ env.PROJECT_PATH }}
+          dotnet restore ${{ env.TEST_PROJECT_PATH }}
+          dotnet restore ${{ env.UNIT_TEST_PROJECT_PATH }}
 
       - name: Build
         run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
 
-      - name: Run Tests and Collect Coverage
+      - name: Run Integration Tests
         run: |
-          dotnet test ${{ env.TEST_PROJECT_PATH }} --no-restore --collect:"XPlat Code Coverage"
-          dotnet test ${{ env.UNIT_TEST_PROJECT_PATH }} --no-restore --collect:"XPlat Code Coverage"
-        env:
-          DOTNET_CLI_TELEMETRY_OPTOUT: 1
+          dotnet test ${{ env.TEST_PROJECT_PATH }} \
+            --configuration Release \
+            --no-restore \
+            --verbosity normal \
+            --collect:"XPlat Code Coverage" \
+            /p:CollectCoverage=true \
+            /p:CoverletOutput=./TestResults/Coverage/ \
+            /p:CoverletOutputFormat=cobertura
 
-      - name: Generate Coverage Report
+      - name: Run Unit Tests
         run: |
-          reportgenerator "-reports:**/coverage.cobertura.xml" "-targetdir:coveragereport" "-reporttypes:HtmlInline;Cobertura"
-          cat coveragereport/index.html
-        continue-on-error: true # Ensure workflow continues even if coverage is low
+          dotnet test ${{ env.UNIT_TEST_PROJECT_PATH }} \
+            --configuration Release \
+            --no-restore \
+            --verbosity normal \
+            --collect:"XPlat Code Coverage" \
+            /p:CollectCoverage=true \
+            /p:CoverletOutput=./TestResults/Coverage/ \
+            /p:CoverletOutputFormat=cobertura
 
-      - name: Upload Coverage Report
+      - name: Install ReportGenerator
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
+
+      - name: Generate coverage report
+        run: |
+          reportgenerator \
+          "-reports:./Integration.Tests/TestResults/Coverage/coverage.cobertura.xml;./Unit.Tests/TestResults/Coverage/coverage.cobertura.xml" \
+          "-targetdir:coveragereport" \
+          "-reporttypes:Html;TextSummary"
+
+      - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: coveragereport/
+          path: coveragereport
+          retention-days: 30
+
+      - name: Check coverage
+        run: |
+          if [ -f coveragereport/Summary.txt ]; then
+            COVERAGE=$(grep -oP '(?<=Line coverage: )[0-9.]+' coveragereport/Summary.txt || echo "0")
+            echo "Code coverage: $COVERAGE%"
+            if (( $(echo "$COVERAGE < ${{ env.MINIMUM_CODE_COVERAGE }}" | bc -l) )); then
+              echo "Code coverage is below minimum threshold of ${{ env.MINIMUM_CODE_COVERAGE }}%"
+              exit 1
+            fi
+          else
+            echo "No coverage report found"
+            exit 1
+          fi
+
+      - name: Create publish output
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ./publish
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: ./publish
+          retention-days: 5
 
   publish:
-    needs: build-and-test
-    if: github.ref == 'refs/heads/Development_CI/CD#2.4' && needs.build-and-test.result == 'success'
+    needs: test-and-build
+    if: github.ref == 'refs/heads/Development_CI/CD#2.4'
     runs-on: ubuntu-latest
+    environment: production
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download Artifacts
+      - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
+          path: ./publish
 
-      - name: Publish Artifacts
-        run: echo "Publishing build artifacts..."
-
-      - name: Auto Merge to Master
-        run: |
-          git config --global user.email "noreply@example.com"
-          git config --global user.name "GitHub Actions"
-          git fetch
-          git checkout master
-          git merge --no-ff ${{ github.sha }} -m "Merging successful build ${{ github.sha }} from Development_CI/CD#2.4"
-          git push origin master
-
-  coverage-summary:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Coverage Report
-        uses: actions/download-artifact@v4
+      - name: Deploy to Production Server
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          name: coverage-report
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./publish/
+          server-dir: /var/www/csharpapi/
 
-      - name: Display Coverage Summary
-        run: cat coveragereport/index.html
+      # This step will intentionally fail if deployment succeeds, triggering GitHub's notification
+      - name: Trigger success notification
+        if: success()
+        run: |
+          echo "::notice::Deployment successful! The application has been deployed to production."
+          # This creates a notice in the GitHub Actions log that will be included in notifications
