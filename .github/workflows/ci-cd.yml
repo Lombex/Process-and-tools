@@ -11,7 +11,7 @@ env:
   PROJECT_PATH: './CSharpAPI/CSharpAPI.csproj'
   TEST_PROJECT_PATH: './Integration.Tests/Integration.Tests.csproj'
   UNIT_TEST_PROJECT_PATH: './Unit.Tests/Unit.Tests.csproj'
-  MIN_METHOD_COVERAGE: 80
+  MIN_BRANCH_COVERAGE: 50
 
 jobs:
   # Job 1: Build
@@ -89,16 +89,16 @@ jobs:
           echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
           cat coveragereport/Summary.txt >> $GITHUB_STEP_SUMMARY
 
-      - name: Check method coverage threshold
+      - name: Check branch coverage threshold
         run: |
-          METHOD_COVERAGE=$(grep -oP '(?<=Method Coverage: )\d+.\d+(?=%)' coveragereport/Summary.txt || echo "0")
-          echo "Method coverage: $METHOD_COVERAGE%"
+          BRANCH_COVERAGE=$(grep -oP '(?<=Branch coverage: )[0-9.]+' coveragereport/Summary.txt || echo "0")
+          echo "Branch coverage: $BRANCH_COVERAGE%"
           
-          if (( $(echo "$METHOD_COVERAGE < ${{ env.MIN_METHOD_COVERAGE }}" | bc -l) )); then
-            echo "❌ Method coverage ($METHOD_COVERAGE%) is below minimum threshold of ${{ env.MIN_METHOD_COVERAGE }}%"
+          if (( $(echo "$BRANCH_COVERAGE < ${{ env.MIN_BRANCH_COVERAGE }}" | bc -l) )); then
+            echo "❌ Branch coverage ($BRANCH_COVERAGE%) is below minimum threshold of ${{ env.MIN_BRANCH_COVERAGE }}%"
             exit 1
           else
-            echo "✅ Method coverage ($METHOD_COVERAGE%) meets minimum threshold of ${{ env.MIN_METHOD_COVERAGE }}%"
+            echo "✅ Branch coverage ($BRANCH_COVERAGE%) meets minimum threshold of ${{ env.MIN_BRANCH_COVERAGE }}%"
           fi
 
       - name: Store coverage report
