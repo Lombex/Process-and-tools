@@ -138,9 +138,7 @@ jobs:
         if: success()
         run: |
           echo "::notice::Successfully merged Development_CI/CD2.5 into master!"
-      - name: Send webhook notification
-        if: success()
-        run: |
           curl -X POST -H "Content-Type: application/json" \
-          -d '{"text": "Deployment successful! Branch Development_CI/CD2.5 has been merged into master."}' \
-          ${{ secrets.WEBHOOK_URL }}
+          -d '{"content": "Deployment successful! Branch Development_CI/CD2.5 has been merged into master."}' \
+          $WEBHOOK_URL
+
