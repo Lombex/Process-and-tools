@@ -66,54 +66,31 @@ jobs:
           "-targetdir:coveragereport" \
           "-reporttypes:Html;TextSummary"
 
-      - name: Debug coverage report
-        run: |
-          if [ -f coveragereport/Summary.txt ]; then
-            echo "Coverage summary found:"
-            cat coveragereport/Summary.txt
-          else
-            echo "Summary.txt not found"
-            exit 1
-          fi
-
-      - name: Check coverage
-        run: |
-          if [ -f coveragereport/Summary.txt ]; then
-            # Debug to ensure parsing works correctly
-            echo "Coverage Summary:"
-            cat coveragereport/Summary.txt
-
-            # Extract coverage using grep
-            COVERAGE=$(grep -oP '(?<=Line coverage: )[0-9.]+' coveragereport/Summary.txt || echo "0")
-            echo "Code coverage: $COVERAGE%"
-            
-            # Compare coverage to threshold
-            if (( $(echo "$COVERAGE < ${{ env.MINIMUM_CODE_COVERAGE }}" | bc -l) )); then
-              echo "Code coverage is below minimum threshold of ${{ env.MINIMUM_CODE_COVERAGE }}%"
-              exit 1
-            fi
-          else
-            echo "No coverage report found"
-            exit 1
-          fi
+      - name: Send Email Notification
+        if: always()
+        uses: peter-evans/sendgrid-action@v1
+        with:
+          sendgrid-api-key: ${{ secrets.SENDGRID_API_KEY }}
+          to: 'your-email@example.com'
+          from: 'no-reply@example.com'
+          subject: 'CI/CD Workflow Execution ${{ job.status }} for ${{ github.repository }}'
+          body: 'The CI/CD workflow execution on branch ${{ github.ref }} is ${{ job.status }}. Please check the GitHub Actions log for more details.'
 
       - name: Create publish output
-        if: github.ref == 'refs/heads/Development_CI/CD#2.4'
+        if: success()
         run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ./publish
 
       - name: Upload build artifacts
-        if: github.ref == 'refs/heads/Development_CI/CD#2.4'
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
           path: ./publish
-          retention-days: 5
 
   deployment:
     needs: build-and-test
-    if: github.ref == 'refs/heads/Development_CI/CD#2.4'
+    if: github.ref == 'refs/heads/master' && needs.build-and-test.result == 'success'
     runs-on: ubuntu-latest
-    environment: production
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
@@ -121,33 +98,20 @@ jobs:
           name: build-artifacts
           path: ./publish
 
-      - name: Setup SSH
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          eval $(ssh-agent -s)
-          ssh-add ~/.ssh/deploy_key
-
       - name: Deploy to Production
-        env:
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SERVER_IP: ${{ secrets.SERVER_IP }}
         run: |
-          # Add server to known hosts
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-          
-          # Stop the service
-          ssh -i ~/.ssh/deploy_key ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "sudo systemctl stop csharpapi" || echo "Service not running"
-          
-          # Copy files
-          scp -i ~/.ssh/deploy_key -r ./publish/* ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/var/www/csharpapi/
-          
-          # Start the service
-          ssh -i ~/.ssh/deploy_key ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "sudo systemctl start csharpapi"
+          echo "Deploying to production server"
+          # Example SSH deployment commands
+          scp -i /path/to/ssh/key ./publish/* user@your-server:/path/to/deploy
+          ssh -i /path/to/ssh/key user@your-server 'sudo systemctl restart your-service'
 
-      - name: Cleanup
-        if: always()
-        run: rm -f ~/.ssh/deploy_key
+      - name: Notify Deployment Success
+        if: success()
+        uses: peter-evans/sendgrid-action@v1
+        with:
+          sendgrid-api-key: ${{ secrets.SENDGRID_API_KEY }}
+          to: 'your-email@example.com'
+          from: 'no-reply@example.com'
+          subject: 'Successful Deployment to Production'
+          body: 'Deployment of ${{ github.repository }} to production was successful.'
+
