@@ -18,9 +18,16 @@ API_KEY: admin_key_2024
   "description": "Default Inventory",
   "item_reference": null,
   "locations": [
-    2
+    {
+      "location_id": 1,
+      "amount": 10
+    }, 
+    {
+      "location_id": 2,
+      "amount": 5
+    }
   ],
-  "total_on_hand": 100,
+  "total_on_hand": 0,
   "total_expected": 100,
   "total_ordered": 100,
   "total_allocated": 100,
@@ -36,7 +43,14 @@ API_KEY: admin_key_2024
   "description": "Updated Inventorie",
   "item_reference": null,
   "locations": [
-    0
+    {
+      "location_id": 1,
+      "amount": 10
+    }, 
+    {
+      "location_id": 2,
+      "amount": 5
+    }
   ],
   "total_on_hand": 0,
   "total_expected": 0,
@@ -46,7 +60,7 @@ API_KEY: admin_key_2024
 }
 
 ### Delete Inventorie
-DELETE http://localhost:5001/api/v1/inventories/4
+DELETE http://localhost:5001/api/v1/inventories/2
 Content-Type: application/json
 API_KEY: admin_key_2024
 

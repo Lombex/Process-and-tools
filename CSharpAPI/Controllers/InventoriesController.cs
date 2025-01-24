@@ -139,7 +139,7 @@ namespace CSharpAPI.Controllers
         }
 
         [HttpGet("location/{locationId}")]
-        public async Task<ActionResult<IEnumerable<InventorieModel>>> GetInventoriesByLocation(int locationId)
+        public async Task<ActionResult<IEnumerable<InventorieModel>>> GetInventoriesByLocation(AmountPerLocation locationId)
         {
             if (!await CheckAccess("GET"))
                 return Forbid();

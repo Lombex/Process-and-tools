@@ -1,6 +1,9 @@
 using CSharpAPI.Models;
 using CSharpAPI.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient.DataClassification;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Newtonsoft.Json;
 
 namespace CSharpAPI.Service
 {   
@@ -12,7 +15,7 @@ namespace CSharpAPI.Service
         Task<bool> UpdateInventory(int id, InventorieModel inventory);
         Task<bool> DeleteInventory(int id);
         Task<List<InventorieModel>> GetInventoriesByItemId(string itemId);
-        Task<List<InventorieModel>> GetInventoriesByLocation(int locationId);
+        Task<List<InventorieModel>> GetInventoriesByLocation(AmountPerLocation locationId);
     }
 
     public class InventoriesService : IInventoriesService
@@ -44,6 +47,12 @@ namespace CSharpAPI.Service
             inventory.created_at = DateTime.UtcNow;
             inventory.updated_at = DateTime.UtcNow;
 
+            // each inventory.location.amount should be added to the total_on_hand
+
+            inventory.total_available = 0;
+
+            foreach (var location in inventory.locations) inventory.total_available += location.amount;
+
             await _Db.Inventors.AddAsync(inventory);
             await _Db.SaveChangesAsync();
         }
@@ -70,13 +79,14 @@ namespace CSharpAPI.Service
             return true;
         }
 
-       public async Task<bool> DeleteInventory(int id)
+        public async Task<bool> DeleteInventory(int id)
         {
             var inventory = await _Db.Inventors.FirstOrDefaultAsync(x => x.id == id);
             if (inventory == null) return false;
 
             // Log de gegevens van de inventaris
             Console.WriteLine($"Archiving Inventory: {inventory.id}, {inventory.description}");
+            Console.WriteLine($"Archiving Inventory Locations: {inventory.locations}");
 
             var archivedInventory = new ArchivedInventorieModel
             {
@@ -84,7 +94,6 @@ namespace CSharpAPI.Service
                 item_id = inventory.item_id,
                 description = inventory.description,
                 item_reference = inventory.item_reference,
-                locations = inventory.locations,
                 total_on_hand = inventory.total_on_hand,
                 total_expected = inventory.total_expected,
                 total_ordered = inventory.total_ordered,
@@ -92,12 +101,13 @@ namespace CSharpAPI.Service
                 total_available = inventory.total_available,
                 created_at = inventory.created_at,
                 updated_at = inventory.updated_at,
-                archived_at = DateTime.UtcNow
+                archived_at = DateTime.UtcNow,
+                locations = inventory.locations
             };
 
             // Controleer of de archiefdata correct is gevuld
             Console.WriteLine($"Archived Inventory: {archivedInventory.id}, {archivedInventory.description}");
-
+            Console.WriteLine($"Archiving Inventory Locations: {archivedInventory.locations}");
             await _Db.ArchivedInventories.AddAsync(archivedInventory);
 
             // Verwijder het originele record
@@ -114,9 +124,9 @@ namespace CSharpAPI.Service
             return await _Db.Inventors.Where(i => i.item_id == itemId).ToListAsync();
         }
 
-        public async Task<List<InventorieModel>> GetInventoriesByLocation(int locationId)
+        public async Task<List<InventorieModel>> GetInventoriesByLocation(AmountPerLocation locationId)
         {
-            return await _Db.Inventors.Where(i => i.locations.Contains(locationId)).ToListAsync();
+            return await _Db.Inventors.Where(i => i.locations != null && i.locations.Contains(locationId)).ToListAsync();
         }
     }
 }

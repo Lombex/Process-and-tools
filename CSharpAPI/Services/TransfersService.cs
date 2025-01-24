@@ -71,13 +71,11 @@ namespace CSharpAPI.Service {
             if (transfer == null) throw new Exception("No pending transfer found with the given ID!");
             foreach (var item in transfer.items)
             {
-                var inventories = await _Db.Inventors
-                                            .Where(y => y.item_id == item.item_id)
-                                            .ToListAsync();
+                var inventories = await _Db.Inventors.Where(y => y.item_id == item.item_id).ToListAsync();
 
                 foreach (var inventory in inventories)
                 {
-                    if (inventory.locations.Contains((int)transfer.transfer_from))
+                    if (inventory.locations[0].Equals((int)transfer.transfer_from))
                     {
                         // verminder de aantalen op de locatie
                         inventory.total_on_hand -= item.amount;
@@ -85,7 +83,7 @@ namespace CSharpAPI.Service {
                         inventory.total_available = inventory.total_on_hand - inventory.total_allocated;
                         _Db.Inventors.Update(inventory);
                     }
-                    else if (inventory.locations.Contains((int)transfer.transfer_to))
+                    else if (inventory.locations[0].Equals((int)transfer.transfer_to))
                     {
                         //optellen van de aantallen op de locatie
                         inventory.total_on_hand += item.amount;

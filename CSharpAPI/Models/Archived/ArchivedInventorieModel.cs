@@ -6,7 +6,7 @@ namespace CSharpAPI.Models
         public string? item_id { get; set; }
         public string? description { get; set; }
         public string? item_reference { get; set; }
-        public List<int>? locations { get; set; }
+        public List<AmountPerLocation>? locations { get; set; }
         public int total_on_hand { get; set; }
         public int total_expected { get; set; }
         public int total_ordered { get; set; }

@@ -80,7 +80,6 @@ namespace CSharpAPI.Migrations
                     item_id = table.Column<string>(type: "TEXT", nullable: true),
                     description = table.Column<string>(type: "TEXT", nullable: true),
                     item_reference = table.Column<string>(type: "TEXT", nullable: true),
-                    locations = table.Column<string>(type: "TEXT", nullable: true),
                     total_on_hand = table.Column<int>(type: "INTEGER", nullable: false),
                     total_expected = table.Column<int>(type: "INTEGER", nullable: false),
                     total_ordered = table.Column<int>(type: "INTEGER", nullable: false),
@@ -665,6 +664,26 @@ namespace CSharpAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ArchivedInventories_locations",
+                columns: table => new
+                {
+                    ArchivedInventorieModelid = table.Column<int>(type: "INTEGER", nullable: false),
+                    Id = table.Column<int>(type: "INTEGER", nullable: false),
+                    location_id = table.Column<int>(type: "INTEGER", nullable: false),
+                    amount = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArchivedInventories_locations", x => new { x.ArchivedInventorieModelid, x.Id });
+                    table.ForeignKey(
+                        name: "FK_ArchivedInventories_locations_ArchivedInventories_ArchivedInventorieModelid",
+                        column: x => x.ArchivedInventorieModelid,
+                        principalTable: "ArchivedInventories",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Items",
                 columns: table => new
                 {
@@ -724,7 +743,7 @@ namespace CSharpAPI.Migrations
                 name: "ArchivedDocks");
 
             migrationBuilder.DropTable(
-                name: "ArchivedInventories");
+                name: "ArchivedInventories_locations");
 
             migrationBuilder.DropTable(
                 name: "ArchivedItemGroups");
@@ -800,6 +819,9 @@ namespace CSharpAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "Warehouse");
+
+            migrationBuilder.DropTable(
+                name: "ArchivedInventories");
 
             migrationBuilder.DropTable(
                 name: "ArchivedOrders");

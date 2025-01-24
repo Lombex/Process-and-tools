@@ -105,9 +105,6 @@ namespace CSharpAPI.Migrations
                     b.Property<string>("item_reference")
                         .HasColumnType("TEXT");
 
-                    b.PrimitiveCollection<string>("locations")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("total_allocated")
                         .HasColumnType("INTEGER");
 
@@ -739,7 +736,7 @@ namespace CSharpAPI.Migrations
                     b.Property<string>("item_reference")
                         .HasColumnType("TEXT");
 
-                    b.PrimitiveCollection<string>("locations")
+                    b.Property<string>("locations")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("total_allocated")
@@ -1238,6 +1235,34 @@ namespace CSharpAPI.Migrations
                         });
 
                     b.Navigation("contact");
+                });
+
+            modelBuilder.Entity("CSharpAPI.Models.ArchivedInventorieModel", b =>
+                {
+                    b.OwnsMany("CSharpAPI.Models.AmountPerLocation", "locations", b1 =>
+                        {
+                            b1.Property<int>("ArchivedInventorieModelid")
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<int>("amount")
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<int>("location_id")
+                                .HasColumnType("INTEGER");
+
+                            b1.HasKey("ArchivedInventorieModelid", "Id");
+
+                            b1.ToTable("ArchivedInventories_locations");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ArchivedInventorieModelid");
+                        });
+
+                    b.Navigation("locations");
                 });
 
             modelBuilder.Entity("CSharpAPI.Models.ArchivedSupplierModel", b =>

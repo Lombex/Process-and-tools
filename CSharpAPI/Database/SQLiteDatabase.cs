@@ -61,18 +61,15 @@ namespace CSharpAPI.Data
                     i => JsonConvert.SerializeObject(i),
                     i => JsonConvert.DeserializeObject<List<Items>>(i)));
 
-            modelBuilder.Entity<OrderModel>().Property(x => x.items)
-                .HasConversion(new ValueConverter<List<Items>, string>(
-                    i => JsonConvert.SerializeObject(i),
-                    i => JsonConvert.DeserializeObject<List<Items>>(i)));
-
-
+            modelBuilder.Entity<OrderModel>().Property(x => x.items).HasConversion(new ValueConverter<List<Items>, string>(
+                    i => JsonConvert.SerializeObject(i), i => JsonConvert.DeserializeObject<List<Items>>(i)));
 
             modelBuilder.Entity<OrderShipmentMapping>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
+
             modelBuilder.Entity<TransferModel>().Property(x => x.items).HasConversion(new ValueConverter<List<Items>, string>(
                 i => JsonConvert.SerializeObject(i), i => JsonConvert.DeserializeObject<List<Items>>(i)));
 
@@ -81,6 +78,9 @@ namespace CSharpAPI.Data
 
             modelBuilder.Entity<OrderModel>().Property(x => x.items).HasConversion(new ValueConverter<List<Items>, string>(
                 i => JsonConvert.SerializeObject(i), i => JsonConvert.DeserializeObject<List<Items>>(i)));
+
+            modelBuilder.Entity<InventorieModel>().Property(x => x.locations).HasConversion(new ValueConverter<List<AmountPerLocation>, string>(
+                i => JsonConvert.SerializeObject(i), i => JsonConvert.DeserializeObject<List<AmountPerLocation>>(i)));
 
             // Configure ApiUser entity
             modelBuilder.Entity<ApiUser>(entity =>
