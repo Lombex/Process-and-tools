@@ -12,6 +12,9 @@ namespace CSharpAPI.Services.V2
         Task<InventoryLocationModel> Update(int id, InventoryLocationModel model);
         Task Delete(int id);
         Task UpdateCalculatedFields(int inventoryId);
+        Task ReceiveShipment(int inventoryId, double amountReceived);
+        Task PlaceOrder(string item_id, double amountOrdered);
+        Task RemoveOrder(string itemId, int amount);
     }
 
     public class InventoryLocationService : IInventoryLocationService
@@ -33,49 +36,23 @@ namespace CSharpAPI.Services.V2
 
         public async Task<InventoryLocationModel> GetById(int id)
         {
-            var inventoryLocation = await _db.InventoryLocations
-                .Include(il => il.Inventory)
-                .Include(il => il.Location)
-                .FirstOrDefaultAsync(il => il.Id == id);
-
-            if (inventoryLocation == null)
-                throw new Exception($"InventoryLocation with id {id} not found");
-
-            return inventoryLocation;
+            return await _db.InventoryLocations.Include(il => il.Inventory).Include(il => il.Location).FirstOrDefaultAsync(il => il.Id == id);
         }
 
         public async Task<InventoryLocationModel> Create(InventoryLocationModel model)
         {
-            // Validate required fields
-            if (model.InventoryId <= 0)
-                throw new ArgumentException("Invalid inventory ID");
+            if (model.InventoryId <= 0 || model.LocationId <= 0 || model.Amount < 0)
+                throw new ArgumentException("Invalid inventory or location ID, or negative amount specified");
 
-            if (model.LocationId <= 0)
-                throw new ArgumentException("Invalid location ID");
-
-            if (model.Amount < 0)
-                throw new ArgumentException("Amount cannot be negative");
-
-            // Check if inventory exists
-            var inventory = await _db.Inventors
-                .FirstOrDefaultAsync(i => i.id == model.InventoryId);
+            var inventory = await _db.Inventors.FirstOrDefaultAsync(i => i.id == model.InventoryId);
             if (inventory == null)
                 throw new ArgumentException($"Inventory with ID {model.InventoryId} not found");
 
-            // Check if location exists
-            var location = await _db.Location
-                .FirstOrDefaultAsync(l => l.id == model.LocationId);
+            var location = await _db.Location.FirstOrDefaultAsync(l => l.id == model.LocationId);
             if (location == null)
                 throw new ArgumentException($"Location with ID {model.LocationId} not found");
 
-            // Check if this inventory-location combination already exists
-            var existing = await _db.InventoryLocations
-                .FirstOrDefaultAsync(il => il.InventoryId == model.InventoryId && il.LocationId == model.LocationId);
-            if (existing != null)
-                throw new ArgumentException($"An inventory location already exists for inventory {model.InventoryId} at location {model.LocationId}");
-
-            // Create new inventory location without navigation properties
-            var newInventoryLocation = new InventoryLocationModel
+            var newRecord = new InventoryLocationModel
             {
                 InventoryId = model.InventoryId,
                 LocationId = model.LocationId,
@@ -84,109 +61,95 @@ namespace CSharpAPI.Services.V2
                 UpdatedAt = DateTime.UtcNow
             };
 
-            _db.Entry(newInventoryLocation).State = EntityState.Added;
+            _db.InventoryLocations.Add(newRecord);
             await _db.SaveChangesAsync();
 
-            // Update calculated fields
             await UpdateCalculatedFields(model.InventoryId);
 
-            // Load the complete model with relationships for return
-            return await _db.InventoryLocations
-                .Include(il => il.Inventory)
-                .Include(il => il.Location)
-                .FirstAsync(il => il.Id == newInventoryLocation.Id);
+            return await GetById(newRecord.Id); // Reload to include navigation properties
         }
 
         public async Task<InventoryLocationModel> Update(int id, InventoryLocationModel model)
         {
-            var existing = await _db.InventoryLocations
+            var record = await _db.InventoryLocations
                 .Include(il => il.Inventory)
                 .Include(il => il.Location)
                 .FirstOrDefaultAsync(il => il.Id == id);
 
-            if (existing == null)
-                throw new Exception($"InventoryLocation with id {id} not found");
+            if (record == null)
+                throw new Exception("Inventory location not found");
 
-            // Verify new inventory exists if it's being changed
-            if (model.InventoryId != existing.InventoryId)
-            {
-                var newInventory = await _db.Inventors.FindAsync(model.InventoryId);
-                if (newInventory == null)
-                    throw new ArgumentException($"Inventory with ID {model.InventoryId} not found");
+            record.Amount = model.Amount;
+            record.UpdatedAt = DateTime.UtcNow;
 
-                // Update inventory reference
-                existing.InventoryId = model.InventoryId;
-                existing.Inventory = newInventory;
-            }
-
-            // Verify new location exists if it's being changed
-            if (model.LocationId != existing.LocationId)
-            {
-                var newLocation = await _db.Location.FindAsync(model.LocationId);
-                if (newLocation == null)
-                    throw new ArgumentException($"Location with ID {model.LocationId} not found");
-
-                // Update location reference
-                existing.LocationId = model.LocationId;
-                existing.Location = newLocation;
-            }
-
-            // Check if this combination already exists (only if location or inventory changed)
-            if (model.LocationId != existing.LocationId || model.InventoryId != existing.InventoryId)
-            {
-                var duplicate = await _db.InventoryLocations
-                    .FirstOrDefaultAsync(il =>
-                        il.Id != id &&
-                        il.InventoryId == model.InventoryId &&
-                        il.LocationId == model.LocationId);
-
-                if (duplicate != null)
-                    throw new ArgumentException($"An inventory location already exists for inventory {model.InventoryId} at location {model.LocationId}");
-            }
-
-            // Update basic properties
-            existing.Amount = model.Amount;
-            existing.UpdatedAt = DateTime.UtcNow;
-
+            _db.InventoryLocations.Update(record);
             await _db.SaveChangesAsync();
 
-            // Update calculated fields for both old and new inventory if changed
-            if (model.InventoryId != existing.InventoryId)
-            {
-                await UpdateCalculatedFields(model.InventoryId);
-                await UpdateCalculatedFields(existing.InventoryId);
-            }
-            else
-            {
-                await UpdateCalculatedFields(existing.InventoryId);
-            }
+            await UpdateCalculatedFields(model.InventoryId);
 
-            return existing;
+            return record;
         }
 
         public async Task Delete(int id)
         {
-            var inventoryLocation = await GetById(id);
-            var inventoryId = inventoryLocation.InventoryId;
-
-            _db.InventoryLocations.Remove(inventoryLocation);
+            var record = await GetById(id);
+            _db.InventoryLocations.Remove(record);
             await _db.SaveChangesAsync();
 
-            await UpdateCalculatedFields(inventoryId);
+            await UpdateCalculatedFields(record.InventoryId);
         }
 
         public async Task UpdateCalculatedFields(int inventoryId)
         {
             var inventory = await _db.Inventors.FindAsync(inventoryId);
             if (inventory == null)
-                throw new Exception($"Inventory with id {inventoryId} not found");
+                throw new Exception("Inventory not found");
 
-            // Calculate total_on_hand based on location amounts
-            var totalOnHand = await _db.InventoryLocations.Where(il => il.InventoryId == inventoryId).SumAsync(il => (int)il.Amount);
+            var totalOnHand = await _db.InventoryLocations.Where(il => il.InventoryId == inventoryId).SumAsync(il => il.Amount);
 
-            inventory.total_on_hand = totalOnHand;
-            inventory.total_expected = totalOnHand + inventory.total_ordered;
-            inventory.total_available = totalOnHand - inventory.total_allocated;
+            inventory.total_on_hand = (int)totalOnHand;
+            inventory.total_available = (int)totalOnHand - inventory.total_allocated;
+            inventory.total_expected = (int)totalOnHand + inventory.total_ordered; // Check if this logic fits your requirements
+
+            _db.Inventors.Update(inventory);
+            await _db.SaveChangesAsync();
+        }
+
+        public async Task ReceiveShipment(int inventoryId, double amountReceived)
+        {
+            var inventory = await _db.Inventors.FindAsync(inventoryId);
+            if (inventory != null)
+            {
+                inventory.total_on_hand += (int)amountReceived;
+                inventory.total_expected -= (int)amountReceived; // Adjust if shipment is part of expected inventory
+                await _db.SaveChangesAsync();
+            }
+        }
+
+        public async Task PlaceOrder(string itemId, double amountOrdered)
+        {
+            var inventory = await _db.Inventors.FirstOrDefaultAsync(i => i.item_id == itemId);
+            if (inventory == null)
+                throw new Exception($"Inventory not found for item ID {itemId}");
+
+            inventory.total_allocated += (int)amountOrdered;
+            inventory.total_available = inventory.total_on_hand - inventory.total_allocated;
+
+            _db.Inventors.Update(inventory);
+            await _db.SaveChangesAsync();
+        }
+
+        public async Task RemoveOrder(string itemId, int amount)
+        {
+            var inventory = await _db.Inventors.FirstOrDefaultAsync(i => i.item_id == itemId);
+            if (inventory == null)
+                throw new Exception($"Inventory not found for item ID {itemId}");
+
+            // Reduce allocated stock and adjust available stock
+            inventory.total_allocated -= amount;
+            if (inventory.total_allocated < 0) inventory.total_allocated = 0;
+
+            inventory.total_available = inventory.total_on_hand - inventory.total_allocated;
 
             _db.Inventors.Update(inventory);
             await _db.SaveChangesAsync();

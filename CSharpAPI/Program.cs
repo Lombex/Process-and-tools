@@ -24,10 +24,11 @@ builder.Services.AddDbContext<SQLiteDatabase>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Register services
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IInventoryLocationService, InventoryLocationService>();
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();
 builder.Services.AddScoped<ITransfersService, TransferSerivce>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IItemsService, ItemsService>();
 builder.Services.AddScoped<IShipmentService, ShipmentService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
@@ -40,7 +41,7 @@ builder.Services.AddScoped<IDockService, DockService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
 builder.Services.AddScoped<HistoryService>();
-builder.Services.AddScoped<IInventoryLocationService, InventoryLocationService>();
+
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -62,7 +63,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "CSharp API", Version = "v1" });
-    
+
     c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
     {
         Description = "API Key must appear in header",
@@ -71,7 +72,7 @@ builder.Services.AddSwaggerGen(c =>
         In = ParameterLocation.Header,
         Scheme = "ApiKeyScheme"
     });
-    
+
     var scheme = new OpenApiSecurityScheme
     {
         Reference = new OpenApiReference
@@ -81,12 +82,12 @@ builder.Services.AddSwaggerGen(c =>
         },
         In = ParameterLocation.Header
     };
-    
+
     var requirement = new OpenApiSecurityRequirement
     {
         { scheme, new List<string>() }
     };
-    
+
     c.AddSecurityRequirement(requirement);
 });
 
@@ -123,7 +124,7 @@ using (var scope = app.Services.CreateScope())
     {
         await dbContext.Database.MigrateAsync();
         await DatabaseSeeding.SeedDatabase(dbContext, authService);
-        
+
         // Ensure permissions for all existing API keys
         var existingUsers = await dbContext.ApiUsers.ToListAsync();
         foreach (var user in existingUsers)

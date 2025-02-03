@@ -33,7 +33,6 @@ namespace CSharpAPI.Data
         public DbSet<ArchivedItemModel> ArchivedItems { get; set; }
         public DbSet<ArchivedClientModel> ArchivedClients { get; set; }
         public DbSet<ArchivedDockModel> ArchivedDocks { get; set; }
-
         public DbSet<ArchivedInventorieModel> ArchivedInventories { get; set; }
         public DbSet<ArchivedItemGroupModel> ArchivedItemGroups { get; set; }
         public DbSet<ArchivedItemLineModel> ArchivedItemLines { get; set; }

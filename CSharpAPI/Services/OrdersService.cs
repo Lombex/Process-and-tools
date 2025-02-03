@@ -1,6 +1,7 @@
 using CSharpAPI.Data;
 using CSharpAPI.Models;
 using CSharpAPI.Services;
+using CSharpAPI.Services.V2;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -23,15 +24,16 @@ namespace CSharpAPI.Service
     {
         private readonly SQLiteDatabase _Db;
         private readonly HistoryService _historyService;
+        private readonly InventoryLocationService _inventoryLocationService;
 
-        
-        public OrderService(SQLiteDatabase sQLite, HistoryService historyService) 
+        public OrderService(SQLiteDatabase sQLite, HistoryService historyService, InventoryLocationService inventoryLocationService)
         {
             _Db = sQLite;
             _historyService = historyService;
+            _inventoryLocationService = inventoryLocationService;
         }
 
-        public async Task<List<OrderModel>> GetAllOrders() => 
+        public async Task<List<OrderModel>> GetAllOrders() =>
             await _Db.Order.AsQueryable().ToListAsync();
 
         public async Task<OrderModel> GetOrderById(int id)
@@ -53,7 +55,7 @@ namespace CSharpAPI.Service
         {
             // Check if order exists
             var order = await GetOrderById(orderId);
-            
+
             // Check if shipment exists
             var shipment = await _Db.Shipment.FindAsync(shipmentId);
             if (shipment == null)
@@ -62,7 +64,7 @@ namespace CSharpAPI.Service
             // Check if mapping already exists
             var existingMapping = await _Db.OrderShipments
                 .FirstOrDefaultAsync(m => m.OrderId == orderId && m.ShipmentId == shipmentId);
-            
+
             if (existingMapping == null)
             {
                 var mapping = new OrderShipmentMapping
@@ -81,7 +83,7 @@ namespace CSharpAPI.Service
         {
             var mapping = await _Db.OrderShipments
                 .FirstOrDefaultAsync(m => m.OrderId == orderId && m.ShipmentId == shipmentId);
-                
+
             if (mapping != null)
             {
                 _Db.OrderShipments.Remove(mapping);
@@ -100,56 +102,58 @@ namespace CSharpAPI.Service
                 .ToListAsync();
         }
 
-        public async Task UpdateOrders(int id, OrderModel updatedOrders)
+        public async Task UpdateOrders(int id, OrderModel updatedOrder)
         {
-            var _order = await GetOrderById(id);
+            var existingOrder = await GetOrderById(id);
 
-            string changes = $"";
-            if (_order.reference != updatedOrders.reference) changes += $"Reference: {_order.reference} -> {updatedOrders.reference}; ";
-            if (_order.order_status != updatedOrders.order_status) changes += $"Status: {_order.order_status} -> {updatedOrders.order_status}; ";
-            if (_order.total_amount != updatedOrders.total_amount) changes += $"Total Amount: {_order.total_amount} -> {updatedOrders.total_amount}; ";
+            foreach (var updatedItem in updatedOrder.items)
+            {
+                var originalItem = existingOrder.items.FirstOrDefault(i => i.item_id == updatedItem.item_id);
 
-            _order.source_id = updatedOrders.source_id;
-            _order.order_date = updatedOrders.order_date;
-            _order.request_date = updatedOrders.request_date;
-            _order.reference = updatedOrders.reference;
-            _order.reference_extra = updatedOrders.reference_extra;
-            _order.order_status = updatedOrders.order_status;
-            _order.notes = updatedOrders.notes;
-            _order.shipping_notes = updatedOrders.shipping_notes;
-            _order.picking_notes = updatedOrders.picking_notes;
-            _order.warehouse_id = updatedOrders.warehouse_id;
-            _order.ship_to = updatedOrders.ship_to;
-            _order.bill_to = updatedOrders.bill_to;
-            _order.total_amount = updatedOrders.total_amount;
-            _order.total_discount = updatedOrders.total_discount;
-            _order.total_tax = updatedOrders.total_tax;
-            _order.total_surcharge = updatedOrders.total_surcharge;
-            _order.updated_at = DateTime.Now;
-            _order.items = updatedOrders.items;
+                if (originalItem != null && originalItem.amount != updatedItem.amount)
+                {
+                    int quantityChange = updatedItem.amount - originalItem.amount;
 
-            _Db.Order.Update(_order);
+                    if (quantityChange > 0)
+                    {
+                        await _inventoryLocationService.PlaceOrder(updatedItem.item_id, quantityChange);
+                    }
+                    else
+                    {
+                        await _inventoryLocationService.RemoveOrder(updatedItem.item_id, -quantityChange);
+                    }
+                }
+            }
+
+            _Db.Order.Update(existingOrder);
             await _Db.SaveChangesAsync();
-            await _historyService.LogAsync(EntityType.Order, id.ToString(), "Updated", $"Wijzigingen: {changes}");
-
+            await _historyService.LogAsync(EntityType.Order, id.ToString(), "Updated", $"Order {existingOrder.reference} updated.");
         }
 
-        public async Task CreateOrder(OrderModel orders)
+        public async Task CreateOrder(OrderModel order)
         {
-            if (orders == null) throw new ArgumentNullException(nameof(orders));
+            if (order == null) throw new ArgumentNullException(nameof(order));
 
-            if (!(await _Db.ClientModels.AnyAsync(client => client.id == orders.ship_to)))
-                throw new Exception($"Shipping address with Client ID {orders.ship_to} does not exist.");
+            // Validate that order references exist
+            if (!(await _Db.ClientModels.AnyAsync(client => client.id == order.ship_to)))
+                throw new Exception($"Shipping address with Client ID {order.ship_to} does not exist.");
 
-            if (!(await _Db.ClientModels.AnyAsync(client => client.id == orders.bill_to))) 
-                throw new Exception($"Billing address with Client ID {orders.bill_to} does not exist.");
+            if (!(await _Db.ClientModels.AnyAsync(client => client.id == order.bill_to)))
+                throw new Exception($"Billing address with Client ID {order.bill_to} does not exist.");
 
-            orders.created_at = DateTime.UtcNow;
-            orders.updated_at = DateTime.UtcNow;
+            order.created_at = DateTime.UtcNow;
+            order.updated_at = DateTime.UtcNow;
 
-            await _Db.Order.AddAsync(orders);
-            await _historyService.LogAsync(EntityType.Order, orders.id.ToString(), "Created", $"Order {orders.reference} is aangemaakt met totaalbedrag {orders.total_amount}");
+            await _Db.Order.AddAsync(order);
             await _Db.SaveChangesAsync();
+
+            // Allocate inventory
+            foreach (var item in order.items)
+            {
+                await _inventoryLocationService.PlaceOrder(item.item_id, item.amount);
+            }
+
+            await _historyService.LogAsync(EntityType.Order, order.id.ToString(), "Created", $"Order {order.reference} created.");
         }
 
         public async Task DeleteOrder(int id)
@@ -157,45 +161,14 @@ namespace CSharpAPI.Service
             var order = await GetOrderById(id);
             if (order == null) throw new Exception("Order not found!");
 
-            // Maak een kopie in de archieftabel
-            var archivedOrder = new ArchivedOrderModel
+            foreach (var item in order.items)
             {
-                id = order.id,
-                source_id = order.source_id,
-                order_date = order.order_date,
-                request_date = order.request_date,
-                reference = order.reference,
-                reference_extra = order.reference_extra,
-                order_status = order.order_status,
-                notes = order.notes,
-                shipping_notes = order.shipping_notes,
-                picking_notes = order.picking_notes,
-                warehouse_id = order.warehouse_id,
-                ship_to = order.ship_to,
-                bill_to = order.bill_to,
-                total_amount = order.total_amount,
-                total_discount = order.total_discount,
-                total_tax = order.total_tax,
-                total_surcharge = order.total_surcharge,
-                created_at = order.created_at,
-                updated_at = order.updated_at,
-                archived_at = DateTime.UtcNow,
-                items = order.items
-            };
+                await _inventoryLocationService.RemoveOrder(item.item_id, item.amount);
+            }
 
-            await _Db.ArchivedOrders.AddAsync(archivedOrder);
-
-            // Log de verwijdering in de History-tabel
-            await _historyService.LogAsync(
-                EntityType.Order,
-                id.ToString(),
-                "Archived",
-                $"Order {order.reference} is gearchiveerd in plaats van verwijderd."
-            );
-
-            // Verwijder de originele order
             _Db.Order.Remove(order);
             await _Db.SaveChangesAsync();
+            await _historyService.LogAsync(EntityType.Order, id.ToString(), "Deleted", $"Order {order.reference} deleted.");
         }
     }
 }

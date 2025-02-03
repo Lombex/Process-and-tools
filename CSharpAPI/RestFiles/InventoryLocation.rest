@@ -27,7 +27,7 @@ API_KEY: admin_key_2024
 {
     "id": 1,
     "inventoryId": 1,
-    "locationId": 63,
+    "locationId": 1,
     "amount": 200.50
 }
 
@@ -68,3 +68,18 @@ API_KEY: admin_key_2024
     "locationId": 999999,
     "amount": 150.75
 }
+
+### Get inventory details again to check updated calculated fields
+GET http://localhost:5001/api/v2/inventories/1
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### Delete inventory location
+DELETE http://localhost:5001/api/v2/inventory-locations/1
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### Get inventory details post-deletion to check calculated fields
+GET http://localhost:5001/api/v2/inventories/1
+Content-Type: application/json
+API_KEY: admin_key_2024
