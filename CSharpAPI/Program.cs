@@ -7,6 +7,7 @@ using CSharpAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
 using CSharpAPI.Services.Auth;
+using CSharpAPI.Services.V2;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +40,7 @@ builder.Services.AddScoped<IDockService, DockService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
 builder.Services.AddScoped<HistoryService>();
+builder.Services.AddScoped<IInventoryLocationService, InventoryLocationService>();
 
 // Add CORS
 builder.Services.AddCors(options =>

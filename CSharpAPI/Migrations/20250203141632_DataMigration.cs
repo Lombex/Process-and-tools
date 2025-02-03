@@ -707,11 +707,50 @@ namespace CSharpAPI.Migrations
                         principalColumn: "id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "inventory_locations",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    inventory_id = table.Column<int>(type: "INTEGER", nullable: false),
+                    location_id = table.Column<int>(type: "INTEGER", nullable: false),
+                    amount = table.Column<decimal>(type: "TEXT", nullable: false),
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_inventory_locations", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_inventory_locations_Inventors_inventory_id",
+                        column: x => x.inventory_id,
+                        principalTable: "Inventors",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_inventory_locations_Location_location_id",
+                        column: x => x.location_id,
+                        principalTable: "Location",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_ApiUsers_api_key",
                 table: "ApiUsers",
                 column: "api_key",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_inventory_locations_inventory_id",
+                table: "inventory_locations",
+                column: "inventory_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_inventory_locations_location_id",
+                table: "inventory_locations",
+                column: "location_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Items_ArchivedOrderModelid",
@@ -779,7 +818,7 @@ namespace CSharpAPI.Migrations
                 name: "History");
 
             migrationBuilder.DropTable(
-                name: "Inventors");
+                name: "inventory_locations");
 
             migrationBuilder.DropTable(
                 name: "ItemGroups");
@@ -795,9 +834,6 @@ namespace CSharpAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "ItemType");
-
-            migrationBuilder.DropTable(
-                name: "Location");
 
             migrationBuilder.DropTable(
                 name: "Order");
@@ -822,6 +858,12 @@ namespace CSharpAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "ArchivedInventories");
+
+            migrationBuilder.DropTable(
+                name: "Inventors");
+
+            migrationBuilder.DropTable(
+                name: "Location");
 
             migrationBuilder.DropTable(
                 name: "ArchivedOrders");

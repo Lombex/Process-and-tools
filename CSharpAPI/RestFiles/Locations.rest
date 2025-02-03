@@ -19,7 +19,6 @@ Content-Type: application/json
 API_KEY: admin_key_2024
 
 {
-  "id": 0,
   "warehouse_id": 1,
   "code": "Q.25.3",
   "name": "Newly created location"

@@ -42,7 +42,7 @@ namespace CSharpAPI.Data
         public DbSet<ArchivedSupplierModel> ArchivedSuppliers { get; set; }
         public DbSet<ArchivedTransferModel> ArchivedTransfers { get; set; }
         public DbSet<ArchivedWarehouseModel> ArchivedWarehouses { get; set; }
-
+        public DbSet<InventoryLocationModel> InventoryLocations { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

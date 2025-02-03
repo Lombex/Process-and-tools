@@ -1,0 +1,70 @@
+### Create new inventory location (connect existing inventory and location)
+POST http://localhost:5001/api/v2/inventory-locations
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+    "inventoryId": 1,
+    "locationId": 1,
+    "amount": 150.75
+}
+
+### Get all inventory locations
+GET http://localhost:5001/api/v2/inventory-locations/all
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### Get specific inventory location
+GET http://localhost:5001/api/v2/inventory-locations/1
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### Update inventory location
+PUT http://localhost:5001/api/v2/inventory-locations/1
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+    "id": 1,
+    "inventoryId": 1,
+    "locationId": 63,
+    "amount": 200.50
+}
+
+### Delete inventory location
+DELETE http://localhost:5001/api/v2/inventory-locations/1
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+### Test error: Create duplicate inventory-location combination
+POST http://localhost:5001/api/v2/inventory-locations
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+    "inventoryId": 1,
+    "locationId": 63,
+    "amount": 300.00
+}
+
+### Test error: Invalid inventory ID
+POST http://localhost:5001/api/v2/inventory-locations
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+    "inventoryId": 999999,
+    "locationId": 63,
+    "amount": 150.75
+}
+
+### Test error: Invalid location ID
+POST http://localhost:5001/api/v2/inventory-locations
+Content-Type: application/json
+API_KEY: admin_key_2024
+
+{
+    "inventoryId": 1,
+    "locationId": 999999,
+    "amount": 150.75
+}

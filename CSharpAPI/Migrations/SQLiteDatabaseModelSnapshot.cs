@@ -762,6 +762,42 @@ namespace CSharpAPI.Migrations
                     b.ToTable("Inventors");
                 });
 
+            modelBuilder.Entity("CSharpAPI.Models.InventoryLocationModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("amount");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("InventoryId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("inventory_id");
+
+                    b.Property<int>("LocationId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("location_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InventoryId");
+
+                    b.HasIndex("LocationId");
+
+                    b.ToTable("inventory_locations");
+                });
+
             modelBuilder.Entity("CSharpAPI.Models.ItemGroupModel", b =>
                 {
                     b.Property<int>("id")
@@ -1344,6 +1380,25 @@ namespace CSharpAPI.Migrations
                         });
 
                     b.Navigation("contact");
+                });
+
+            modelBuilder.Entity("CSharpAPI.Models.InventoryLocationModel", b =>
+                {
+                    b.HasOne("CSharpAPI.Models.InventorieModel", "Inventory")
+                        .WithMany()
+                        .HasForeignKey("InventoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CSharpAPI.Models.LocationModel", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Inventory");
+
+                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("CSharpAPI.Models.Items", b =>
