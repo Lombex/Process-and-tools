@@ -24,9 +24,9 @@ namespace CSharpAPI.Service
     {
         private readonly SQLiteDatabase _Db;
         private readonly HistoryService _historyService;
-        private readonly InventoryLocationService _inventoryLocationService;
+        private readonly IInventoryLocationService  _inventoryLocationService;
 
-        public OrderService(SQLiteDatabase sQLite, HistoryService historyService, InventoryLocationService inventoryLocationService)
+        public OrderService(SQLiteDatabase sQLite, HistoryService historyService, IInventoryLocationService  inventoryLocationService)
         {
             _Db = sQLite;
             _historyService = historyService;
