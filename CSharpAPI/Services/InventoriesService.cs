@@ -86,11 +86,11 @@ namespace CSharpAPI.Service
 
             // Log de gegevens van de inventaris
             Console.WriteLine($"Archiving Inventory: {inventory.id}, {inventory.description}");
-            Console.WriteLine($"Archiving Inventory Locations: {inventory.locations}");
+            Console.WriteLine($"Archiving Inventory Locations: {JsonConvert.SerializeObject(inventory.locations)}");
 
             var archivedInventory = new ArchivedInventorieModel
             {
-                id = inventory.id,
+                id = inventory.id, // Als je de id automatisch wilt laten genereren, verwijder deze toewijzing.
                 item_id = inventory.item_id,
                 description = inventory.description,
                 item_reference = inventory.item_reference,
@@ -102,22 +102,27 @@ namespace CSharpAPI.Service
                 created_at = inventory.created_at,
                 updated_at = inventory.updated_at,
                 archived_at = DateTime.UtcNow,
-                locations = inventory.locations
+                // Clone de lijst zodat er nieuwe instanties worden gemaakt
+                locations = inventory.locations?
+                                .Select(loc => new AmountPerLocation
+                                {
+                                    location_id = loc.location_id,
+                                    amount = loc.amount
+                                })
+                                .ToList()
             };
 
             // Controleer of de archiefdata correct is gevuld
             Console.WriteLine($"Archived Inventory: {archivedInventory.id}, {archivedInventory.description}");
-            Console.WriteLine($"Archiving Inventory Locations: {archivedInventory.locations}");
+            Console.WriteLine($"Archiving Inventory Locations: {JsonConvert.SerializeObject(archivedInventory.locations)}");
+
             await _Db.ArchivedInventories.AddAsync(archivedInventory);
-
-            // Verwijder het originele record
             _Db.Inventors.Remove(inventory);
-
-            // Sla wijzigingen op
             await _Db.SaveChangesAsync();
 
             return true;
         }
+
 
         public async Task<List<InventorieModel>> GetInventoriesByItemId(string itemId)
         {

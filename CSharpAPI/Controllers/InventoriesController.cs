@@ -123,10 +123,11 @@ namespace CSharpAPI.Controllers
 
             var result = await _inventoriesService.DeleteInventory(id);
             if (result)
-                return NoContent();
+                return Ok(new { message = $"Inventory with id {id} is successfully deleted and archived." });
 
             return NotFound($"Inventory with id {id} not found.");
         }
+
 
         [HttpGet("item/{itemId}")]
         public async Task<ActionResult<IEnumerable<InventorieModel>>> GetInventoriesByItemId(string itemId)

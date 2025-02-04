@@ -89,6 +89,14 @@ namespace CSharpAPI.Data
                 entity.Property(e => e.role).IsRequired();
                 entity.HasIndex(e => e.api_key).IsUnique();
             });
+            
+            modelBuilder.Entity<ArchivedInventorieModel>()
+                .OwnsMany(a => a.locations, aBuilder =>
+                {
+                    aBuilder.WithOwner().HasForeignKey("ArchivedInventorieModelId");
+                    aBuilder.HasKey("Id"); // Definieer een shadow property "Id" als de sleutel
+                    aBuilder.Property<int>("Id").ValueGeneratedOnAdd(); // Zorgt voor automatische generatie
+                });
 
             // Configure RolePermission entity
             modelBuilder.Entity<RolePermission>(entity =>
