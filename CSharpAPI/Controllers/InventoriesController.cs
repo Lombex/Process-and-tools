@@ -86,11 +86,17 @@ namespace CSharpAPI.Controllers
         public async Task<ActionResult<InventorieModel>> CreateInventory([FromBody] InventorieModel inventory)
         {
             if (!await CheckAccess("POST"))
-                return Forbid();
+            return Forbid();
 
             if (inventory == null)
             {
-                return BadRequest("Inventory data is null.");
+            return BadRequest("Inventory data is null.");
+            }
+
+            var existingInventory = await _inventoriesService.GetInventoriesByItemId(inventory.item_id);
+            if (existingInventory.Any())
+            {
+            return Conflict("An inventory with the same item_id already exists.");
             }
 
             await _inventoriesService.AddInventory(inventory);
