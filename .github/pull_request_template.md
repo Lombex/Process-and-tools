@@ -22,11 +22,11 @@ Kies één of meerdere opties die van toepassing zijn:
 - [ ] De code bevat duidelijke en beknopte comments waar nodig  
 - [ ] De code voldoet aan de afgesproken projectconventies en stijlrichtlijnen  
 
-### **🔹 Beveiliging & Prestaties** (indien van toepassing)  
-- [ ] Geen gevoelige informatie is hardcoded in de code  
-- [ ] De code bevat geen onnodige prestatieslurpende operaties  
-- [ ] Alle externe API-aanroepen en databaseverbindingen zijn correct afgehandeld  
-
+## 🔍 **Review Regels (verplicht)**  
+🔹 **Minimaal 1 reviewer is vereist voordat een PR gemerged kan worden.**  
+🔹 **Iedereen in het team mag reviews uitvoeren.**  
+🔹 **Auteur mag zijn/haar eigen PR niet goedkeuren.**  
+🔹 **Feedback moet constructief en professioneel zijn.**  
 ## 🔍 **Review Notes**  
 <!-- Noteer hier specifieke punten waarop je graag feedback ontvangt van de reviewer. -->  
 
