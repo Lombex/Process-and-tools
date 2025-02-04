@@ -67,7 +67,9 @@ API_KEY: admin_key_2024
 ### Get Inventorie item
 GET http://localhost:5001/api/v1/inventories/item/ITEM001
 Content-Type: application/json
+API_KEY: admin_key_2024
 
 ### Get Inventorie location
 GET http://localhost:5001/api/v1/inventories/location/0
 Content-Type: application/json
+API_KEY: admin_key_2024
