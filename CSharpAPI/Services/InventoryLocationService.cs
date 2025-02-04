@@ -107,7 +107,7 @@ namespace CSharpAPI.Services.V2
             inventory.total_on_hand = 0;
 
             foreach (var location in inventory.locations) inventory.total_on_hand += location.amount;
-            inventory.total_available = inventory.total_ordered - inventory.total_allocated;
+            inventory.total_available = inventory.total_on_hand - inventory.total_ordered;
 
             _db.Inventors.Update(inventory);
             await _db.SaveChangesAsync();

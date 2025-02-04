@@ -46,10 +46,9 @@ namespace CSharpAPI.Service
         {
             inventory.created_at = DateTime.UtcNow;
             inventory.updated_at = DateTime.UtcNow;
-            inventory.total_on_hand = 0;
-            inventory.total_available = inventory.total_ordered - inventory.total_allocated;
+            inventory.total_on_hand = 0;      
             foreach (var location in inventory.locations) inventory.total_on_hand += location.amount;
-
+            inventory.total_available = inventory.total_on_hand - inventory.total_ordered;
             await _Db.Inventors.AddAsync(inventory);
             await _Db.SaveChangesAsync();
         }
