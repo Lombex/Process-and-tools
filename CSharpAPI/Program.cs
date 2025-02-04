@@ -135,5 +135,5 @@ using (var scope = app.Services.CreateScope())
         throw;
     }
 }
-
+Console.WriteLine();
 app.Run();
