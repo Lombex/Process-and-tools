@@ -157,8 +157,7 @@ namespace CSharpAPI.Service
                     throw new Exception($"Inventory not found for item {item.item_id}");
                 }
 
-                // Increase total_expected and total_ordered
-                inventory.total_expected += item.amount;
+                // Increase total_ordered
                 inventory.total_ordered += item.amount;
 
                 _Db.Inventors.Update(inventory);

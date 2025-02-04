@@ -28,8 +28,8 @@ API_KEY: admin_key_2024
     }
   ],
   "total_on_hand": 0,
-  "total_expected": 100,
-  "total_ordered": 100,
+  "total_expected": 0,
+  "total_ordered": 0,
   "total_allocated": 100,
   "total_available": 0
 }
@@ -61,7 +61,7 @@ API_KEY: admin_key_2024
 }
 
 ### Delete Inventorie
-DELETE http://localhost:5001/api/v1/inventories/4
+DELETE http://localhost:5001/api/v1/inventories/1
 Content-Type: application/json
 API_KEY: admin_key_2024
 
