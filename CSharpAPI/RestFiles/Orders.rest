@@ -38,12 +38,8 @@ API_KEY: admin_key_2024
   "total_surcharge": 77.6,
   "items": [
       {
-          "item_id": "P007435",
-          "amount": 23
-      },
-      {
-          "item_id": "P009557",
-          "amount": 1
+          "item_id": "ITEM001",
+          "amount": 24
       }
   ]      
 }
@@ -58,7 +54,7 @@ API_KEY: admin_key_2024
 }
 
 ### Delete order
-DELETE http://localhost:5001/api/v1/orders/1
+DELETE http://localhost:5001/api/v1/orders/4
 Content-Type: application/json
 API_KEY: admin_key_2024
 

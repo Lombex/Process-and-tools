@@ -147,11 +147,24 @@ namespace CSharpAPI.Service
             await _Db.Order.AddAsync(order);
             await _Db.SaveChangesAsync();
 
-            // Allocate inventory
+            // Update inventory records
             foreach (var item in order.items)
             {
-                await _inventoryLocationService.PlaceOrder(item.item_id, item.amount);
+                var inventory = await _Db.Inventors.FirstOrDefaultAsync(i => i.item_id == item.item_id);
+
+                if (inventory == null)
+                {
+                    throw new Exception($"Inventory not found for item {item.item_id}");
+                }
+
+                // Increase total_expected and total_ordered
+                inventory.total_expected += item.amount;
+                inventory.total_ordered += item.amount;
+
+                _Db.Inventors.Update(inventory);
             }
+
+            await _Db.SaveChangesAsync();
 
             await _historyService.LogAsync(EntityType.Order, order.id.ToString(), "Created", $"Order {order.reference} created.");
         }
