@@ -102,14 +102,12 @@ namespace CSharpAPI.Services.V2
         public async Task UpdateCalculatedFields(int inventoryId)
         {
             var inventory = await _db.Inventors.FindAsync(inventoryId);
-            if (inventory == null)
-                throw new Exception("Inventory not found");
+            if (inventory == null) throw new Exception("Inventory not found");
 
-            var totalOnHand = await _db.InventoryLocations.Where(il => il.InventoryId == inventoryId).SumAsync(il => il.Amount);
+            inventory.total_on_hand = 0;
 
-            inventory.total_on_hand = (int)totalOnHand;
-            inventory.total_available = (int)totalOnHand - inventory.total_allocated;
-            inventory.total_expected = (int)totalOnHand + inventory.total_ordered; // Check if this logic fits your requirements
+            foreach (var location in inventory.locations) inventory.total_on_hand += location.amount;
+            inventory.total_available = inventory.total_ordered - inventory.total_allocated;
 
             _db.Inventors.Update(inventory);
             await _db.SaveChangesAsync();

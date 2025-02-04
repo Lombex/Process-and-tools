@@ -60,7 +60,7 @@ API_KEY: admin_key_2024
 }
 
 ### Delete Inventorie
-DELETE http://localhost:5001/api/v1/inventories/7
+DELETE http://localhost:5001/api/v1/inventories/4
 Content-Type: application/json
 API_KEY: admin_key_2024
 
