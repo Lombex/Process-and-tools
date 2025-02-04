@@ -134,7 +134,7 @@ namespace CSharpAPI.Service
         {
             if (order == null) throw new ArgumentNullException(nameof(order));
 
-            // Validate that order references exist
+            // Validate shipping and billing references
             if (!(await _Db.ClientModels.AnyAsync(client => client.id == order.ship_to)))
                 throw new Exception($"Shipping address with Client ID {order.ship_to} does not exist.");
 
@@ -147,7 +147,7 @@ namespace CSharpAPI.Service
             await _Db.Order.AddAsync(order);
             await _Db.SaveChangesAsync();
 
-            // Update inventory records
+            // Update inventory for each item in the order
             foreach (var item in order.items)
             {
                 var inventory = await _Db.Inventors.FirstOrDefaultAsync(i => i.item_id == item.item_id);
@@ -157,8 +157,11 @@ namespace CSharpAPI.Service
                     throw new Exception($"Inventory not found for item {item.item_id}");
                 }
 
-                // Increase total_ordered
+                // Update total_ordered
                 inventory.total_ordered += item.amount;
+
+                // Corrected Calculation for total_available
+                inventory.total_available = inventory.total_on_hand - inventory.total_ordered;
 
                 _Db.Inventors.Update(inventory);
             }
@@ -167,6 +170,7 @@ namespace CSharpAPI.Service
 
             await _historyService.LogAsync(EntityType.Order, order.id.ToString(), "Created", $"Order {order.reference} created.");
         }
+
 
         public async Task DeleteOrder(int id)
         {

@@ -39,7 +39,7 @@ API_KEY: admin_key_2024
   "items": [
       {
           "item_id": "ITEM001",
-          "amount": 24
+          "amount": 100
       }
   ]      
 }

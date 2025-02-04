@@ -4,7 +4,7 @@ Content-Type: application/json
 API_KEY: admin_key_2024
 
 ### Get inventorie id
-GET http://localhost:5001/api/v1/inventories/1
+GET http://localhost:5001/api/v1/inventories/4
 Content-Type: application/json
 API_KEY: admin_key_2024
 
@@ -20,17 +20,17 @@ API_KEY: admin_key_2024
   "locations": [
     {
       "location_id": 1,
-      "amount": 10
+      "amount": 200
     }, 
     {
       "location_id": 2,
-      "amount": 5
+      "amount": 200
     }
   ],
   "total_on_hand": 0,
   "total_expected": 0,
   "total_ordered": 0,
-  "total_allocated": 100,
+  "total_allocated": 0,
   "total_available": 0
 }
 
@@ -61,7 +61,7 @@ API_KEY: admin_key_2024
 }
 
 ### Delete Inventorie
-DELETE http://localhost:5001/api/v1/inventories/1
+DELETE http://localhost:5001/api/v1/inventories/4
 Content-Type: application/json
 API_KEY: admin_key_2024
 
