@@ -65,24 +65,24 @@ jobs:
             /p:CoverletOutput=./TestResults/Coverage/ \
             /p:CoverletOutputFormat=cobertura
 
-      # - name: Run Unit Tests with coverage
-      #   run: |
-      #     dotnet test ${{ env.UNIT_TEST_PROJECT_PATH }} \
-      #       --configuration Release \
-      #       --no-restore \
-      #       --verbosity normal \
-      #       --collect:"XPlat Code Coverage" \
-      #       /p:CollectCoverage=true \
-      #       /p:CoverletOutput=./TestResults/Coverage/ \
-      #       /p:CoverletOutputFormat=cobertura
+      - name: Run Unit Tests with coverage
+        run: |
+          dotnet test ${{ env.UNIT_TEST_PROJECT_PATH }} \
+            --configuration Release \
+            --no-restore \
+            --verbosity normal \
+            --collect:"XPlat Code Coverage" \
+            /p:CollectCoverage=true \
+            /p:CoverletOutput=./TestResults/Coverage/ \
+            /p:CoverletOutputFormat=cobertura
 
-      # - name: Generate coverage report
-      #   run: |
-      #     dotnet tool install -g dotnet-reportgenerator-globaltool
-      #     reportgenerator \
-      #     "-reports:./Integration.Tests/TestResults/Coverage/coverage.cobertura.xml;./Unit.Tests/TestResults/Coverage/coverage.cobertura.xml" \
-      #     "-targetdir:coveragereport" \
-      #     "-reporttypes:TextSummary;Html;Cobertura"
+      - name: Generate coverage report
+        run: |
+          dotnet tool install -g dotnet-reportgenerator-globaltool
+          reportgenerator \
+          "-reports:./Integration.Tests/TestResults/Coverage/coverage.cobertura.xml;./Unit.Tests/TestResults/Coverage/coverage.cobertura.xml" \
+          "-targetdir:coveragereport" \
+          "-reporttypes:TextSummary;Html;Cobertura"
 
       - name: Add coverage report to job summary
         run: |
