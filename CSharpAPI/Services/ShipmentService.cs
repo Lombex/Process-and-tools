@@ -57,34 +57,49 @@ namespace CSharpAPI.Service
             await _Db.SaveChangesAsync();
         } 
 
-        public async Task Add(ShipmentModel shipment)
+public async Task Add(ShipmentModel shipment)
+{
+    if (shipment == null) 
+        throw new ArgumentNullException(nameof(shipment));
+
+    var order = await _Db.Order
+        .Where(o => o.id == shipment.order_id)
+        .FirstOrDefaultAsync();
+
+    if (order == null)
+        throw new Exception($"Order with ID {shipment.order_id} does not exist!");
+
+    var orderItems = await _Db.Order
+        .Where(o => o.id == shipment.order_id)
+        .Select(o => o.items)
+        .FirstOrDefaultAsync();
+
+    if (orderItems == null || !orderItems.Any())
+        throw new Exception($"Order with ID {shipment.order_id} has no items!");
+
+    shipment.items = orderItems;
+
+    // Move items from ordered to allocated
+    foreach (var item in shipment.items)
+    {
+        var inventory = await _Db.Inventors.FirstOrDefaultAsync(i => i.item_id == item.item_id);
+        if (inventory != null)
         {
-            if (shipment == null) 
-                throw new ArgumentNullException(nameof(shipment));
-
-            // ✅ Ensure the order exists before creating the shipment
-            var order = await _Db.Order
-                .Where(o => o.id == shipment.order_id)
-                .FirstOrDefaultAsync();
-
-            if (order == null)
-                throw new Exception($"Order with ID {shipment.order_id} does not exist! Cannot create shipment.");
-
-            // ✅ Extract items manually (Fix for EF Core JSON storage)
-            var orderItems = await _Db.Order
-                .Where(o => o.id == shipment.order_id)
-                .Select(o => o.items)
-                .FirstOrDefaultAsync();
-
-            if (orderItems == null || !orderItems.Any())
-                throw new Exception($"Order with ID {shipment.order_id} has no items! Cannot create shipment.");
-
-            // ✅ Auto-fill items from order
-            shipment.items = orderItems;
-
-            await _Db.Shipment.AddAsync(shipment);
-            await _Db.SaveChangesAsync();
+            inventory.total_ordered -= item.amount;  // Remove from ordered
+            inventory.total_allocated += item.amount;  // Add to allocated
+            inventory.total_available = (inventory.total_on_hand + inventory.total_expected) - 
+                                     (inventory.total_ordered + inventory.total_allocated);
+            _Db.Inventors.Update(inventory);
         }
+    }
+
+    await _Db.Shipment.AddAsync(shipment);
+    await _Db.SaveChangesAsync();
+    
+    order.shipment_id = shipment.id;
+    _Db.Order.Update(order);
+    await _Db.SaveChangesAsync();
+}
 
         public async Task Update(int id, ShipmentModel shipment)
         {
