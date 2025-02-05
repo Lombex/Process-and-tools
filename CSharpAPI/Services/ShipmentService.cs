@@ -59,6 +59,7 @@ namespace CSharpAPI.Service
 
 public async Task Add(ShipmentModel shipment)
 {
+    
     if (shipment == null) 
         throw new ArgumentNullException(nameof(shipment));
 
@@ -83,6 +84,10 @@ public async Task Add(ShipmentModel shipment)
     foreach (var item in shipment.items)
     {
         var inventory = await _Db.Inventors.FirstOrDefaultAsync(i => i.item_id == item.item_id);
+        if (shipment.shipment_type == "I") 
+        {
+            inventory.total_expected += item.amount;  // Voeg toe aan verwachte voorraad
+        }
         if (inventory != null)
         {
             inventory.total_ordered -= item.amount;  // Remove from ordered
@@ -91,6 +96,7 @@ public async Task Add(ShipmentModel shipment)
                                      (inventory.total_ordered + inventory.total_allocated);
             _Db.Inventors.Update(inventory);
         }
+
     }
 
     await _Db.Shipment.AddAsync(shipment);
