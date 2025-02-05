@@ -193,18 +193,32 @@ namespace CSharpAPI.Service
                 if (inventory.total_ordered < 0)
                     inventory.total_ordered = 0;
 
-                inventory.total_available = (inventory.total_on_hand + inventory.total_expected) - 
-                                            (inventory.total_ordered + inventory.total_allocated);
-            }
+                inventory.total_allocated -= order.items
+                    .Where(it => it.item_id == inventory.item_id)
+                    .Sum(it => it.amount);
 
+                if (inventory.total_allocated < 0)
+                    inventory.total_allocated = 0;
+
+                inventory.total_available = (inventory.total_on_hand + inventory.total_expected) 
+                                        - (inventory.total_ordered + inventory.total_allocated);
+            }
 
             _Db.Inventors.UpdateRange(inventories);
 
+            var shipments = await _Db.Shipment
+                .Where(s => s.id == order.shipment_id)
+                .ToListAsync();
+
+            if (shipments.Any())
+            {
+                _Db.Shipment.RemoveRange(shipments);
+            }
 
             _Db.Order.Remove(order);
             await _Db.SaveChangesAsync();
 
-            await _historyService.LogAsync(EntityType.Order, id.ToString(), "Deleted", $"Order {order.reference} deleted.");
+            await _historyService.LogAsync(EntityType.Order, id.ToString(), "Deleted", $"Order {order.reference} and linked shipments deleted.");
         }
 
 

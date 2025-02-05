@@ -25,13 +25,13 @@ API_KEY: admin_key_2024
 
 {
 
-  "order_id": 1,
+  "order_id": 3,
   "source_id": 33,
   "order_date": "2000-03-09",
   "request_date": "2000-03-11",
   "shipment_date": "2000-03-13",
-  "shipment_type": "I",
-  "shipment_status": "Pending",
+  "shipment_type": "O",
+  "shipment_status": "Transit",
   "notes": "Newly created shipment!!!",
   "carrier_code": "DPD",
   "carrier_description": "Dynamic Parcel Distribution",
@@ -64,7 +64,7 @@ API_KEY: admin_key_2024
 }
 
 ### Delete shipment
-DELETE http://localhost:5001/api/v1/shipments/5
+DELETE http://localhost:5001/api/v1/shipments/2
 Content-Type: application/json
 API_KEY: admin_key_2024
 

@@ -54,7 +54,7 @@ API_KEY: admin_key_2024
 }
 
 ### Delete order
-DELETE http://localhost:5001/api/v1/orders/4
+DELETE http://localhost:5001/api/v1/orders/3
 Content-Type: application/json
 API_KEY: admin_key_2024
 
