@@ -36,7 +36,10 @@ namespace CSharpAPI.Services.V2
 
         public async Task<InventoryLocationModel> GetById(int id)
         {
-            return await _db.InventoryLocations.Include(il => il.Inventory).Include(il => il.Location).FirstOrDefaultAsync(il => il.Id == id);
+            return await _db.InventoryLocations
+                .Include(il => il.Inventory)
+                .Include(il => il.Location)
+                .FirstOrDefaultAsync(il => il.Id == id);
         }
 
         public async Task<InventoryLocationModel> Create(InventoryLocationModel model)
@@ -63,10 +66,9 @@ namespace CSharpAPI.Services.V2
 
             _db.InventoryLocations.Add(newRecord);
             await _db.SaveChangesAsync();
-
             await UpdateCalculatedFields(model.InventoryId);
 
-            return await GetById(newRecord.Id); // Reload to include navigation properties
+            return await GetById(newRecord.Id); 
         }
 
         public async Task<InventoryLocationModel> Update(int id, InventoryLocationModel model)
@@ -84,7 +86,6 @@ namespace CSharpAPI.Services.V2
 
             _db.InventoryLocations.Update(record);
             await _db.SaveChangesAsync();
-
             await UpdateCalculatedFields(model.InventoryId);
 
             return record;
@@ -95,18 +96,57 @@ namespace CSharpAPI.Services.V2
             var record = await GetById(id);
             _db.InventoryLocations.Remove(record);
             await _db.SaveChangesAsync();
-
             await UpdateCalculatedFields(record.InventoryId);
         }
 
         public async Task UpdateCalculatedFields(int inventoryId)
         {
-            var inventory = await _db.Inventors.FindAsync(inventoryId);
+            var inventory = await _db.Inventors
+                .Include(i => i.locations)
+                .FirstOrDefaultAsync(i => i.id == inventoryId);
+
             if (inventory == null) throw new Exception("Inventory not found");
 
-            inventory.total_on_hand = 0;
+            inventory.total_on_hand = inventory.locations?.Sum(loc => loc.amount) ?? 0;
 
-            foreach (var location in inventory.locations) inventory.total_on_hand += location.amount;
+            // ✅ Count incoming shipments (`shipment_status = "I"`)
+            var shipments = await _db.Shipment
+                .Include(s => s.items)
+                .Where(s => s.shipment_status == "I")
+                .ToListAsync();
+
+            inventory.total_expected = shipments
+                .SelectMany(s => s.items)
+                .Where(i => i.item_id == inventory.item_id)
+                .Sum(i => i.amount);
+
+            // ✅ Update `total_ordered` from `PENDING` orders
+            var pendingOrders = await _db.Order
+                .Include(o => o.items)
+                .Where(o => o.order_status == "Pending")
+                .ToListAsync();
+
+            inventory.total_ordered = pendingOrders
+                .SelectMany(o => o.items)
+                .Where(i => i.item_id == inventory.item_id)
+                .Sum(i => i.amount);
+
+            // ✅ Update `total_allocated` for `DELIVERED` orders with `TRANSIT` shipments
+            var allocatedOrders = await _db.Order
+                .Where(o => o.order_status == "Delivered")
+                .Join(_db.Shipment,
+                    o => o.id,
+                    s => s.order_id,
+                    (o, s) => new { Order = o, Shipment = s })
+                .Where(os => os.Shipment.shipment_status == "Transit")
+                .ToListAsync();
+
+            inventory.total_allocated = allocatedOrders
+                .SelectMany(os => os.Order.items)
+                .Where(i => i.item_id == inventory.item_id)
+                .Sum(i => i.amount);
+
+            // ✅ Calculate `total_available`
             inventory.total_available = (inventory.total_on_hand + inventory.total_expected) - (inventory.total_ordered + inventory.total_allocated);
 
             _db.Inventors.Update(inventory);
@@ -119,7 +159,7 @@ namespace CSharpAPI.Services.V2
             if (inventory != null)
             {
                 inventory.total_on_hand += (int)amountReceived;
-                inventory.total_expected -= (int)amountReceived; // Adjust if shipment is part of expected inventory
+                inventory.total_expected -= (int)amountReceived;
                 await _db.SaveChangesAsync();
             }
         }
@@ -130,8 +170,7 @@ namespace CSharpAPI.Services.V2
             if (inventory == null)
                 throw new Exception($"Inventory not found for item ID {itemId}");
 
-            inventory.total_ordered += (int)amountOrdered;
-            inventory.total_available = (inventory.total_on_hand + inventory.total_expected) - (inventory.total_ordered + inventory.total_allocated);
+            await UpdateCalculatedFields(inventory.id);
 
             _db.Inventors.Update(inventory);
             await _db.SaveChangesAsync();
@@ -143,9 +182,8 @@ namespace CSharpAPI.Services.V2
             if (inventory == null)
                 throw new Exception($"Inventory not found for item ID {itemId}");
 
-            // Reduce allocated stock and adjust available stock
-            inventory.total_allocated -= amount;
-            if (inventory.total_ordered < 0) inventory.total_ordered = 0;
+            inventory.total_allocated = Math.Max(0, inventory.total_allocated - amount);
+            inventory.total_ordered = Math.Max(0, inventory.total_ordered - amount);
 
             inventory.total_available = (inventory.total_on_hand + inventory.total_expected) - (inventory.total_ordered + inventory.total_allocated);
 

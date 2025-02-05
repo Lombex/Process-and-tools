@@ -4,6 +4,7 @@ namespace CSharpAPI.Models
     { 
         public int id { get; set; }
         public int source_id { get; set; }
+        public int order_id { get; set; }
         public string? order_date { get; set; }
         public string? request_date { get; set; }
         public string? shipment_date { get; set; }

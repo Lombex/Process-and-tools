@@ -59,7 +59,29 @@ namespace CSharpAPI.Service
 
         public async Task Add(ShipmentModel shipment)
         {
-            if (shipment == null) throw new ArgumentNullException(nameof(shipment));
+            if (shipment == null) 
+                throw new ArgumentNullException(nameof(shipment));
+
+            // ✅ Ensure the order exists before creating the shipment
+            var order = await _Db.Order
+                .Where(o => o.id == shipment.order_id)
+                .FirstOrDefaultAsync();
+
+            if (order == null)
+                throw new Exception($"Order with ID {shipment.order_id} does not exist! Cannot create shipment.");
+
+            // ✅ Extract items manually (Fix for EF Core JSON storage)
+            var orderItems = await _Db.Order
+                .Where(o => o.id == shipment.order_id)
+                .Select(o => o.items)
+                .FirstOrDefaultAsync();
+
+            if (orderItems == null || !orderItems.Any())
+                throw new Exception($"Order with ID {shipment.order_id} has no items! Cannot create shipment.");
+
+            // ✅ Auto-fill items from order
+            shipment.items = orderItems;
+
             await _Db.Shipment.AddAsync(shipment);
             await _Db.SaveChangesAsync();
         }
