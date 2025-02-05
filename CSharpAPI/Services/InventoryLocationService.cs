@@ -107,7 +107,7 @@ namespace CSharpAPI.Services.V2
             inventory.total_on_hand = 0;
 
             foreach (var location in inventory.locations) inventory.total_on_hand += location.amount;
-            inventory.total_available = inventory.total_on_hand - inventory.total_ordered;
+            inventory.total_available = (inventory.total_on_hand + inventory.total_expected) - (inventory.total_ordered + inventory.total_allocated);
 
             _db.Inventors.Update(inventory);
             await _db.SaveChangesAsync();
@@ -130,8 +130,8 @@ namespace CSharpAPI.Services.V2
             if (inventory == null)
                 throw new Exception($"Inventory not found for item ID {itemId}");
 
-            inventory.total_allocated += (int)amountOrdered;
-            inventory.total_available = inventory.total_on_hand - inventory.total_allocated;
+            inventory.total_ordered += (int)amountOrdered;
+            inventory.total_available = (inventory.total_on_hand + inventory.total_expected) - (inventory.total_ordered + inventory.total_allocated);
 
             _db.Inventors.Update(inventory);
             await _db.SaveChangesAsync();
@@ -145,9 +145,9 @@ namespace CSharpAPI.Services.V2
 
             // Reduce allocated stock and adjust available stock
             inventory.total_allocated -= amount;
-            if (inventory.total_allocated < 0) inventory.total_allocated = 0;
+            if (inventory.total_ordered < 0) inventory.total_ordered = 0;
 
-            inventory.total_available = inventory.total_on_hand - inventory.total_allocated;
+            inventory.total_available = (inventory.total_on_hand + inventory.total_expected) - (inventory.total_ordered + inventory.total_allocated);
 
             _db.Inventors.Update(inventory);
             await _db.SaveChangesAsync();
