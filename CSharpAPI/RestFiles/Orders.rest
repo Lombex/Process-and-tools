@@ -24,7 +24,7 @@ API_KEY: admin_key_2024
   "request_date": "2019-04-07T11:33:15Z",
   "reference": "ORD00001",
   "reference_extra": "Bedreven arm straffen bureau.",
-  "order_status": "Delivered",
+  "order_status": "Pending",
   "notes": "Voedsel vijf vork heel.",
   "shipping_notes": "Buurman betalen plaats bewolkt.",
   "picking_notes": "Ademen fijn volgorde scherp aardappel op leren.",
