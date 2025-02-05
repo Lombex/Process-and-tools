@@ -105,30 +105,72 @@ namespace CSharpAPI.Service
         public async Task UpdateOrders(int id, OrderModel updatedOrder)
         {
             var existingOrder = await GetOrderById(id);
+            
+            if (existingOrder == null)
+                throw new Exception("Order not found!");
 
-            foreach (var updatedItem in updatedOrder.items)
+            // Update order details
+            existingOrder.reference_extra = updatedOrder.reference_extra ?? existingOrder.reference_extra;
+            existingOrder.reference = updatedOrder.reference ?? existingOrder.reference;
+            existingOrder.order_status = updatedOrder.order_status ?? existingOrder.order_status;
+            existingOrder.order_date = updatedOrder.order_date ?? existingOrder.order_date;
+            existingOrder.request_date = updatedOrder.request_date ?? existingOrder.request_date;
+            existingOrder.notes = updatedOrder.notes ?? existingOrder.notes;
+            existingOrder.shipping_notes = updatedOrder.shipping_notes ?? existingOrder.shipping_notes;
+            existingOrder.picking_notes = updatedOrder.picking_notes ?? existingOrder.picking_notes;
+            existingOrder.warehouse_id = updatedOrder.warehouse_id != 0 ? updatedOrder.warehouse_id : existingOrder.warehouse_id;
+            existingOrder.ship_to = updatedOrder.ship_to != 0 ? updatedOrder.ship_to : existingOrder.ship_to;
+            existingOrder.bill_to = updatedOrder.bill_to != 0 ? updatedOrder.bill_to : existingOrder.bill_to;
+            existingOrder.total_amount = updatedOrder.total_amount != 0 ? updatedOrder.total_amount : existingOrder.total_amount;
+            existingOrder.total_discount = updatedOrder.total_discount != 0 ? updatedOrder.total_discount : existingOrder.total_discount;
+            existingOrder.total_tax = updatedOrder.total_tax != 0 ? updatedOrder.total_tax : existingOrder.total_tax;
+            existingOrder.total_surcharge = updatedOrder.total_surcharge != 0 ? updatedOrder.total_surcharge : existingOrder.total_surcharge;
+
+            // Ensure order has items
+            if (existingOrder.items == null)
+                existingOrder.items = new List<Items>();
+
+            if (updatedOrder.items != null && updatedOrder.items.Any())
             {
-                var originalItem = existingOrder.items.FirstOrDefault(i => i.item_id == updatedItem.item_id);
-
-                if (originalItem != null && originalItem.amount != updatedItem.amount)
+                foreach (var updatedItem in updatedOrder.items)
                 {
-                    int quantityChange = updatedItem.amount - originalItem.amount;
+                    var originalItem = existingOrder.items.FirstOrDefault(i => i.item_id == updatedItem.item_id);
 
-                    if (quantityChange > 0)
+                    if (originalItem != null)
                     {
-                        await _inventoryLocationService.PlaceOrder(updatedItem.item_id, quantityChange);
+                        int quantityChange = updatedItem.amount - originalItem.amount;
+
+                        if (quantityChange > 0)
+                        {
+                            await _inventoryLocationService.PlaceOrder(updatedItem.item_id, quantityChange);
+                        }
+                        else if (quantityChange < 0)
+                        {
+                            await _inventoryLocationService.RemoveOrder(updatedItem.item_id, -quantityChange);
+                        }
+
+                        originalItem.amount = updatedItem.amount;
                     }
                     else
                     {
-                        await _inventoryLocationService.RemoveOrder(updatedItem.item_id, -quantityChange);
+                        // If item doesn't exist, add it to order
+                        existingOrder.items.Add(new Items { item_id = updatedItem.item_id, amount = updatedItem.amount });
+
+                        // Update inventory for new item
+                        await _inventoryLocationService.PlaceOrder(updatedItem.item_id, updatedItem.amount);
                     }
                 }
             }
 
+            existingOrder.updated_at = DateTime.UtcNow;
+
             _Db.Order.Update(existingOrder);
             await _Db.SaveChangesAsync();
+            
             await _historyService.LogAsync(EntityType.Order, id.ToString(), "Updated", $"Order {existingOrder.reference} updated.");
         }
+
+
 
         public async Task CreateOrder(OrderModel order)
         {

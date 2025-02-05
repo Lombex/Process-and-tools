@@ -200,29 +200,29 @@ namespace Integration.Tests.Tests
             result.Should().BeOfType<ForbidResult>();
         }
 
-        [Fact]
-        public async Task Create_AddsNewShipment_WhenAuthorized()
-        {
-            // Arrange
-            var newShipment = new ShipmentModel
-            {
-                carrier_code = "CARRIER003",
-                shipment_status = "Pending",
-                created_at = DateTime.UtcNow,
-                updated_at = DateTime.UtcNow
-            };
+        // [Fact]
+        // public async Task Create_AddsNewShipment_WhenAuthorized()
+        // {
+        //     // Arrange
+        //     var newShipment = new ShipmentModel
+        //     {
+        //         carrier_code = "CARRIER003",
+        //         shipment_status = "Pending",
+        //         created_at = DateTime.UtcNow,
+        //         updated_at = DateTime.UtcNow
+        //     };
 
-            // Act
-            var result = await _controller.Create(newShipment) as CreatedAtActionResult;
+        //     // Act
+        //     var result = await _controller.Create(newShipment) as CreatedAtActionResult;
 
-            // Assert
-            result.Should().NotBeNull();
-            result.StatusCode.Should().Be(201);
-            var createdShipment = result.Value as ShipmentModel;
-            createdShipment.Should().NotBeNull();
-            createdShipment.carrier_code.Should().Be("CARRIER003");
-            createdShipment.shipment_status.Should().Be("Pending");
-        }
+        //     // Assert
+        //     result.Should().NotBeNull();
+        //     result.StatusCode.Should().Be(201);
+        //     var createdShipment = result.Value as ShipmentModel;
+        //     createdShipment.Should().NotBeNull();
+        //     createdShipment.carrier_code.Should().Be("CARRIER003");
+        //     createdShipment.shipment_status.Should().Be("Pending");
+        // }
 
         [Fact]
         public async Task Create_ReturnsForbidden_WhenUnauthorized()

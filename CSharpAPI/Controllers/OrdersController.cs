@@ -51,7 +51,7 @@ namespace CSharpAPI.Controllers
                 Warehouse_id = x.warehouse_id,
                 Ship_to = x.ship_to,
                 Bill_to = x.bill_to,
-                // Shipment_id = x.shipment_id,
+                Shipment_id = x.shipment_id,
                 Total_amount = x.total_amount,
                 Total_discount = x.total_discount,
                 Total_tax = x.total_tax,
