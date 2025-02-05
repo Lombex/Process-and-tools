@@ -124,4 +124,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+Console.WriteLine();
+
 app.Run();
