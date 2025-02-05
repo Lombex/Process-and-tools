@@ -177,14 +177,36 @@ namespace CSharpAPI.Service
             var order = await GetOrderById(id);
             if (order == null) throw new Exception("Order not found!");
 
-            foreach (var item in order.items)
+            if (order.items == null || !order.items.Any())
+                throw new Exception("Order has no items!");
+
+            var inventories = await _Db.Inventors
+                .Where(i => order.items.Select(it => it.item_id).Contains(i.item_id))
+                .ToListAsync();
+
+            foreach (var inventory in inventories)
             {
-                await _inventoryLocationService.RemoveOrder(item.item_id, item.amount);
+                inventory.total_ordered -= order.items
+                    .Where(it => it.item_id == inventory.item_id)
+                    .Sum(it => it.amount);
+
+                if (inventory.total_ordered < 0)
+                    inventory.total_ordered = 0;
+
+                inventory.total_available = (inventory.total_on_hand + inventory.total_expected) - 
+                                            (inventory.total_ordered + inventory.total_allocated);
             }
+
+
+            _Db.Inventors.UpdateRange(inventories);
+
 
             _Db.Order.Remove(order);
             await _Db.SaveChangesAsync();
+
             await _historyService.LogAsync(EntityType.Order, id.ToString(), "Deleted", $"Order {order.reference} deleted.");
         }
+
+
     }
 }
