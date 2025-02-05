@@ -7,11 +7,6 @@ using FluentAssertions;
 using Integration.Tests.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Xunit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using CSharpAPI.Services;
 using CSharpAPI.Services.V2;
 
@@ -31,7 +26,7 @@ namespace Integration.Tests.Tests
             _inventoryLocationService = new InventoryLocationService(DbContext);
             _service = new OrderService(DbContext, _historyService, _inventoryLocationService);
             _authService = new AuthService(DbContext, Configuration);
-            _controller = new OrderController(_service, _authService);
+            _controller = new OrdersController(_service, _authService);
 
             // Set up admin auth by default
             SetupAdminUserContext(_controller);
@@ -112,7 +107,7 @@ namespace Integration.Tests.Tests
         public async Task GetAllOrders_ReturnsAllOrders_WhenAuthorized()
         {
             // Act
-            var result = await _controller.GetAll() as OkObjectResult;
+            var result = await _controller.GetAllOrders(10) as OkObjectResult;
             
             // Assert
             result.Should().NotBeNull();
@@ -132,7 +127,7 @@ namespace Integration.Tests.Tests
             SetupUserContextByRole(_controller, "Operative");
 
             // Act
-            var result = await _controller.GetAll();
+            var result = await _controller.GetAllOrders(10);
 
             // Assert
             result.Should().BeOfType<ObjectResult>();
@@ -149,7 +144,7 @@ namespace Integration.Tests.Tests
             order.Should().NotBeNull();
 
             // Act
-            var result = await _controller.Get(order.id) as OkObjectResult;
+            var result = await _controller.GetOrdersById(order.id) as OkObjectResult;
             var returnedOrder = result?.Value as OrderModel;
 
             // Assert
@@ -182,7 +177,7 @@ namespace Integration.Tests.Tests
             };
 
             // Act
-            var result = await _controller.Post(newOrder) as CreatedAtActionResult;
+            var result = await _controller.CreateOrder(newOrder) as CreatedAtActionResult;
 
             // Assert
             result.Should().NotBeNull();
@@ -211,7 +206,7 @@ namespace Integration.Tests.Tests
             };
 
             // Act
-            var result = await _controller.Put(order.id, updateOrder) as OkObjectResult;
+            var result = await _controller.UpdateOrders(order.id, updateOrder) as OkObjectResult;
 
             // Assert
             result.Should().NotBeNull();
@@ -232,7 +227,7 @@ namespace Integration.Tests.Tests
             order.Should().NotBeNull();
 
             // Act
-            var result = await _controller.Delete(order.id) as OkObjectResult;
+            var result = await _controller.DeleteOrder(order.id) as OkObjectResult;
 
             // Assert
             result.Should().NotBeNull();
@@ -251,7 +246,7 @@ namespace Integration.Tests.Tests
             order.Should().NotBeNull();
 
             // Act
-            var result = await _controller.Delete(order.id);
+            var result = await _controller.DeleteOrder(order.id);
 
             // Assert
             result.Should().BeOfType<ObjectResult>();
