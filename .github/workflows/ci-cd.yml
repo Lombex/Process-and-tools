@@ -73,10 +73,10 @@ jobs:
           "-targetdir:coveragereport" \
           "-reporttypes:TextSummary;Html;Cobertura"
 
-      - name: Add coverage report to job summary
-        run: |
-          echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
-          cat coveragereport/Summary.txt >> $GITHUB_STEP_SUMMARY
+      # - name: Add coverage report to job summary
+      #   run: |
+      #     echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
+      #     cat coveragereport/Summary.txt >> $GITHUB_STEP_SUMMARY
 
       - name: Check branch coverage threshold
         run: |
